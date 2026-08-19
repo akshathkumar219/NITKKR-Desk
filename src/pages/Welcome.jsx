@@ -15,12 +15,21 @@ export default function Welcome() {
   }
 
   return (
-    <div className="grid min-h-dvh place-items-center px-4 py-10">
-      <Panel className="animate-flip w-full max-w-lg p-6 sm:p-8">
-        <p className="label muted">BOARD · INITIALISING</p>
+    <div className="world-grain relative grid min-h-dvh place-items-center overflow-hidden px-4 py-10">
+      <div
+        className="world world-halftone"
+        style={{
+          color: 'var(--primary)',
+          maskImage: 'radial-gradient(circle at 50% 40%, #000, transparent 65%)',
+          WebkitMaskImage: 'radial-gradient(circle at 50% 40%, #000, transparent 65%)',
+        }}
+        aria-hidden
+      />
+      <Panel className="animate-flip relative z-10 w-full max-w-lg p-6 sm:p-8">
+        <span className="sticker">NEW HERE</span>
 
-        <h1 className="heading mt-4 text-4xl sm:text-5xl">
-          What should
+        <h1 className="display mt-5 text-4xl sm:text-5xl">
+          what should
           <br />
           the board
           <br />

@@ -29,7 +29,7 @@ const SECTIONS = [
   { id: 'skip', label: 'SKIP GUARD', icon: ShieldCheck, accent: 'var(--color-acid)' },
   { id: 'cgpa', label: 'CGPA', icon: Calculator, accent: 'var(--color-sky)' },
   { id: 'transport', label: 'TRANSPORT', icon: Bus, accent: 'var(--color-teal)' },
-  { id: 'links', label: 'LINKS', icon: LinkIcon, accent: 'var(--surface)' },
+  { id: 'links', label: 'LINKS', icon: LinkIcon, accent: 'var(--surface)', neutral: true },
   { id: 'placements', label: 'PLACEMENTS', icon: Briefcase, accent: 'var(--color-coral)' },
   { id: 'backup', label: 'BACKUP', icon: HardDriveDownload, accent: 'var(--color-amber)' },
 ]
@@ -264,7 +264,7 @@ export default function Tools() {
               key={s.id}
               href={`#${s.id}`}
               className="btn"
-              style={{ background: s.accent, color: 'var(--color-ink)' }}
+              style={{ background: s.accent, color: s.neutral ? 'var(--text)' : 'var(--color-ink)' }}
             >
               <s.icon size={14} strokeWidth={2.5} /> {s.label}
             </a>

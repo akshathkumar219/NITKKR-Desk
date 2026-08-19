@@ -84,7 +84,7 @@ export function Segmented({ options, value, onChange, label, size = 'md' }) {
               padding: size === 'sm' ? '0.3rem 0.55rem' : '0.45rem 0.8rem',
               fontSize: size === 'sm' ? '0.625rem' : '0.6875rem',
               ...(active
-                ? { background: 'var(--color-ink)', color: 'var(--color-paper)' }
+                ? { background: 'var(--text)', color: 'var(--bg)' }
                 : null),
             }}
           >
@@ -100,10 +100,23 @@ export function Segmented({ options, value, onChange, label, size = 'md' }) {
 
 export function EmptyState({ title, hint, action }) {
   return (
-    <Panel className="px-6 py-14 text-center" hard={false}>
-      <p className="heading text-xl sm:text-2xl">{title}</p>
-      {hint ? <p className="label muted mx-auto mt-3 max-w-md">{hint}</p> : null}
-      {action ? <div className="mt-6 flex justify-center">{action}</div> : null}
+    // §10 lists empty states as high-personality territory — one of the few
+    // places the display face earns its keep outside the landing page.
+    <Panel className="relative overflow-hidden px-6 py-14 text-center" hard={false}>
+      <div
+        className="world world-halftone"
+        style={{
+          color: 'var(--primary)',
+          maskImage: 'radial-gradient(ellipse at center, #000, transparent 70%)',
+          WebkitMaskImage: 'radial-gradient(ellipse at center, #000, transparent 70%)',
+        }}
+        aria-hidden
+      />
+      <div className="relative z-10">
+        <p className="display text-3xl sm:text-4xl">{title}</p>
+        {hint ? <p className="label muted mx-auto mt-4 max-w-md normal-case">{hint}</p> : null}
+        {action ? <div className="mt-7 flex justify-center">{action}</div> : null}
+      </div>
     </Panel>
   )
 }

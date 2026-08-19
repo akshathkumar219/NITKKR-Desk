@@ -34,7 +34,7 @@ export default function Profile() {
       <Panel className="p-4 sm:p-6">
         <div className="flex items-center gap-4">
           <span
-            className="grid size-14 shrink-0 place-items-center border-2 border-[var(--border)] font-mono text-base font-bold"
+            className="grid size-14 shrink-0 place-items-center border-2 border-[var(--border)] text-base font-bold"
             style={{ background: 'var(--color-acid)', borderRadius: 2, color: 'var(--color-ink)' }}
             aria-hidden
           >

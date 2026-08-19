@@ -1,7 +1,6 @@
 import { NavLink, useLocation, useNavigate } from 'react-router-dom'
 import { CalendarDays, Info, Moon, Sun, UtensilsCrossed, Repeat, ClipboardCheck } from 'lucide-react'
 import { initialsOf, useProfile, useTheme } from '../lib/storage'
-import { branchName, hostelName } from '../data/campus'
 
 const NAV = [
   { to: '/home', label: 'BOARD', icon: CalendarDays },
@@ -50,10 +49,10 @@ export default function Shell({ children }) {
           >
             <Repeat size={17} strokeWidth={3} color="var(--color-ink)" />
           </span>
-          <span className="heading text-lg leading-none text-white">
-            NITKKR
+          <span className="display text-xl leading-none text-white">
+            nitkkr
             <br />
-            BOARD
+            board
           </span>
         </button>
 
@@ -86,7 +85,7 @@ export default function Shell({ children }) {
             onClick={() => navigate('/profile')}
           >
             <span
-              className="grid size-9 shrink-0 place-items-center border-2 border-[var(--border)] font-mono text-xs font-bold"
+              className="grid size-9 shrink-0 place-items-center border-2 border-[var(--border)] text-xs font-bold"
               style={{ background: 'var(--color-acid)', borderRadius: 2, color: 'var(--color-ink)' }}
               aria-hidden
             >
@@ -111,7 +110,7 @@ export default function Shell({ children }) {
         >
           <button
             type="button"
-            className="heading text-base leading-none text-white"
+            className="display text-lg leading-none text-white"
             onClick={() => navigate('/')}
           >
             NITKKR BOARD
@@ -136,7 +135,7 @@ export default function Shell({ children }) {
           </div>
         </header>
 
-        <main className="flex-1 space-y-4 p-3 pb-24 sm:p-5 lg:pb-8">{children}</main>
+        <main className="world-grain relative flex-1 space-y-4 p-3 pb-24 sm:p-5 lg:pb-8">{children}</main>
 
         {/* Mobile bottom nav */}
         <nav
@@ -152,7 +151,11 @@ export default function Shell({ children }) {
                 className="btn !flex-col !gap-1 !px-1 !py-2 !text-[0.55rem]"
                 style={
                   active
-                    ? { background: 'var(--color-ink)', color: 'var(--color-paper)' }
+                    ? {
+                        background: 'var(--primary)',
+                        borderColor: 'var(--primary)',
+                        color: 'var(--on-primary)',
+                      }
                     : undefined
                 }
               >
@@ -165,9 +168,4 @@ export default function Shell({ children }) {
       </div>
     </div>
   )
-}
-
-export function IdentityLine() {
-  const { profile, year } = useProfile()
-  return `${branchName(profile.branch)} · YEAR ${year} · ${hostelName(profile.hostel)}`
 }

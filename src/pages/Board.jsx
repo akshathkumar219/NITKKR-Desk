@@ -33,7 +33,7 @@ function SessionCard({ session, mark, onEdit, onMark, editing, isToday }) {
         </div>
         {!isBreak ? (
           <span
-            className="grid size-8 shrink-0 place-items-center border-2 border-[var(--border)] font-mono text-[0.6rem] font-bold"
+            className="grid size-8 shrink-0 place-items-center border-2 border-[var(--border)] text-[0.6rem] font-bold"
             style={{
               borderRadius: 99,
               background: mark ? MARK_TONE[mark] : 'transparent',
@@ -49,7 +49,7 @@ function SessionCard({ session, mark, onEdit, onMark, editing, isToday }) {
       <h3 className="heading mt-3 text-xl">{session.name}</h3>
 
       {session.code ? (
-        <p className="mt-1 font-mono text-xs muted">&lt;{session.code}&gt;</p>
+        <p className="label muted mt-1">{session.code}</p>
       ) : null}
 
       {session.room || session.group ? (
@@ -274,7 +274,7 @@ export default function Board() {
       <PageHeader
         icon={CalendarDays}
         accent="var(--color-sky)"
-        eyebrow="DEPARTURE BOARD"
+        eyebrow="YOUR WEEK"
         title="TIMETABLE"
         sub={`${branchName(profile.branch)} · YEAR ${year}`}
         actions={
@@ -307,7 +307,7 @@ export default function Board() {
               type="button"
               className="btn !px-2.5"
               aria-pressed={view === 'day'}
-              style={view === 'day' ? { background: 'var(--color-ink)', color: 'var(--color-paper)' } : undefined}
+              style={view === 'day' ? { background: 'var(--text)', color: 'var(--bg)' } : undefined}
               onClick={() => setView('day')}
               aria-label="Day view"
             >
@@ -317,7 +317,7 @@ export default function Board() {
               type="button"
               className="btn !px-2.5"
               aria-pressed={view === 'week'}
-              style={view === 'week' ? { background: 'var(--color-ink)', color: 'var(--color-paper)' } : undefined}
+              style={view === 'week' ? { background: 'var(--text)', color: 'var(--bg)' } : undefined}
               onClick={() => setView('week')}
               aria-label="Week view"
             >
@@ -380,7 +380,7 @@ export default function Board() {
 
       {sessions.length === 0 ? (
         <EmptyState
-          title="NOTHING ON THIS BOARD YET"
+          title="nothing pinned yet"
           hint={`No published timetable for ${branchName(profile.branch)} Year ${year}. Add your sessions in edit mode — they save to this device.`}
           action={
             <button
@@ -421,7 +421,7 @@ export default function Board() {
 
           {dayList.length === 0 ? (
             <EmptyState
-              title={query ? 'NO MATCHES' : 'CLEAR DAY'}
+              title={query ? 'no matches' : 'clear day'}
               hint={query ? `Nothing matches "${query}" on ${day}.` : `Nothing scheduled on ${day}.`}
             />
           ) : (

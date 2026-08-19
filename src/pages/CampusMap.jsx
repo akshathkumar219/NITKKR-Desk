@@ -21,8 +21,8 @@ export default function CampusMap() {
       <Eyebrow icon={MapPin}>CAMPUS NAVIGATION</Eyebrow>
 
       <div className="mt-3 flex flex-wrap items-end justify-between gap-6">
-        <h1 className="heading text-5xl sm:text-6xl">
-          Campus
+        <h1 className="display text-5xl sm:text-6xl">
+          campus
           <br />
           map
         </h1>

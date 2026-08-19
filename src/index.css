@@ -77,6 +77,12 @@
   --color-absent: #dc2626;
   --color-cancelled: #78716c;
 
+  /* Same states, but as TEXT on --surface. The accent fills above are far
+     too light to read as foreground; these clear 4.5:1 in both themes. */
+  --present-ink: #15803d;
+  --absent-ink: #b91c1c;
+  --warn-ink: #a16207;
+
   /* Paper-cutout offset. §5 prefers this over any glass treatment. */
   --shadow-ink: #111111;
   --shadow-hard-sm: 2px 2px 0 0 var(--shadow-ink);
@@ -116,6 +122,10 @@
   --color-present: #4ade80;
   --color-absent: #ff6b81;
   --color-cancelled: #8b8b9e;
+
+  --present-ink: #4ade80;
+  --absent-ink: #ff8a99;
+  --warn-ink: #fbbf24;
 
   /* On a near-black ground a black offset still reads as a cutout lift,
      where the light theme's ink shadow would vanish. */
@@ -371,9 +381,13 @@
 
   /* Screen-print halftone dot field. */
   .world-halftone {
-    background-image: radial-gradient(currentColor 1px, transparent 1px);
-    background-size: 14px 14px;
-    opacity: 0.09;
+    background-image: radial-gradient(currentColor 1.4px, transparent 1.4px);
+    background-size: 11px 11px;
+    opacity: 0.16;
+  }
+
+  .dark .world-halftone {
+    opacity: 0.2;
   }
 
   /* Print misregistration — decorative elements only, never live text. */
@@ -475,6 +489,69 @@
     animation: none !important;
     text-shadow: none !important;
     transform: none !important;
+  }
+}
+
+/* ---- Expressive layer (design.md §5, §6) -----------------------------
+   Paper-cutout language: opaque surfaces, ink-like borders, offset shadows,
+   pasted labels. Explicitly NOT glassmorphism (§5).
+
+   §5's restraint matters as much as the effect: "Not every card should look
+   like physical paper." These are opt-in decorations layered on top of the
+   plain .board, never a replacement for it. Functional components stay
+   structurally identical. */
+
+@layer components {
+  /* A pasted-on label. §6 allows a slightly offset decorative label; the
+     rotation is tiny and deliberate — enough to read as stuck on, never
+     enough to look like a mistake. */
+  .sticker {
+    display: inline-block;
+    padding: 0.25rem 0.6rem;
+    border: 2px solid var(--color-ink);
+    background-color: var(--color-amber);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    font-size: 0.625rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    box-shadow: var(--shadow-hard-sm);
+    transform: rotate(-1.4deg);
+  }
+
+  .sticker-flip {
+    transform: rotate(1.6deg);
+  }
+
+  /* Torn/clipped corner — a cut-paper edge rather than a rounded one (§6). */
+  .cutout {
+    clip-path: polygon(0 0, 100% 0, 100% calc(100% - 14px), calc(100% - 14px) 100%, 0 100%);
+  }
+
+  /* Oversized background typography (§3.1). Sits in the WORLD layer: it is
+     atmosphere, never content, and must never sit under body text. */
+  .ghost-type {
+    font-family: var(--font-display);
+    color: var(--text);
+    opacity: 0.05;
+    line-height: 0.8;
+    letter-spacing: -0.01em;
+    user-select: none;
+    white-space: nowrap;
+  }
+
+  .dark .ghost-type {
+    opacity: 0.07;
+  }
+
+  /* Screen-printed rule: a thick ink bar, the kind a zine uses to break
+     sections. Cheaper and louder than a hairline. */
+  .rule-ink {
+    height: 3px;
+    border: 0;
+    background-color: var(--text);
+    opacity: 0.9;
   }
 }
 

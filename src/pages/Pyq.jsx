@@ -56,8 +56,8 @@ export default function Pyq() {
       <Eyebrow icon={FileText}>PYQ ARCHIVE</Eyebrow>
 
       <div className="mt-3 flex flex-wrap items-end justify-between gap-6">
-        <h1 className="heading text-5xl sm:text-7xl">
-          Previous
+        <h1 className="display text-5xl sm:text-7xl">
+          previous
           <br />
           year
           <br />
@@ -70,7 +70,7 @@ export default function Pyq() {
 
       <section className="mt-10">
         <div className="mb-3 flex items-center gap-2">
-          <Chip tone="var(--color-ink)" style={{ color: 'var(--color-paper)' }}>
+          <Chip tone="var(--text)" style={{ color: 'var(--bg)' }}>
             STEP 01
           </Chip>
           <span className="label muted">SELECT SESSION</span>
@@ -102,7 +102,7 @@ export default function Pyq() {
       {year ? (
         <section className="mt-10">
           <div className="mb-3 flex items-center gap-2">
-            <Chip tone="var(--color-ink)" style={{ color: 'var(--color-paper)' }}>
+            <Chip tone="var(--text)" style={{ color: 'var(--bg)' }}>
               STEP 02
             </Chip>
             <span className="label muted">PAPERS — {year}</span>

@@ -106,11 +106,25 @@ export function status(percent, required) {
   return 'short'
 }
 
+/** Fills and graphical objects — rings, bars, chips. */
 export const STATUS_COLOR = {
   safe: 'var(--color-present)',
   edge: 'var(--color-amber)',
   short: 'var(--color-absent)',
   untracked: 'var(--color-cancelled)',
+}
+
+/**
+ * The same states as TEXT. The fills above are tuned to carry ink on top of
+ * them, which makes them far too light to read as a foreground colour on a
+ * surface — `--color-amber` on white is 1.75:1. These clear 4.5:1 in both
+ * themes. Never use STATUS_COLOR for text.
+ */
+export const STATUS_INK = {
+  safe: 'var(--present-ink)',
+  edge: 'var(--warn-ink)',
+  short: 'var(--absent-ink)',
+  untracked: 'var(--muted)',
 }
 
 /**

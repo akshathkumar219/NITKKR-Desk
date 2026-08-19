@@ -96,6 +96,66 @@ async function run(label, viewport, theme, seed) {
     await page.goto(BASE + path, { waitUntil: 'networkidle' })
     await page.waitForTimeout(250)
 
+    // ---- Contrast --------------------------------------------------------
+    // Catches the class of bug where a FIXED colour token (--color-ink /
+    // --color-paper, which mean literal black/off-white for text on bright
+    // accent fills) gets used as if it were theme-aware, producing e.g. a
+    // near-black active state on a near-black dark-mode page.
+    const lowContrast = await page.evaluate(() => {
+      const parse = (c) => {
+        const m = c.match(/rgba?\(([^)]+)\)/)
+        if (!m) return null
+        const [r, g, b, a = '1'] = m[1].split(',').map((x) => parseFloat(x))
+        return { r, g, b, a }
+      }
+      const lum = ({ r, g, b }) => {
+        const f = (v) => {
+          v /= 255
+          return v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4
+        }
+        return 0.2126 * f(r) + 0.7152 * f(g) + 0.0722 * f(b)
+      }
+      const ratio = (a, b) => {
+        const [x, y] = [lum(a), lum(b)].sort((p, q) => q - p)
+        return (x + 0.05) / (y + 0.05)
+      }
+      // Effective background: walk up until something is actually painted.
+      const bgOf = (el) => {
+        let n = el
+        while (n && n !== document.documentElement) {
+          const c = parse(getComputedStyle(n).backgroundColor)
+          if (c && c.a > 0.5) return c
+          n = n.parentElement
+        }
+        return parse(getComputedStyle(document.body).backgroundColor)
+      }
+      const out = []
+      for (const el of document.querySelectorAll('body *')) {
+        if (el.closest('[aria-hidden="true"], .world, .ghost-type, .intro-overlay')) continue
+        // Only elements rendering their own text.
+        const own = [...el.childNodes]
+          .filter((n) => n.nodeType === 3)
+          .map((n) => n.textContent.trim())
+          .join('')
+        if (!own) continue
+        const cs = getComputedStyle(el)
+        if (cs.visibility === 'hidden' || cs.display === 'none' || parseFloat(cs.opacity) < 0.5) continue
+        const r = el.getBoundingClientRect()
+        if (r.width < 4 || r.height < 4) continue
+        const fg = parse(cs.color)
+        const bg = bgOf(el)
+        if (!fg || !bg || fg.a < 0.5) continue
+        const cr = ratio(fg, bg)
+        // 3.0 is the WCAG floor for large text and UI components. Anything
+        // under that is not a judgement call, it is unreadable.
+        if (cr < 3) {
+          out.push(`${cr.toFixed(2)}:1 "${own.slice(0, 32)}" (${cs.color} on rgb(${bg.r},${bg.g},${bg.b}))`)
+        }
+      }
+      return [...new Set(out)].slice(0, 6)
+    })
+    for (const c of lowContrast) errors.push(`[${label}/${name}] low contrast ${c}`)
+
     const text = await page.evaluate(() => document.body.innerText.trim())
     const rootEmpty = await page.evaluate(
       () => document.getElementById('root').children.length === 0,

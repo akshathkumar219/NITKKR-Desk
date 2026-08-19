@@ -67,7 +67,7 @@ export default function CampusInfo() {
               className="flex flex-wrap items-center justify-between gap-3 border-t-2 border-black/10 py-3 dark:border-white/10"
             >
               <dt className="label">{e.label}</dt>
-              <dd className="font-mono text-sm font-bold">{e.value}</dd>
+              <dd className="text-sm font-bold tabular-nums">{e.value}</dd>
             </div>
           ))}
         </dl>
@@ -89,7 +89,7 @@ export default function CampusInfo() {
                 className="flex flex-wrap items-center justify-between gap-3 border-t-2 border-black/10 py-3 dark:border-white/10"
               >
                 <dt className="label">{h.label}</dt>
-                <dd className="font-mono text-sm font-bold">{h.value}</dd>
+                <dd className="text-sm font-bold tabular-nums">{h.value}</dd>
               </div>
             ))}
           </dl>

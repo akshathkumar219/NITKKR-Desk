@@ -190,7 +190,7 @@ export default function SessionModal({ open, onClose, onSave, onDelete, session,
         {error ? (
           <p
             className="label border-2 p-2"
-            style={{ borderColor: 'var(--color-absent)', color: 'var(--color-absent)' }}
+            style={{ borderColor: 'var(--absent-ink)', color: 'var(--absent-ink)' }}
             role="alert"
           >
             {error}

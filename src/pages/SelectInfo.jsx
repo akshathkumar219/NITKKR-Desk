@@ -1,18 +1,8 @@
 import { Link } from 'react-router-dom'
-import { DoorOpen, FileText, Info, Map, ShieldQuestion, User, Wrench } from 'lucide-react'
+import { Info } from 'lucide-react'
 import PlainShell from '../components/PlainShell'
 import { Eyebrow } from '../ui'
-
-const TILES = [
-  { to: '/profile', icon: User, title: 'EDIT PROFILE', sub: 'NAME, BRANCH & HOSTEL' },
-  { to: '/rollcall', icon: ShieldQuestion, title: 'ROLL CALL', sub: 'ATTENDANCE TRACKER' },
-  { to: '/tools', icon: Wrench, title: 'STUDENT TOOLS', sub: 'SKIP GUARD, CGPA, BACKUP' },
-  { to: '/rooms', icon: DoorOpen, title: 'FREE NOW', sub: 'OPEN ROOM CHECKER' },
-  { to: '/pyq', icon: FileText, title: 'PYQ BROWSER', sub: 'PREVIOUS YEAR QUESTIONS' },
-  { to: '/map', icon: Map, title: 'CAMPUS MAP', sub: 'NAVIGATE THE CAMPUS' },
-  { to: '/campus', icon: Info, title: 'NITKKR INFO', sub: 'CALENDAR & CONTACTS' },
-  { to: '/about', icon: ShieldQuestion, title: 'ABOUT', sub: 'UNOFFICIAL COMPANION' },
-]
+import { HUB_TILES } from '../data/hubs'
 
 export default function SelectInfo() {
   return (
@@ -20,8 +10,8 @@ export default function SelectInfo() {
       <Eyebrow icon={Info}>INFO SELECTION</Eyebrow>
 
       <div className="mt-3 flex flex-wrap items-end justify-between gap-6">
-        <h1 className="heading text-5xl sm:text-6xl">
-          Select
+        <h1 className="display text-5xl sm:text-6xl">
+          select
           <br />
           your info
         </h1>
@@ -31,14 +21,25 @@ export default function SelectInfo() {
       </div>
 
       <div className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-        {TILES.map((t) => (
+        {HUB_TILES.map((t) => (
           <Link
             key={t.to}
             to={t.to}
             className="board board-hard flex items-start gap-3 p-4 transition-transform hover:-translate-y-0.5"
+            style={{ transitionDuration: 'var(--dur-fast)' }}
           >
-            <t.icon size={18} strokeWidth={2.5} className="mt-0.5 shrink-0" aria-hidden />
-            <span>
+            <span
+              className="grid size-8 shrink-0 place-items-center border-2 border-[var(--border)]"
+              style={{
+                background: t.neutral ? 'var(--surface)' : t.bg,
+                color: t.neutral ? 'var(--text)' : 'var(--color-ink)',
+                borderRadius: 2,
+              }}
+              aria-hidden
+            >
+              <t.icon size={16} strokeWidth={2.5} />
+            </span>
+            <span className="min-w-0">
               <span className="heading block text-base">{t.title}</span>
               <span className="label muted mt-1 block">{t.sub}</span>
             </span>

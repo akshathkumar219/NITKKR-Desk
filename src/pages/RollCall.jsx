@@ -6,6 +6,7 @@ import { useProfile, useRollcallSettings } from '../lib/storage'
 import { coursesOf, nextClassDay, sessionsForDay, useBoard } from '../lib/board'
 import {
   STATUS_COLOR,
+  STATUS_INK,
   canSkip,
   mustAttend,
   status,
@@ -209,7 +210,7 @@ export default function RollCall() {
       {tab === 'TODAY' ? (
         todaySessions.length === 0 ? (
           <EmptyState
-            title="NO CLASSES TODAY"
+            title="no classes today"
             hint={
               nextClassDay(sessions)
                 ? `Next class day · ${nextClassDay(sessions)}`
@@ -235,7 +236,7 @@ export default function RollCall() {
       {/* ---- SUBJECTS ---- */}
       {tab === 'SUBJECTS' ? (
         courses.length === 0 ? (
-          <EmptyState title="NO SUBJECTS" hint="Add sessions to your board first." />
+          <EmptyState title="no subjects yet" hint="Add sessions to your board first." />
         ) : (
           <div className="space-y-3">
             {courses.map((c) => {
@@ -257,7 +258,7 @@ export default function RollCall() {
                       </p>
                     </div>
                     <div className="shrink-0 text-right">
-                      <p className="heading text-xl" style={{ color: STATUS_COLOR[st] }}>
+                      <p className="heading text-xl" style={{ color: STATUS_INK[st] }}>
                         {t.percent === null ? '—' : `${Math.round(t.percent)}%`}
                       </p>
                       <p className="label muted mt-0.5">{open ? 'HIDE' : 'DETAILS'}</p>
@@ -354,7 +355,7 @@ export default function RollCall() {
                     key={d}
                     type="button"
                     className="btn !py-1.5"
-                    style={fixDate === d ? { background: 'var(--color-ink)', color: 'var(--color-paper)' } : undefined}
+                    style={fixDate === d ? { background: 'var(--text)', color: 'var(--bg)' } : undefined}
                     onClick={() => setFixDate(d)}
                   >
                     {fmtDateShort(d)}

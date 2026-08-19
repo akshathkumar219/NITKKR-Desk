@@ -24,8 +24,8 @@ export default function SelectBranch() {
       <Eyebrow icon={GraduationCap}>DEPARTMENT SELECTION</Eyebrow>
 
       <div className="mt-3 flex flex-wrap items-end justify-between gap-6">
-        <h1 className="heading text-5xl sm:text-6xl">
-          Select your
+        <h1 className="display text-5xl sm:text-6xl">
+          select your
           <br />
           branch
         </h1>

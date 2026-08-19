@@ -100,33 +100,48 @@ export default function Landing() {
   const weekday = now.toLocaleDateString('en-GB', { weekday: 'short' }).toUpperCase()
 
   const st = status(attendance.percent, settings.required)
+
+  // Values render in --text, not an accent. The accent tokens are FILLS,
+  // bright enough to carry ink text; as foreground on --surface they fail
+  // contrast outright (--color-sky on white is 1.67:1).
+  //
+  // Attendance is the one tile with real state, so it carries a word as well
+  // as a colour — §12: "Do not use color alone to communicate critical
+  // status." The colour comes from the *-ink tokens, which are readable.
+  const attendanceWord =
+    attendance.percent === null
+      ? 'NOTHING LOGGED'
+      : st === 'short'
+        ? 'BELOW TARGET'
+        : st === 'edge'
+          ? 'CUTTING IT FINE'
+          : 'ON TRACK'
+
   const tiles = [
     {
       label: 'ATTENDANCE',
       value: attendance.percent === null ? '—' : `${Math.round(attendance.percent)}%`,
-      note: attendance.percent === null ? 'NOTHING LOGGED' : `TARGET ${settings.required}%`,
-      accent:
+      note: attendanceWord,
+      noteColor:
         attendance.percent === null
           ? 'var(--muted)'
           : st === 'short'
-            ? 'var(--color-absent)'
+            ? 'var(--absent-ink)'
             : st === 'edge'
-              ? 'var(--color-amber)'
-              : 'var(--color-present)',
+              ? 'var(--warn-ink)'
+              : 'var(--present-ink)',
       to: '/rollcall',
     },
     {
       label: 'NEXT MEAL',
       value: meal.label,
       note: meal.time,
-      accent: 'var(--color-coral)',
       to: '/mess',
     },
     {
       label: 'LEFT TODAY',
       value: String(remaining),
       note: remaining === 1 ? 'CLASS REMAINING' : 'CLASSES REMAINING',
-      accent: 'var(--color-sky)',
       to: '/home',
     },
   ]
@@ -142,11 +157,17 @@ export default function Landing() {
         className="world world-halftone"
         style={{
           color: 'var(--primary)',
-          maskImage: 'linear-gradient(180deg, #000, transparent 60%)',
-          WebkitMaskImage: 'linear-gradient(180deg, #000, transparent 60%)',
+          maskImage: 'linear-gradient(180deg, #000, transparent 62%)',
+          WebkitMaskImage: 'linear-gradient(180deg, #000, transparent 62%)',
         }}
         aria-hidden
       />
+      {/* Oversized background typography. Anchored to the bottom edge so it
+          never sits underneath body text (§3.1), and hidden on small screens
+          where §13 asks for reduced decorative complexity. */}
+      <p className="ghost-type absolute -bottom-6 -left-4 z-0 hidden text-[13rem] sm:block" aria-hidden>
+        NITKKR
+      </p>
 
       <div className="relative z-10 mx-auto max-w-4xl px-4 py-6 sm:px-8 sm:py-8">
         {/* The wordmark lives up here now, small. This page's job is to
@@ -168,25 +189,18 @@ export default function Landing() {
           </div>
         </header>
 
-        <hr className="mt-4 border-t-2" style={{ borderColor: 'var(--border)' }} />
+        <hr className="rule-ink mt-4" />
 
         {/* ---- SIGNAL ---- */}
-        <section className="mt-8 sm:mt-12">
+        <section className="mt-10 sm:mt-14">
           <div className="flex flex-wrap items-center gap-2">
-            <span
-              className="chip"
-              style={{
-                background: signal.tone,
-                borderColor: signal.tone,
-                color: 'var(--color-ink)',
-              }}
-            >
+            <span className="sticker" style={{ background: signal.tone }}>
               {signal.eyebrow}
             </span>
-            {signal.note ? <span className="chip">{signal.note}</span> : null}
+            {signal.note ? <span className="sticker sticker-flip">{signal.note}</span> : null}
           </div>
 
-          <h1 className="heading mt-4 text-4xl sm:text-6xl">{signal.title}</h1>
+          <h1 className="heading mt-5 text-5xl sm:text-7xl">{signal.title}</h1>
           <p className="mt-3 text-sm font-medium">{signal.detail}</p>
 
           {onboarded ? (
@@ -222,14 +236,17 @@ export default function Landing() {
         </section>
 
         {/* ---- INTERFACE ---- quiet on purpose, so the signal stays a signal */}
-        <section className="mt-8 grid gap-3 sm:grid-cols-3">
+        <section className="mt-10 grid gap-3 sm:grid-cols-3">
           {tiles.map((t) => (
             <Link key={t.label} to={t.to} className="board board-hard block p-4">
               <p className="label muted">{t.label}</p>
-              <p className="heading mt-1.5 text-3xl" style={{ color: t.accent }}>
-                {t.value}
+              <p className="heading mt-1.5 text-3xl">{t.value}</p>
+              <p
+                className={`label mt-1.5 ${t.noteColor ? '' : 'muted'}`}
+                style={t.noteColor ? { color: t.noteColor } : undefined}
+              >
+                {t.note}
               </p>
-              <p className="label muted mt-1.5">{t.note}</p>
             </Link>
           ))}
         </section>
@@ -243,7 +260,7 @@ export default function Landing() {
           ))}
         </nav>
 
-        <footer className="mt-10 flex flex-wrap items-center justify-between gap-2">
+        <footer className="mt-12 flex flex-wrap items-center justify-between gap-2">
           <p className="label muted">EVERYTHING STAYS ON THIS DEVICE.</p>
           <p className="label muted">UNOFFICIAL · NOT AFFILIATED WITH NIT KURUKSHETRA</p>
         </footer>

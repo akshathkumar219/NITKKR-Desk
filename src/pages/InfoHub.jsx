@@ -52,14 +52,14 @@ const TILES = [
     icon: Info,
     title: 'NITKKR INFO',
     sub: 'CALENDAR, HELPLINE, LINKS',
-    bg: '#ffffff',
+    bg: 'var(--surface)',
   },
   {
     to: '/about',
     icon: ShieldQuestion,
     title: 'ABOUT',
     sub: 'DISCLAIMER & PRIVACY',
-    bg: '#ffffff',
+    bg: 'var(--surface)',
   },
 ]
 
@@ -68,7 +68,7 @@ export default function InfoHub() {
     <Shell>
       <Panel className="p-5 sm:p-6">
         <p className="label muted">INFO HUB</p>
-        <h1 className="display mt-2 text-3xl sm:text-4xl">Everything in one place</h1>
+        <h1 className="heading mt-2 text-3xl sm:text-4xl">Everything in one place</h1>
       </Panel>
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -77,10 +77,10 @@ export default function InfoHub() {
             key={t.to}
             to={t.to}
             className="board board-hard block p-5 transition-transform hover:-translate-y-0.5"
-            style={{ background: t.bg, color: '#12121A' }}
+            style={{ background: t.bg, color: 'var(--color-ink)' }}
           >
             <t.icon size={22} strokeWidth={2.5} aria-hidden />
-            <p className="display mt-8 text-xl">{t.title}</p>
+            <p className="heading mt-8 text-xl">{t.title}</p>
             <p className="label mt-1.5 opacity-70">{t.sub}</p>
           </Link>
         ))}

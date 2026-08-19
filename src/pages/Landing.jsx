@@ -107,10 +107,10 @@ export default function Landing() {
         </div>
 
         <div className="text-center">
-          <span className="chip" style={{ background: 'var(--color-acid)', color: '#12121A' }}>
+          <span className="chip" style={{ background: 'var(--color-acid)', color: 'var(--color-ink)' }}>
             STUDENT DEPARTURE BOARD
           </span>
-          <h1 className="display mt-5 text-6xl sm:text-8xl">
+          <h1 className="heading mt-5 text-6xl sm:text-8xl">
             NITKKR
             <br />
             BOARD
@@ -134,14 +134,14 @@ export default function Landing() {
 
           <div className="mt-5 flex items-start gap-4">
             <span
-              className="grid size-12 shrink-0 place-items-center border-2 border-ink font-mono text-sm font-bold"
-              style={{ background: 'var(--color-amber)', borderRadius: 2, color: '#12121A' }}
+              className="grid size-12 shrink-0 place-items-center border-2 border-[var(--border)] font-mono text-sm font-bold"
+              style={{ background: 'var(--color-amber)', borderRadius: 2, color: 'var(--color-ink)' }}
               aria-hidden
             >
               {initialsOf(profile.name)}
             </span>
             <div className="min-w-0">
-              <h2 className="display text-2xl sm:text-3xl">{headline}</h2>
+              <h2 className="heading text-2xl sm:text-3xl">{headline}</h2>
               <p className="mt-2 text-sm font-medium">{detail}</p>
             </div>
           </div>
@@ -172,13 +172,13 @@ export default function Landing() {
           {tiles.map((t) => (
             <Link key={t.to} to={t.to} className="board board-hard block p-5 transition-transform hover:-translate-y-0.5">
               <span
-                className="grid size-10 place-items-center border-2 border-ink"
+                className="grid size-10 place-items-center border-2 border-[var(--border)]"
                 style={{ background: t.accent, borderRadius: 'var(--radius-board)' }}
                 aria-hidden
               >
-                <t.icon size={18} strokeWidth={2.5} color="#12121A" />
+                <t.icon size={18} strokeWidth={2.5} color="var(--color-ink)" />
               </span>
-              <p className="display mt-4 text-lg">{t.title}</p>
+              <p className="heading mt-4 text-lg">{t.title}</p>
               <p className="label muted mt-1.5">{t.sub}</p>
             </Link>
           ))}

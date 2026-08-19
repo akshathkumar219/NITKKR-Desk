@@ -19,7 +19,7 @@ export default function Welcome() {
       <Panel className="animate-flip w-full max-w-lg p-6 sm:p-8">
         <p className="label muted">BOARD · INITIALISING</p>
 
-        <h1 className="display mt-4 text-4xl sm:text-5xl">
+        <h1 className="heading mt-4 text-4xl sm:text-5xl">
           What should
           <br />
           the board
@@ -60,7 +60,7 @@ export default function Welcome() {
           </button>
         </form>
 
-        <hr className="my-6 border-t-2 border-ink dark:border-[#26263a]" />
+        <hr className="my-6 border-t-2 border-[var(--border)]" />
         <p className="label muted">
           NO ACCOUNT. NO PASSWORD. NO SERVER. EXPORT A BACKUP FROM TOOLS TO KEEP IT SAFE.
         </p>

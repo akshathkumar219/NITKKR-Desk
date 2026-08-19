@@ -169,7 +169,7 @@ export function useTheme() {
     document.documentElement.classList.toggle('dark', theme === 'dark')
     document
       .querySelector('meta[name="theme-color"]')
-      ?.setAttribute('content', theme === 'dark' ? '#0B0B10' : '#FAF7F2')
+      ?.setAttribute('content', theme === 'dark' ? '#080D18' : '#F4F1E8')
   }, [theme])
 
   const toggle = useCallback(

@@ -24,7 +24,7 @@ export default function SelectBranch() {
       <Eyebrow icon={GraduationCap}>DEPARTMENT SELECTION</Eyebrow>
 
       <div className="mt-3 flex flex-wrap items-end justify-between gap-6">
-        <h1 className="display text-5xl sm:text-6xl">
+        <h1 className="heading text-5xl sm:text-6xl">
           Select your
           <br />
           branch
@@ -57,14 +57,14 @@ export default function SelectBranch() {
                       : undefined
                   }
                 >
-                  <p className="display text-2xl">{b.code}</p>
+                  <p className="heading text-2xl">{b.code}</p>
                   <p className="label muted mt-1.5">{b.name}</p>
                   <hr className="my-3 border-t-2 border-black/10 dark:border-white/10" />
                   <span
                     className="chip"
                     style={
                       has
-                        ? { background: 'var(--color-acid)', color: '#12121A' }
+                        ? { background: 'var(--color-acid)', color: 'var(--color-ink)' }
                         : undefined
                     }
                   >

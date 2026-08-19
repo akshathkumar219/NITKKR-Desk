@@ -101,7 +101,7 @@ export default function RollCall() {
         <div className="flex flex-wrap items-center gap-5">
           <Ring percent={overall.percent} color={STATUS_COLOR[overallStatus]} />
           <div className="min-w-0 flex-1">
-            <p className="display text-2xl sm:text-3xl">
+            <p className="heading text-2xl sm:text-3xl">
               {overall.percent === null
                 ? 'NOTHING LOGGED'
                 : overallStatus === 'safe'
@@ -130,7 +130,7 @@ export default function RollCall() {
               <button
                 type="button"
                 className="btn mt-3 !py-1.5"
-                style={{ background: 'var(--color-amber)', color: '#12121A' }}
+                style={{ background: 'var(--color-amber)', color: 'var(--color-ink)' }}
                 onClick={() => setTab('BACKFILL')}
               >
                 {pending.length} UNMARKED — BACKFILL
@@ -155,7 +155,7 @@ export default function RollCall() {
         </button>
 
         {showSettings ? (
-          <div className="grid gap-4 border-t-2 border-ink p-4 sm:grid-cols-2 dark:border-[#33334a]">
+          <div className="grid gap-4 border-t-2 border-[var(--border)] p-4 sm:grid-cols-2">
             <Field label="REQUIRED ATTENDANCE (%)" id="rc-req">
               <div className="flex gap-2">
                 <input
@@ -251,13 +251,13 @@ export default function RollCall() {
                     aria-expanded={open}
                   >
                     <div className="min-w-0">
-                      <p className="display text-lg">{c.name}</p>
+                      <p className="heading text-lg">{c.name}</p>
                       <p className="label muted mt-1">
                         {c.code || '—'} · {c.type.toUpperCase()}
                       </p>
                     </div>
                     <div className="shrink-0 text-right">
-                      <p className="display text-xl" style={{ color: STATUS_COLOR[st] }}>
+                      <p className="heading text-xl" style={{ color: STATUS_COLOR[st] }}>
                         {t.percent === null ? '—' : `${Math.round(t.percent)}%`}
                       </p>
                       <p className="label muted mt-0.5">{open ? 'HIDE' : 'DETAILS'}</p>
@@ -308,7 +308,7 @@ export default function RollCall() {
         <Panel className="p-4">
           <div className="flex items-center gap-2">
             <CalendarClock size={16} strokeWidth={2.5} aria-hidden />
-            <p className="display text-lg">FIX A PAST DAY</p>
+            <p className="heading text-lg">FIX A PAST DAY</p>
           </div>
           <p className="label muted mt-1.5">PICK ANY DATE TO ADD OR CORRECT THAT DAY'S MARKS.</p>
 

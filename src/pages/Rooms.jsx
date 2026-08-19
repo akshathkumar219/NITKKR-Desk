@@ -69,7 +69,7 @@ export default function Rooms() {
 
       {total === 0 ? (
         <Panel className="p-8 text-center">
-          <p className="display text-xl">NO ROOMS TRACKED YET</p>
+          <p className="heading text-xl">NO ROOMS TRACKED YET</p>
           <p className="label muted mx-auto mt-3 max-w-md">
             OPEN ROOMS READS ROOM NAMES OFF THE PUBLISHED TIMETABLES. ADD REAL
             TIMETABLE DATA IN SRC/DATA/TIMETABLES.JS AND THIS FILLS IN AUTOMATICALLY.
@@ -78,8 +78,8 @@ export default function Rooms() {
       ) : (
         <div className="grid gap-4 lg:grid-cols-2">
           <Panel>
-            <div className="flex items-center justify-between gap-3 border-b-2 border-ink px-4 py-3 dark:border-[#33334a]">
-              <p className="display text-lg">OCCUPIED</p>
+            <div className="flex items-center justify-between gap-3 border-b-2 border-[var(--border)] px-4 py-3">
+              <p className="heading text-lg">OCCUPIED</p>
               <Chip tone="var(--color-coral)">{occupied.length} ROOMS</Chip>
             </div>
             <div className="p-4">
@@ -95,7 +95,7 @@ export default function Rooms() {
                       className="board flex flex-wrap items-center justify-between gap-2 p-3"
                     >
                       <div className="min-w-0">
-                        <p className="display text-base">{o.room}</p>
+                        <p className="heading text-base">{o.room}</p>
                         <p className="label muted mt-0.5 truncate">
                           {o.session.name} · {o.branch} Y{o.year}
                         </p>
@@ -109,8 +109,8 @@ export default function Rooms() {
           </Panel>
 
           <Panel>
-            <div className="flex items-center justify-between gap-3 border-b-2 border-ink px-4 py-3 dark:border-[#33334a]">
-              <p className="display text-lg">FREE NOW</p>
+            <div className="flex items-center justify-between gap-3 border-b-2 border-[var(--border)] px-4 py-3">
+              <p className="heading text-lg">FREE NOW</p>
               <Chip tone="var(--color-acid)">{free.length} ROOMS</Chip>
             </div>
             <div className="p-4">

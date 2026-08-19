@@ -16,7 +16,7 @@ function NavItem({ to, label, icon: Icon, onNavigate }) {
       to={to}
       onClick={onNavigate}
       className={({ isActive }) =>
-        `btn w-full !justify-start ${isActive ? '!bg-ink !text-paper dark:!bg-brand dark:!border-brand dark:!text-white' : ''}`
+        `btn w-full !justify-start ${isActive ? '!bg-[var(--primary)] !border-[var(--primary)] !text-[var(--on-primary)]' : ''}`
       }
     >
       <Icon size={16} strokeWidth={2.5} aria-hidden />
@@ -36,21 +36,21 @@ export default function Shell({ children }) {
   return (
     <div className="min-h-dvh lg:flex">
       {/* ---- Sidebar (desktop) ---- */}
-      <aside className="sticky top-0 hidden h-dvh w-64 shrink-0 flex-col border-r-2 border-ink lg:flex dark:border-[#26263a]">
+      <aside className="sticky top-0 hidden h-dvh w-64 shrink-0 flex-col border-r-2 border-[var(--border)] lg:flex">
         <button
           type="button"
           onClick={() => navigate('/')}
-          className="flex items-center gap-3 border-b-2 border-ink px-4 py-4 text-left dark:border-[#26263a]"
+          className="flex items-center gap-3 border-b-2 border-[var(--border)] px-4 py-4 text-left"
           style={{ background: 'var(--color-brand)' }}
         >
           <span
-            className="grid size-9 shrink-0 place-items-center border-2 border-ink bg-white"
+            className="grid size-9 shrink-0 place-items-center border-2 border-[var(--border)] bg-white"
             style={{ borderRadius: 'var(--radius-board)' }}
             aria-hidden
           >
-            <Repeat size={17} strokeWidth={3} color="#12121A" />
+            <Repeat size={17} strokeWidth={3} color="var(--color-ink)" />
           </span>
-          <span className="display text-lg leading-none text-white">
+          <span className="heading text-lg leading-none text-white">
             NITKKR
             <br />
             BOARD
@@ -63,7 +63,7 @@ export default function Shell({ children }) {
           ))}
         </nav>
 
-        <div className="mt-auto space-y-2 border-t-2 border-ink p-3 dark:border-[#26263a]">
+        <div className="mt-auto space-y-2 border-t-2 border-[var(--border)] p-3">
           <div className="grid grid-cols-2 gap-2">
             <button type="button" className="btn" onClick={toggle}>
               {theme === 'dark' ? <Sun size={14} strokeWidth={2.5} /> : <Moon size={14} strokeWidth={2.5} />}
@@ -86,8 +86,8 @@ export default function Shell({ children }) {
             onClick={() => navigate('/profile')}
           >
             <span
-              className="grid size-9 shrink-0 place-items-center border-2 border-ink font-mono text-xs font-bold"
-              style={{ background: 'var(--color-acid)', borderRadius: 2, color: '#12121A' }}
+              className="grid size-9 shrink-0 place-items-center border-2 border-[var(--border)] font-mono text-xs font-bold"
+              style={{ background: 'var(--color-acid)', borderRadius: 2, color: 'var(--color-ink)' }}
               aria-hidden
             >
               {initialsOf(profile.name)}
@@ -106,12 +106,12 @@ export default function Shell({ children }) {
       <div className="flex min-w-0 flex-1 flex-col">
         {/* Mobile top bar */}
         <header
-          className="sticky top-0 z-30 flex items-center justify-between gap-3 border-b-2 border-ink px-4 py-3 lg:hidden dark:border-[#26263a]"
+          className="sticky top-0 z-30 flex items-center justify-between gap-3 border-b-2 border-[var(--border)] px-4 py-3 lg:hidden"
           style={{ background: 'var(--color-brand)' }}
         >
           <button
             type="button"
-            className="display text-base leading-none text-white"
+            className="heading text-base leading-none text-white"
             onClick={() => navigate('/')}
           >
             NITKKR BOARD
@@ -140,7 +140,7 @@ export default function Shell({ children }) {
 
         {/* Mobile bottom nav */}
         <nav
-          className="fixed inset-x-0 bottom-0 z-30 grid grid-cols-4 gap-1 border-t-2 border-ink bg-paper p-2 lg:hidden dark:border-[#26263a] dark:bg-[#0b0b10]"
+          className="fixed inset-x-0 bottom-0 z-30 grid grid-cols-4 gap-1 border-t-2 border-[var(--border)] bg-[var(--bg)] p-2 lg:hidden"
           aria-label="Primary"
         >
           {NAV.map(({ to, label, icon: Icon }) => {

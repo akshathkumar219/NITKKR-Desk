@@ -9,18 +9,18 @@ function Viewer({ paper, onClose }) {
   return (
     <div className="fixed inset-0 z-50 flex flex-col bg-black/90">
       <div
-        className="flex items-center justify-between gap-4 border-b-2 border-ink px-4 py-3"
+        className="flex items-center justify-between gap-4 border-b-2 border-[var(--border)] px-4 py-3"
         style={{ background: 'var(--color-acid)' }}
       >
         <div className="flex items-center gap-3">
           <button type="button" className="btn !py-1.5" onClick={onClose}>
             <X size={14} strokeWidth={2.5} /> CLOSE
           </button>
-          <p className="display text-sm" style={{ color: '#12121A' }}>
+          <p className="heading text-sm" style={{ color: 'var(--color-ink)' }}>
             {paper.code} · {paper.title}
           </p>
         </div>
-        <p className="label" style={{ color: '#12121A' }}>
+        <p className="label" style={{ color: 'var(--color-ink)' }}>
           VIEW ONLY
         </p>
       </div>
@@ -34,7 +34,7 @@ function Viewer({ paper, onClose }) {
           />
         ) : (
           <div className="max-w-md text-center text-white">
-            <p className="display text-2xl">NO FILE ATTACHED</p>
+            <p className="heading text-2xl">NO FILE ATTACHED</p>
             <p className="label mt-3 opacity-70">
               THIS ENTRY HAS NO URL YET. HOST THE SCAN (A DRIVE "VIEW ONLY" PREVIEW LINK
               WORKS WELL) AND PUT IT ON THE PAPER IN SRC/DATA/PYQ.JS
@@ -56,7 +56,7 @@ export default function Pyq() {
       <Eyebrow icon={FileText}>PYQ ARCHIVE</Eyebrow>
 
       <div className="mt-3 flex flex-wrap items-end justify-between gap-6">
-        <h1 className="display text-5xl sm:text-7xl">
+        <h1 className="heading text-5xl sm:text-7xl">
           Previous
           <br />
           year
@@ -87,11 +87,11 @@ export default function Pyq() {
                 onClick={() => setYear(active ? null : y.id)}
                 className="board board-hard w-40 p-4 text-left disabled:opacity-45"
                 style={{
-                  ...(active ? { background: 'var(--color-acid)', color: '#12121A' } : null),
+                  ...(active ? { background: 'var(--color-acid)', color: 'var(--color-ink)' } : null),
                   ...(y.available ? null : { borderStyle: 'dashed', boxShadow: 'none' }),
                 }}
               >
-                <p className="display text-2xl">{y.label}</p>
+                <p className="heading text-2xl">{y.label}</p>
                 <p className="label mt-2 opacity-70">{y.sub}</p>
               </button>
             )
@@ -110,7 +110,7 @@ export default function Pyq() {
 
           {papers.length === 0 ? (
             <Panel className="p-8 text-center">
-              <p className="display text-lg">NO PAPERS FOR THIS SESSION YET</p>
+              <p className="heading text-lg">NO PAPERS FOR THIS SESSION YET</p>
             </Panel>
           ) : (
             <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
@@ -122,7 +122,7 @@ export default function Pyq() {
                   className="board board-hard p-4 text-left transition-transform hover:-translate-y-0.5"
                 >
                   <Chip tone="var(--color-sky)">{p.code}</Chip>
-                  <p className="display mt-3 text-base">{p.title}</p>
+                  <p className="heading mt-3 text-base">{p.title}</p>
                   <p className="label muted mt-1.5">
                     {year} · {p.sem}
                   </p>

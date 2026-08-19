@@ -20,7 +20,7 @@ export default function SelectInfo() {
       <Eyebrow icon={Info}>INFO SELECTION</Eyebrow>
 
       <div className="mt-3 flex flex-wrap items-end justify-between gap-6">
-        <h1 className="display text-5xl sm:text-6xl">
+        <h1 className="heading text-5xl sm:text-6xl">
           Select
           <br />
           your info
@@ -39,7 +39,7 @@ export default function SelectInfo() {
           >
             <t.icon size={18} strokeWidth={2.5} className="mt-0.5 shrink-0" aria-hidden />
             <span>
-              <span className="display block text-base">{t.title}</span>
+              <span className="heading block text-base">{t.title}</span>
               <span className="label muted mt-1 block">{t.sub}</span>
             </span>
           </Link>

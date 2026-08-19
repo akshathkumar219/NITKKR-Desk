@@ -31,15 +31,15 @@ export function PageHeader({ icon: Icon, accent, eyebrow, title, sub, actions })
         <div className="flex items-start gap-3 sm:gap-4">
           {Icon ? (
             <span
-              className="grid size-11 shrink-0 place-items-center border-2 border-ink dark:border-ink"
+              className="grid size-11 shrink-0 place-items-center border-2 border-[var(--border)]"
               style={{ background: accent, borderRadius: 'var(--radius-board)' }}
             >
-              <Icon size={20} strokeWidth={2.5} color="#12121A" aria-hidden />
+              <Icon size={20} strokeWidth={2.5} color="var(--color-ink)" aria-hidden />
             </span>
           ) : null}
           <div className="min-w-0">
             {eyebrow ? <Eyebrow className="mb-1">{eyebrow}</Eyebrow> : null}
-            <h1 className="display text-3xl sm:text-4xl">{title}</h1>
+            <h1 className="heading text-3xl sm:text-4xl">{title}</h1>
             {sub ? <p className="label muted mt-2">{sub}</p> : null}
           </div>
         </div>
@@ -55,7 +55,7 @@ export function Chip({ children, tone, className = '', style, ...rest }) {
   return (
     <span
       className={`chip ${className}`}
-      style={tone ? { background: tone, color: '#12121A', ...style } : style}
+      style={tone ? { background: tone, color: 'var(--color-ink)', ...style } : style}
       {...rest}
     >
       {children}
@@ -101,7 +101,7 @@ export function Segmented({ options, value, onChange, label, size = 'md' }) {
 export function EmptyState({ title, hint, action }) {
   return (
     <Panel className="px-6 py-14 text-center" hard={false}>
-      <p className="display text-xl sm:text-2xl">{title}</p>
+      <p className="heading text-xl sm:text-2xl">{title}</p>
       {hint ? <p className="label muted mx-auto mt-3 max-w-md">{hint}</p> : null}
       {action ? <div className="mt-6 flex justify-center">{action}</div> : null}
     </Panel>
@@ -117,7 +117,7 @@ export function StatTile({ label, value, accent }) {
       style={accent ? { borderBottomWidth: 5, borderBottomColor: accent } : undefined}
     >
       <p className="label muted">{label}</p>
-      <p className="display mt-1 text-lg">{value}</p>
+      <p className="heading mt-1 text-lg">{value}</p>
     </div>
   )
 }
@@ -159,9 +159,9 @@ export function Modal({ open, onClose, title, sub, children, footer }) {
         aria-label={title}
         className="animate-flip my-auto w-full max-w-lg outline-none"
       >
-        <div className="flex items-start justify-between gap-4 border-b-2 border-ink p-4 dark:border-[#33334a]">
+        <div className="flex items-start justify-between gap-4 border-b-2 border-[var(--border)] p-4">
           <div>
-            <h2 className="display text-xl">{title}</h2>
+            <h2 className="heading text-xl">{title}</h2>
             {sub ? <p className="label muted mt-1">{sub}</p> : null}
           </div>
           <button type="button" className="btn !p-2" onClick={onClose} aria-label="Close">
@@ -170,7 +170,7 @@ export function Modal({ open, onClose, title, sub, children, footer }) {
         </div>
         <div className="p-4">{children}</div>
         {footer ? (
-          <div className="flex flex-wrap justify-end gap-2 border-t-2 border-ink p-4 dark:border-[#33334a]">
+          <div className="flex flex-wrap justify-end gap-2 border-t-2 border-[var(--border)] p-4">
             {footer}
           </div>
         ) : null}
@@ -234,7 +234,7 @@ export function Meter({ percent, color, required }) {
   const width = percent === null ? 0 : Math.min(100, Math.max(0, percent))
   return (
     <div
-      className="relative h-3 w-full border-2 border-ink dark:border-[#33334a]"
+      className="relative h-3 w-full border-2 border-[var(--border)]"
       style={{ borderRadius: 2 }}
       role="meter"
       aria-valuenow={percent === null ? undefined : Math.round(percent)}
@@ -244,7 +244,7 @@ export function Meter({ percent, color, required }) {
       <div className="h-full" style={{ width: `${width}%`, background: color }} />
       {required != null ? (
         <span
-          className="absolute top-[-3px] bottom-[-3px] w-0.5 bg-ink dark:bg-white"
+          className="absolute top-[-3px] bottom-[-3px] w-0.5 bg-[var(--text)]"
           style={{ left: `${required}%` }}
           aria-hidden
         />
@@ -270,7 +270,7 @@ export function Ring({ percent, size = 104, color }) {
           r={r}
           fill="none"
           strokeWidth={stroke}
-          className="stroke-black/10 dark:stroke-white/12"
+          className="stroke-[var(--border)]"
         />
         <circle
           cx={size / 2}
@@ -285,7 +285,7 @@ export function Ring({ percent, size = 104, color }) {
       </svg>
       <div className="absolute inset-0 grid place-items-center text-center">
         <div>
-          <p className="display text-xl leading-none">
+          <p className="heading text-xl leading-none">
             {percent === null ? '—' : `${Math.round(percent)}%`}
           </p>
         </div>

@@ -91,7 +91,7 @@ export default function SessionModal({ open, onClose, onSave, onDelete, session,
             <button
               type="button"
               className="btn mr-auto"
-              style={{ background: 'var(--color-coral)', color: '#12121A' }}
+              style={{ background: 'var(--color-coral)', color: 'var(--color-ink)' }}
               onClick={() => {
                 onDelete(session.id)
                 onClose()

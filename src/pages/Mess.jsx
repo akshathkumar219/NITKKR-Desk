@@ -63,14 +63,14 @@ export default function Mess() {
           <Panel key={meal.key} className="p-4">
             <div className="flex items-center gap-3">
               <span
-                className="grid size-9 shrink-0 place-items-center border-2 border-ink"
+                className="grid size-9 shrink-0 place-items-center border-2 border-[var(--border)]"
                 style={{ background: meal.accent, borderRadius: 'var(--radius-board)' }}
                 aria-hidden
               >
-                <UtensilsCrossed size={16} strokeWidth={2.5} color="#12121A" />
+                <UtensilsCrossed size={16} strokeWidth={2.5} color="var(--color-ink)" />
               </span>
               <div>
-                <p className="display text-lg">{meal.label}</p>
+                <p className="heading text-lg">{meal.label}</p>
                 <p className="label muted mt-0.5">{meal.time}</p>
               </div>
             </div>

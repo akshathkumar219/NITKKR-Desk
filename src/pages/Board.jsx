@@ -33,7 +33,7 @@ function SessionCard({ session, mark, onEdit, onMark, editing, isToday }) {
         </div>
         {!isBreak ? (
           <span
-            className="grid size-8 shrink-0 place-items-center border-2 border-ink font-mono text-[0.6rem] font-bold"
+            className="grid size-8 shrink-0 place-items-center border-2 border-[var(--border)] font-mono text-[0.6rem] font-bold"
             style={{
               borderRadius: 99,
               background: mark ? MARK_TONE[mark] : 'transparent',
@@ -46,7 +46,7 @@ function SessionCard({ session, mark, onEdit, onMark, editing, isToday }) {
         ) : null}
       </div>
 
-      <h3 className="display mt-3 text-xl">{session.name}</h3>
+      <h3 className="heading mt-3 text-xl">{session.name}</h3>
 
       {session.code ? (
         <p className="mt-1 font-mono text-xs muted">&lt;{session.code}&gt;</p>
@@ -119,27 +119,27 @@ function WeekGrid({ sessions, editing, onEdit, onDrop, onAddDay }) {
 
   return (
     <Panel className="overflow-hidden">
-      <div className="label muted border-b-2 border-ink px-4 py-2.5 dark:border-[#33334a]">
+      <div className="label muted border-b-2 border-[var(--border)] px-4 py-2.5">
         WEEK GRID · {sessions.length} BLOCKS ·{' '}
         {editing ? 'DRAG A BLOCK TO ANOTHER DAY' : 'BATCHES GROUPED'}
       </div>
 
       <div className="overflow-x-auto no-scrollbar">
         <div className="min-w-[720px]">
-          <div className="grid grid-cols-[56px_repeat(5,1fr)] border-b-2 border-ink dark:border-[#33334a]">
+          <div className="grid grid-cols-[56px_repeat(5,1fr)] border-b-2 border-[var(--border)]">
             <div />
             {DAYS.map((d) => (
               <div
                 key={d}
-                className="label flex items-center justify-center gap-2 border-l-2 border-ink py-2 dark:border-[#33334a]"
+                className="label flex items-center justify-center gap-2 border-l-2 border-[var(--border)] py-2"
               >
                 {d}
                 {editing ? (
                   <button
                     type="button"
                     onClick={() => onAddDay(d)}
-                    className="grid size-5 place-items-center border-2 border-ink"
-                    style={{ background: 'var(--color-acid)', borderRadius: 2, color: '#12121A' }}
+                    className="grid size-5 place-items-center border-2 border-[var(--border)]"
+                    style={{ background: 'var(--color-acid)', borderRadius: 2, color: 'var(--color-ink)' }}
                     aria-label={`Add session on ${d}`}
                   >
                     <Plus size={11} strokeWidth={3} />
@@ -170,7 +170,7 @@ function WeekGrid({ sessions, editing, onEdit, onDrop, onAddDay }) {
             {DAYS.map((day) => (
               <div
                 key={day}
-                className="relative border-l-2 border-ink dark:border-[#33334a]"
+                className="relative border-l-2 border-[var(--border)]"
                 onDragOver={editing ? (e) => e.preventDefault() : undefined}
                 onDrop={
                   editing
@@ -209,13 +209,13 @@ function WeekGrid({ sessions, editing, onEdit, onDrop, onAddDay }) {
                           : undefined
                       }
                       onClick={editing ? () => onEdit(s) : undefined}
-                      className="absolute inset-x-1 overflow-hidden border-2 border-ink p-1.5 text-left"
+                      className="absolute inset-x-1 overflow-hidden border-2 border-[var(--border)] p-1.5 text-left"
                       style={{
                         top: (s.start - from) * pxPerMin + 2,
                         height: Math.max((s.end - s.start) * pxPerMin - 4, 26),
                         background: isBreak ? 'transparent' : style.bg,
                         borderRadius: 2,
-                        color: '#12121A',
+                        color: 'var(--color-ink)',
                         cursor: editing ? 'grab' : 'default',
                         ...(isBreak
                           ? { borderStyle: 'dashed', color: 'inherit' }
@@ -351,7 +351,7 @@ export default function Board() {
               <button
                 type="button"
                 className="btn"
-                style={{ background: 'var(--color-sky)', color: '#12121A' }}
+                style={{ background: 'var(--color-sky)', color: 'var(--color-ink)' }}
                 onClick={() => setModal({ open: true, session: null, day })}
               >
                 <Plus size={14} strokeWidth={3} /> ADD SESSION
@@ -412,7 +412,7 @@ export default function Board() {
           <Panel className="flex flex-wrap items-center justify-between gap-3 p-4">
             <div>
               <p className="label muted">DAY VIEW · YEAR {year}</p>
-              <p className="display mt-1 text-3xl">{day}</p>
+              <p className="heading mt-1 text-3xl">{day}</p>
             </div>
             <span className="label muted">
               {teaching.length} SESSION{teaching.length === 1 ? '' : 'S'}

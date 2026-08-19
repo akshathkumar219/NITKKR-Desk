@@ -21,7 +21,7 @@ export default function CampusMap() {
       <Eyebrow icon={MapPin}>CAMPUS NAVIGATION</Eyebrow>
 
       <div className="mt-3 flex flex-wrap items-end justify-between gap-6">
-        <h1 className="display text-5xl sm:text-6xl">
+        <h1 className="heading text-5xl sm:text-6xl">
           Campus
           <br />
           map
@@ -52,7 +52,7 @@ export default function CampusMap() {
 
       {list.length === 0 ? (
         <Panel className="mt-4 p-8 text-center">
-          <p className="display text-lg">NO LANDMARKS MATCH</p>
+          <p className="heading text-lg">NO LANDMARKS MATCH</p>
         </Panel>
       ) : (
         <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
@@ -65,7 +65,7 @@ export default function CampusMap() {
               className="board board-hard flex items-start justify-between gap-3 p-4 transition-transform hover:-translate-y-0.5"
             >
               <div className="min-w-0">
-                <p className="display text-base">{l.name}</p>
+                <p className="heading text-base">{l.name}</p>
                 <Chip className="mt-2">{l.tag}</Chip>
               </div>
               <ExternalLink size={15} strokeWidth={2.5} className="shrink-0 opacity-60" aria-hidden />
@@ -75,7 +75,7 @@ export default function CampusMap() {
       )}
 
       <Panel className="mt-6 overflow-hidden">
-        <div className="label muted border-b-2 border-ink px-4 py-2.5 dark:border-[#33334a]">
+        <div className="label muted border-b-2 border-[var(--border)] px-4 py-2.5">
           LIVE MAP · NIT KURUKSHETRA
         </div>
         <iframe

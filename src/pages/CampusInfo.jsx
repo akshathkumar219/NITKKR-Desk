@@ -37,7 +37,7 @@ export default function CampusInfo() {
 
       <Panel className="p-4 sm:p-5">
         <p className="label muted">ABOUT</p>
-        <p className="display mt-1 text-xl">{INSTITUTE.name}</p>
+        <p className="heading mt-1 text-xl">{INSTITUTE.name}</p>
         <p className="mt-2 text-sm font-medium">{INSTITUTE.blurb}</p>
         <div className="mt-4 grid gap-3 sm:grid-cols-3">
           <StatTile label="ESTABLISHED" value={INSTITUTE.established} accent="var(--color-sky)" />
@@ -50,7 +50,7 @@ export default function CampusInfo() {
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
             <p className="label muted">ACADEMIC CALENDAR</p>
-            <p className="display mt-1 text-xl">{CALENDAR.title}</p>
+            <p className="heading mt-1 text-xl">{CALENDAR.title}</p>
             <p className="label muted mt-1.5 normal-case">{CALENDAR.audience}</p>
           </div>
           <Chip tone="var(--color-amber)">PLACEHOLDER</Chip>
@@ -81,7 +81,7 @@ export default function CampusInfo() {
             <Phone size={15} strokeWidth={2.5} aria-hidden />
             <p className="label muted">HELPLINE</p>
           </div>
-          <p className="display mt-1 text-xl">EMERGENCY CONTACTS</p>
+          <p className="heading mt-1 text-xl">EMERGENCY CONTACTS</p>
           <dl className="mt-3">
             {HELPLINE.map((h) => (
               <div
@@ -103,7 +103,7 @@ export default function CampusInfo() {
 
         <Panel className="p-4 sm:p-5">
           <p className="label muted">RESOURCES</p>
-          <p className="display mt-1 text-xl">QUICK LINKS</p>
+          <p className="heading mt-1 text-xl">QUICK LINKS</p>
           <div className="mt-4 flex flex-wrap gap-2">
             {QUICK_LINKS.map((l) => (
               <a

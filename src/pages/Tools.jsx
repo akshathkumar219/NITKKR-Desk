@@ -29,7 +29,7 @@ const SECTIONS = [
   { id: 'skip', label: 'SKIP GUARD', icon: ShieldCheck, accent: 'var(--color-acid)' },
   { id: 'cgpa', label: 'CGPA', icon: Calculator, accent: 'var(--color-sky)' },
   { id: 'transport', label: 'TRANSPORT', icon: Bus, accent: 'var(--color-teal)' },
-  { id: 'links', label: 'LINKS', icon: LinkIcon, accent: '#fff' },
+  { id: 'links', label: 'LINKS', icon: LinkIcon, accent: 'var(--surface)' },
   { id: 'placements', label: 'PLACEMENTS', icon: Briefcase, accent: 'var(--color-coral)' },
   { id: 'backup', label: 'BACKUP', icon: HardDriveDownload, accent: 'var(--color-amber)' },
 ]
@@ -63,7 +63,7 @@ function SkipGuard() {
   return (
     <Panel className="p-4 sm:p-5" id="skip">
       <p className="label muted">SKIP GUARD</p>
-      <p className="display mt-2 text-2xl">
+      <p className="heading mt-2 text-2xl">
         {live ? 'YOU ARE IN CLASS' : next ? 'ONE MORE TO GO' : 'BOARD IS CLEAR'}
       </p>
       <p className="mt-2 text-sm font-semibold">
@@ -112,7 +112,7 @@ function Cgpa() {
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
           <p className="label muted">SGPA · LIVE ESTIMATE</p>
-          <p className="display mt-1 text-5xl">{sgpa.toFixed(2)}</p>
+          <p className="heading mt-1 text-5xl">{sgpa.toFixed(2)}</p>
         </div>
         <div className="grid grid-cols-2 gap-2">
           <StatTile label="CREDITS" value={credits} accent="var(--color-sky)" />
@@ -203,7 +203,7 @@ function Backup() {
   return (
     <Panel className="p-4 sm:p-5" id="backup">
       <p className="label muted">BACKUP / RESTORE</p>
-      <p className="display mt-1 text-xl">OFFLINE JSON SNAPSHOT</p>
+      <p className="heading mt-1 text-xl">OFFLINE JSON SNAPSHOT</p>
       <p className="mt-2 text-sm font-medium">
         Your board, roll call, grades and profile as one file. This is the only way to
         recover if you clear your browser data — do it every few weeks.
@@ -264,7 +264,7 @@ export default function Tools() {
               key={s.id}
               href={`#${s.id}`}
               className="btn"
-              style={{ background: s.accent, color: '#12121A' }}
+              style={{ background: s.accent, color: 'var(--color-ink)' }}
             >
               <s.icon size={14} strokeWidth={2.5} /> {s.label}
             </a>
@@ -305,7 +305,7 @@ export default function Tools() {
       {/* ---- Transport ---- */}
       <Panel className="p-4 sm:p-5" id="transport">
         <p className="label muted">KURUKSHETRA TRANSPORT</p>
-        <p className="display mt-1 text-xl">OPEN DIRECTIONS IN MAPS</p>
+        <p className="heading mt-1 text-xl">OPEN DIRECTIONS IN MAPS</p>
         <div className="mt-4 flex flex-wrap gap-2">
           {TRANSPORT.map((t) => (
             <a
@@ -326,7 +326,7 @@ export default function Tools() {
         <div className="flex items-center justify-between gap-3">
           <div>
             <p className="label muted">USEFUL LINKS</p>
-            <p className="display mt-1 text-xl">PORTALS & STUDY TOOLS</p>
+            <p className="heading mt-1 text-xl">PORTALS & STUDY TOOLS</p>
           </div>
           <Chip>{USEFUL_LINKS.length} LINKS</Chip>
         </div>
@@ -340,7 +340,7 @@ export default function Tools() {
               className="board p-3 transition-transform hover:-translate-y-0.5"
             >
               <Chip tone="var(--color-amber)">{l.tag}</Chip>
-              <p className="display mt-2 text-base">{l.title}</p>
+              <p className="heading mt-2 text-base">{l.title}</p>
               <p className="label muted mt-1 normal-case">{l.description}</p>
             </a>
           ))}
@@ -350,12 +350,12 @@ export default function Tools() {
       {/* ---- Placements ---- */}
       <Panel className="p-4 sm:p-5" id="placements">
         <p className="label muted">PLACEMENT CHECKLIST</p>
-        <p className="display mt-1 text-xl">DRIVE PREP ESSENTIALS</p>
+        <p className="heading mt-1 text-xl">DRIVE PREP ESSENTIALS</p>
         <ol className="mt-4 grid gap-3 sm:grid-cols-2">
           {PLACEMENT_CHECKLIST.map((item, i) => (
             <li key={item.title} className="board p-3">
               <span className="label muted">{String(i + 1).padStart(2, '0')}</span>
-              <p className="display mt-1 text-base">{item.title}</p>
+              <p className="heading mt-1 text-base">{item.title}</p>
               <p className="mt-1 text-sm font-medium">{item.body}</p>
             </li>
           ))}

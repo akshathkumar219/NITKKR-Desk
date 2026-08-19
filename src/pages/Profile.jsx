@@ -34,15 +34,15 @@ export default function Profile() {
       <Panel className="p-4 sm:p-6">
         <div className="flex items-center gap-4">
           <span
-            className="grid size-14 shrink-0 place-items-center border-2 border-ink font-mono text-base font-bold"
-            style={{ background: 'var(--color-acid)', borderRadius: 2, color: '#12121A' }}
+            className="grid size-14 shrink-0 place-items-center border-2 border-[var(--border)] font-mono text-base font-bold"
+            style={{ background: 'var(--color-acid)', borderRadius: 2, color: 'var(--color-ink)' }}
             aria-hidden
           >
             {initialsOf(profile.name)}
           </span>
           <div className="min-w-0">
             <p className="label muted">DISPLAY NAME</p>
-            <p className="display text-2xl">{profile.name || 'NO NAME SET'}</p>
+            <p className="heading text-2xl">{profile.name || 'NO NAME SET'}</p>
             <p className="label muted mt-1">
               {branchName(profile.branch)} · Y{year} · {hostelName(profile.hostel)}
             </p>
@@ -77,7 +77,7 @@ export default function Profile() {
         >
           <span>
             <span className="label muted block">CHANGE BRANCH</span>
-            <span className="display mt-1 block text-lg">
+            <span className="heading mt-1 block text-lg">
               {branchName(profile.branch)} · YEAR {year}
             </span>
           </span>
@@ -91,7 +91,7 @@ export default function Profile() {
         >
           <span>
             <span className="label muted block">CHANGE HOSTEL</span>
-            <span className="display mt-1 block text-lg">{hostelName(profile.hostel)}</span>
+            <span className="heading mt-1 block text-lg">{hostelName(profile.hostel)}</span>
           </span>
           <ChevronRight size={18} strokeWidth={2.5} aria-hidden />
         </button>

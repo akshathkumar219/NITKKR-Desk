@@ -7,7 +7,7 @@ export default function NotFound() {
     <PlainShell back={null}>
       <Panel className="mt-16 p-8 text-center sm:p-12">
         <p className="label muted">404</p>
-        <h1 className="display mt-3 text-5xl sm:text-6xl">
+        <h1 className="heading mt-3 text-5xl sm:text-6xl">
           Not on
           <br />
           the board

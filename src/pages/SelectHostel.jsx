@@ -20,7 +20,7 @@ export default function SelectHostel() {
       <Eyebrow icon={UtensilsCrossed}>HOSTEL SELECTION</Eyebrow>
 
       <div className="mt-3 flex flex-wrap items-end justify-between gap-6">
-        <h1 className="display text-5xl sm:text-6xl">
+        <h1 className="heading text-5xl sm:text-6xl">
           Select your
           <br />
           hostel
@@ -42,12 +42,12 @@ export default function SelectHostel() {
               className="board board-hard p-4 text-left transition-transform hover:-translate-y-0.5"
               style={active ? { borderColor: 'var(--color-brand)', borderWidth: 3 } : undefined}
             >
-              <p className="display text-2xl">{h.code}</p>
+              <p className="heading text-2xl">{h.code}</p>
               <p className="label muted mt-1.5">{h.name}</p>
               <hr className="my-3 border-t-2 border-black/10 dark:border-white/10" />
               <span
                 className="chip"
-                style={custom ? { background: 'var(--color-coral)', color: '#12121A' } : undefined}
+                style={custom ? { background: 'var(--color-coral)', color: 'var(--color-ink)' } : undefined}
               >
                 {custom ? 'OWN MENU' : 'SHARED MENU'}
               </span>

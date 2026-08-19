@@ -38,6 +38,12 @@
   --shadow-hard-lg: 7px 7px 0 0 var(--color-ink);
 }
 
+:root {
+  /* Chevron for select.field — inline SVG so it needs no network request. */
+  --chevron-light: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' fill='none' stroke='%2312121a' stroke-width='2' stroke-linecap='square'/%3E%3C/svg%3E");
+  --chevron-dark: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' fill='none' stroke='%23f4f2ee' stroke-width='2' stroke-linecap='square'/%3E%3C/svg%3E");
+}
+
 @layer base {
   html {
     -webkit-text-size-adjust: 100%;
@@ -217,7 +223,7 @@
     padding: 0.625rem 0.75rem;
     border: 2px solid var(--color-ink);
     border-radius: var(--radius-board);
-    background: #fff;
+    background-color: #fff;
     color: var(--color-ink);
     font-family: var(--font-mono);
     font-size: 0.875rem;
@@ -230,8 +236,38 @@
 
   .dark .field {
     border-color: #3a3a52;
-    background: #10101a;
+    background-color: #10101a;
     color: #f4f2ee;
+  }
+
+  /* Native <select> ships an OS-drawn control: rounded, system-font, its own
+     arrow. That is the one element on screen that does not belong to this
+     design language. Strip the chrome and draw our own chevron. The element
+     stays a real <select>, so phones still open the native picker and the
+     accessibility tree is unchanged. */
+  select.field {
+    appearance: none;
+    -webkit-appearance: none;
+    padding-right: 2rem;
+    background-image: var(--chevron-light);
+    background-repeat: no-repeat;
+    background-position: right 0.625rem center;
+    background-size: 0.7rem;
+    font-weight: 500;
+    text-overflow: ellipsis;
+    cursor: pointer;
+  }
+
+  select.field:hover:not(:disabled) {
+    border-color: var(--color-brand);
+  }
+
+  .dark select.field {
+    background-image: var(--chevron-dark);
+  }
+
+  select.field::-ms-expand {
+    display: none;
   }
 
   /* ---- Chips ------------------------------------------------------- */

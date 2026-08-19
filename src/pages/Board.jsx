@@ -3,12 +3,12 @@ import { Link } from 'react-router-dom'
 import { CalendarDays, GripVertical, LayoutGrid, List, Plus, Search } from 'lucide-react'
 import Shell from '../components/Shell'
 import SessionModal from '../components/SessionModal'
-import { Chip, EmptyState, Field, PageHeader, Panel, Segmented, Select } from '../ui'
+import { Chip, EmptyState, PageHeader, Panel, Segmented, Select } from '../ui'
 import { BRANCHES, TYPE_STYLE, YEARS, branchName } from '../data/campus'
 import { useProfile } from '../lib/storage'
 import { gridBounds, sessionsForDay, useBoard } from '../lib/board'
 import { DAYS, dayCode, fmtRange } from '../lib/time'
-import { useRollcall } from '../lib/rollcall'
+import { MARKS, useRollcall } from '../lib/rollcall'
 import { todayISO } from '../lib/time'
 
 const MARK_TONE = {
@@ -17,9 +17,10 @@ const MARK_TONE = {
   cancelled: 'var(--color-cancelled)',
 }
 
+
 /* --------------------------------------------------------------- Day card -- */
 
-function SessionCard({ session, mark, onEdit, editing }) {
+function SessionCard({ session, mark, onEdit, onMark, editing, isToday }) {
   const style = TYPE_STYLE[session.type] ?? TYPE_STYLE.other
   const isBreak = session.type === 'break'
 
@@ -64,6 +65,29 @@ function SessionCard({ session, mark, onEdit, editing }) {
             <button type="button" className="btn !py-1.5" onClick={() => onEdit(session)}>
               EDIT
             </button>
+          ) : isToday ? (
+            /* Marking straight from the board is the whole point of the board.
+               Only offered on today's tab — marking a Friday class while
+               looking at Monday would silently write the wrong date. Past days
+               are what Roll Call's BACKFILL tab is for. */
+            <div className="flex w-full gap-1.5">
+              {MARKS.map((m) => (
+                <button
+                  key={m}
+                  type="button"
+                  className="btn flex-1 !px-1 !py-1.5 !text-[0.6rem]"
+                  aria-pressed={mark === m}
+                  style={
+                    mark === m
+                      ? { background: MARK_TONE[m], borderColor: MARK_TONE[m], color: '#fff' }
+                      : undefined
+                  }
+                  onClick={() => onMark(session.id, m)}
+                >
+                  {m.toUpperCase()}
+                </button>
+              ))}
+            </div>
           ) : (
             <>
               <span className="label muted">LOG IT IN ROLL CALL</span>
@@ -223,7 +247,7 @@ export default function Board() {
   const { profile, year, setBranch, setYear } = useProfile()
   const { sessions, addSession, removeSession, moveSession, resetBoard, isCustomised } =
     useBoard(profile.branch, year)
-  const { getMark } = useRollcall()
+  const { getMark, setMark } = useRollcall()
 
   const today = dayCode()
   const [day, setDay] = useState(DAYS.includes(today) ? today : 'MON')
@@ -255,7 +279,7 @@ export default function Board() {
         sub={`${branchName(profile.branch)} · YEAR ${year}`}
         actions={
           <>
-            <div className="w-44">
+            <div className="w-52">
               <Select
                 aria-label="Branch"
                 options={BRANCHES.map((b) => ({ value: b.code, label: b.name }))}
@@ -263,7 +287,7 @@ export default function Board() {
                 onChange={(v) => setBranch(v)}
               />
             </div>
-            <div className="w-24">
+            <div className="w-28">
               <Select
                 aria-label="Year"
                 options={YEARS.map((y) => ({ value: y, label: `Year ${y}` }))}
@@ -408,6 +432,8 @@ export default function Board() {
                   session={s}
                   editing={editing}
                   mark={getMark(iso, s.id)}
+                  isToday={day === today}
+                  onMark={(id, m) => setMark(iso, id, m)}
                   onEdit={(sess) => setModal({ open: true, session: sess, day: sess.day })}
                 />
               ))}

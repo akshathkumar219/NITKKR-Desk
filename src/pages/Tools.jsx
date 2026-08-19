@@ -13,9 +13,9 @@ import {
   Wrench,
 } from 'lucide-react'
 import Shell from '../components/Shell'
-import { Chip, EmptyState, Field, PageHeader, Panel, Select, StatTile } from '../ui'
+import { Chip, Field, PageHeader, Panel, Select, StatTile } from '../ui'
 import { KEYS, exportSnapshot, importSnapshot, useProfile, useStored } from '../lib/storage'
-import { BRANCHES, HOSTELS, YEARS, branchName, hostelName } from '../data/campus'
+import { BRANCHES, HOSTELS, YEARS } from '../data/campus'
 import { currentSession, nextSession, useBoard } from '../lib/board'
 import { currentMeal, menuFor } from '../data/mess'
 import { dayCode, fmtRange, minutesNow } from '../lib/time'

@@ -58,7 +58,7 @@ export default function SelectHostel() {
 
       <p className="label muted mt-10">
         HOSTELS WITHOUT THEIR OWN MENU FALL BACK TO A SHARED PLACEHOLDER WEEK.
-        ADD REAL MENUS IN SRC/DATA/MESS.JS
+        ADD REAL MENUS IN CONTENT/MESS/ — ONE FILE PER HOSTEL
       </p>
     </PlainShell>
   )

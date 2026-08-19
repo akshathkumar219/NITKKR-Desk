@@ -53,7 +53,7 @@ export default function Mess() {
         >
           <p className="label">
             PLACEHOLDER MENU — {hostelName(profile.hostel)} HAS NO OWN DATA YET.
-            ADD IT IN SRC/DATA/MESS.JS
+            ADD IT IN CONTENT/MESS/ — ONE FILE PER HOSTEL
           </p>
         </Panel>
       ) : null}
@@ -78,7 +78,7 @@ export default function Mess() {
             <ol className="mt-4 space-y-0">
               {(menu[meal.key] ?? []).map((item, i) => (
                 <li
-                  key={item}
+                  key={`${meal.key}-${i}`}
                   className="flex gap-3 border-t-2 border-black/10 py-2.5 dark:border-white/10"
                 >
                   <span className="label muted shrink-0 pt-0.5">

@@ -227,7 +227,16 @@ function WeekGrid({ sessions, editing, onEdit, onDrop, onAddDay }) {
                         <span className="line-clamp-2 font-bold">{s.name}</span>
                       </span>
                       {s.room ? (
-                        <span className="label muted mt-0.5 block !text-[0.5rem]">{s.room}</span>
+                        // Not .muted: that grey is tuned for --surface, and
+                        // these blocks sit on a bright accent fill, where it
+                        // drops to ~2:1. Dimming the inherited ink instead
+                        // keeps the secondary weight and stays readable.
+                        <span
+                          className="label mt-0.5 block !text-[0.5rem]"
+                          style={{ opacity: 0.72 }}
+                        >
+                          {s.room}
+                        </span>
                       ) : null}
                     </button>
                   )

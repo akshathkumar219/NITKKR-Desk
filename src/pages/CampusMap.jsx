@@ -89,7 +89,7 @@ export default function CampusMap() {
 
       <p className="label muted mt-4">
         LANDMARK LINKS SEARCH GOOGLE MAPS BY NAME. FOR EXACT PINS, REPLACE THE
-        QUERY WITH LAT/LNG COORDINATES IN SRC/DATA/INFO.JS
+        QUERY WITH LAT/LNG COORDINATES IN CONTENT/CAMPUS/LANDMARKS.MD
       </p>
     </PlainShell>
   )

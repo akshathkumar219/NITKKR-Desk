@@ -105,8 +105,13 @@ async function run(label, viewport, theme, seed) {
       const parse = (c) => {
         const m = c.match(/rgba?\(([^)]+)\)/)
         if (!m) return null
-        const [r, g, b, a = '1'] = m[1].split(',').map((x) => parseFloat(x))
-        return { r, g, b, a }
+        // Handles both `rgba(0, 0, 0, 0.9)` and the modern `rgb(0 0 0 / 0.9)`
+        // that Tailwind emits.
+        const [rgb, alpha] = m[1].split('/')
+        const n = rgb.trim().split(/[\s,]+/).map(parseFloat)
+        if (n.length < 3 || n.slice(0, 3).some(Number.isNaN)) return null
+        const a = alpha !== undefined ? parseFloat(alpha) : (Number.isNaN(n[3]) ? 1 : n[3] ?? 1)
+        return { r: n[0], g: n[1], b: n[2], a: Number.isNaN(a) ? 1 : a }
       }
       const lum = ({ r, g, b }) => {
         const f = (v) => {

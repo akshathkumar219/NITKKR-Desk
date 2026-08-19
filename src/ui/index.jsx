@@ -3,9 +3,13 @@ import { X } from 'lucide-react'
 
 /* ---------------------------------------------------------------- Panel -- */
 
-export function Panel({ children, className = '', hard = true, ...rest }) {
+export function Panel({ children, className = '', hard = true, ref, ...rest }) {
+  // `ref` is destructured explicitly rather than left to ride along in
+  // {...rest}. Under React 19 a ref is an ordinary prop, so spreading it onto
+  // the div happened to work — but silently, and only by accident of that
+  // version's behaviour. Modal focuses this element on open and depends on it.
   return (
-    <div className={`board ${hard ? 'board-hard' : ''} ${className}`} {...rest}>
+    <div ref={ref} className={`board ${hard ? 'board-hard' : ''} ${className}`} {...rest}>
       {children}
     </div>
   )
@@ -142,16 +146,45 @@ export function Modal({ open, onClose, title, sub, children, footer }) {
 
   useEffect(() => {
     if (!open) return undefined
+    const FOCUSABLE =
+      'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
+
     const onKey = (e) => {
-      if (e.key === 'Escape') onClose()
+      if (e.key === 'Escape') {
+        onClose()
+        return
+      }
+      // Without this, Tab walks straight out of the dialog and into the page
+      // behind it, which is still visible and still scrolled to wherever the
+      // user was — keyboard users end up editing a form they cannot see.
+      if (e.key !== 'Tab' || !ref.current) return
+      const items = [...ref.current.querySelectorAll(FOCUSABLE)].filter(
+        (el) => el.offsetParent !== null,
+      )
+      if (!items.length) return
+      const first = items[0]
+      const last = items[items.length - 1]
+      const active = document.activeElement
+      if (e.shiftKey && (active === first || active === ref.current)) {
+        e.preventDefault()
+        last.focus()
+      } else if (!e.shiftKey && active === last) {
+        e.preventDefault()
+        first.focus()
+      }
     }
+
     document.addEventListener('keydown', onKey)
     const prev = document.body.style.overflow
+    const previouslyFocused = document.activeElement
     document.body.style.overflow = 'hidden'
     ref.current?.focus()
     return () => {
       document.removeEventListener('keydown', onKey)
       document.body.style.overflow = prev
+      // Send focus back where it came from, so closing a dialog does not
+      // dump the user at the top of the document.
+      if (previouslyFocused instanceof HTMLElement) previouslyFocused.focus()
     }
   }, [open, onClose])
 

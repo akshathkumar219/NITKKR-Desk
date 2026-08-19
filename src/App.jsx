@@ -17,6 +17,7 @@ import InfoHub from './pages/InfoHub'
 import Profile from './pages/Profile'
 import About from './pages/About'
 import NotFound from './pages/NotFound'
+import ErrorBoundary from './components/ErrorBoundary'
 import { KEYS, read, useTheme } from './lib/storage'
 
 function ScrollToTop() {
@@ -33,11 +34,24 @@ function RootGate() {
   return seen ? <Landing /> : <Navigate to="/welcome" replace />
 }
 
+/**
+ * Guards the app routes the same way RootGate guards `/`.
+ *
+ * Without this, a deep link to /home for a brand-new visitor rendered a board
+ * for DEFAULT_BRANCH/DEFAULT_YEAR — asserting a branch and year they never
+ * chose, which is the same class of bug that was showing phantom "CSE · Y1"
+ * chips on the landing page.
+ */
+function RequireWelcome({ children }) {
+  const seen = read(KEYS.welcomed, false)
+  return seen ? children : <Navigate to="/welcome" replace />
+}
+
 export default function App() {
   useTheme() // keeps the <html> class and theme-color meta in sync
 
   return (
-    <>
+    <ErrorBoundary>
       <ScrollToTop />
       <Routes>
         <Route path="/" element={<RootGate />} />
@@ -47,16 +61,16 @@ export default function App() {
         <Route path="/select/hostel" element={<SelectHostel />} />
         <Route path="/select/info" element={<SelectInfo />} />
 
-        <Route path="/home" element={<Board />} />
-        <Route path="/mess" element={<Mess />} />
-        <Route path="/rollcall" element={<RollCall />} />
-        <Route path="/rooms" element={<Rooms />} />
-        <Route path="/tools" element={<Tools />} />
+        <Route path="/home" element={<RequireWelcome><Board /></RequireWelcome>} />
+        <Route path="/mess" element={<RequireWelcome><Mess /></RequireWelcome>} />
+        <Route path="/rollcall" element={<RequireWelcome><RollCall /></RequireWelcome>} />
+        <Route path="/rooms" element={<RequireWelcome><Rooms /></RequireWelcome>} />
+        <Route path="/tools" element={<RequireWelcome><Tools /></RequireWelcome>} />
         <Route path="/pyq" element={<Pyq />} />
         <Route path="/map" element={<CampusMap />} />
-        <Route path="/campus" element={<CampusInfo />} />
-        <Route path="/info" element={<InfoHub />} />
-        <Route path="/profile" element={<Profile />} />
+        <Route path="/campus" element={<RequireWelcome><CampusInfo /></RequireWelcome>} />
+        <Route path="/info" element={<RequireWelcome><InfoHub /></RequireWelcome>} />
+        <Route path="/profile" element={<RequireWelcome><Profile /></RequireWelcome>} />
         <Route path="/about" element={<About />} />
 
         {/* Legacy query-tab URLs from the reference app */}
@@ -65,6 +79,6 @@ export default function App() {
 
         <Route path="*" element={<NotFound />} />
       </Routes>
-    </>
+    </ErrorBoundary>
   )
 }

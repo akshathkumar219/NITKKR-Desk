@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import {
   Bus,
   Briefcase,
@@ -51,8 +51,18 @@ const GRADE_POINTS = [
 function SkipGuard() {
   const { profile, year } = useProfile()
   const { sessions } = useBoard(profile.branch, year)
-  const day = dayCode()
-  const mins = minutesNow()
+
+  // "Now" was computed once per render with no ticker, so this panel kept
+  // naming a class that had already ended until some unrelated state change
+  // forced a re-render. Landing ticks at 30s and Rooms at 60s — match them.
+  const [now, setNow] = useState(() => new Date())
+  useEffect(() => {
+    const id = setInterval(() => setNow(new Date()), 30_000)
+    return () => clearInterval(id)
+  }, [])
+
+  const day = dayCode(now)
+  const mins = minutesNow(now)
 
   const live = currentSession(sessions, day, mins)
   const next = nextSession(sessions, day, mins)

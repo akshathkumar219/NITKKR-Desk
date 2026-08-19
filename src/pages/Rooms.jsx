@@ -72,7 +72,7 @@ export default function Rooms() {
           <p className="heading text-xl">NO ROOMS TRACKED YET</p>
           <p className="label muted mx-auto mt-3 max-w-md">
             OPEN ROOMS READS ROOM NAMES OFF THE PUBLISHED TIMETABLES. ADD REAL
-            TIMETABLE DATA IN SRC/DATA/TIMETABLES.JS AND THIS FILLS IN AUTOMATICALLY.
+            TIMETABLE DATA IN CONTENT/TIMETABLES/ AND THIS FILLS IN AUTOMATICALLY.
           </p>
         </Panel>
       ) : (

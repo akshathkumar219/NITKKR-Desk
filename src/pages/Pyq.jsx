@@ -7,7 +7,16 @@ import { PYQ_PAPERS, PYQ_YEARS } from '../data/pyq'
 function Viewer({ paper, onClose }) {
   if (!paper) return null
   return (
-    <div className="fixed inset-0 z-50 flex flex-col bg-black/90">
+    // Opaque, not a translucent scrim. §5 rules out glass/translucent
+    // surfaces, and letting the page bleed through also dropped the body copy
+    // below 2:1 in light mode.
+    <div
+      className="fixed inset-0 z-50 flex flex-col"
+      style={{ backgroundColor: 'var(--bg)' }}
+      role="dialog"
+      aria-modal="true"
+      aria-label={`${paper.code} ${paper.title}`}
+    >
       <div
         className="flex items-center justify-between gap-4 border-b-2 border-[var(--border)] px-4 py-3"
         style={{ background: 'var(--color-acid)' }}
@@ -33,11 +42,12 @@ function Viewer({ paper, onClose }) {
             className="h-full w-full border-0 bg-white"
           />
         ) : (
-          <div className="max-w-md text-center text-white">
-            <p className="heading text-2xl">NO FILE ATTACHED</p>
-            <p className="label mt-3 opacity-70">
-              THIS ENTRY HAS NO URL YET. HOST THE SCAN (A DRIVE "VIEW ONLY" PREVIEW LINK
-              WORKS WELL) AND PUT IT ON THE PAPER IN SRC/DATA/PYQ.JS
+          <div className="max-w-md text-center">
+            <p className="display text-3xl">no file attached</p>
+            <p className="label muted mt-4 normal-case">
+              This paper has no link yet. Add a view-only URL in the{' '}
+              <span className="font-bold">URL</span> column of{' '}
+              <span className="font-bold">content/pyq/{'{'}session{'}'}.md</span>.
             </p>
           </div>
         )}

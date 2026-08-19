@@ -79,7 +79,7 @@ export default function SelectBranch() {
 
       <p className="label muted mt-10">
         ONLY CSE YEAR 2 SHIPS WITH A SAMPLE BOARD. EVERY OTHER BRANCH STARTS EMPTY —
-        BUILD IT IN EDIT MODE, OR ADD THE REAL DATA IN SRC/DATA/TIMETABLES.JS
+        BUILD IT IN EDIT MODE, OR ADD THE REAL DATA IN CONTENT/TIMETABLES/
       </p>
     </PlainShell>
   )

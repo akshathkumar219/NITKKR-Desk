@@ -1,151 +1,131 @@
 // ---------------------------------------------------------------------------
-// STATIC CAMPUS CONTENT — PLACEHOLDER DATA
+// CAMPUS INFO — generated from content/*.md
 //
-// Calendar dates, phone numbers and landmark coordinates below are INVENTED
-// placeholders. Verify every one against official NITKKR sources before you
-// publish — a wrong emergency number is worse than no number.
+// Edit the markdown, not this file:
+//   content/institute.md          institute facts + blurb
+//   content/calendar/*.md         academic calendar (and holidays)
+//   content/helpline.md           emergency contacts
+//   content/links.md              useful + quick links
+//   content/transport.md          local destinations
+//   content/placements.md         placement checklist
+//   content/campus/landmarks.md   map landmarks
+//
+// This file only reshapes that JSON into the exact objects the pages already
+// consume, so the pipeline stayed invisible to every component.
 // ---------------------------------------------------------------------------
 
-export const INSTITUTE = {
-  name: 'National Institute of Technology Kurukshetra',
-  short: 'NIT Kurukshetra',
-  address: 'Thanesar, Kurukshetra, Haryana 136119',
-  established: '1963',
-  campus: '300 ACRES',
-  location: 'KURUKSHETRA, HR',
-  website: 'https://nitkkr.ac.in/',
-  blurb:
-    'NIT Kurukshetra is an Institute of National Importance with a large residential campus, established in 1963 as Regional Engineering College Kurukshetra.',
+import links from './generated/links.json'
+import landmarksJson from './generated/landmarks.json'
+import calendarJson from './generated/calendar.json'
+
+const rows = (dataset, section = 'DEFAULT') => links[dataset]?.[section] ?? []
+
+/** `| Label | Value |` tables read most naturally as an object. */
+function byLabel(list) {
+  return Object.fromEntries(list.map((r) => [r.label?.toLowerCase(), r.value]))
 }
+
+// ------------------------------------------------------------- institute --
+
+const inst = byLabel(rows('institute'))
+
+export const INSTITUTE = {
+  name: inst.name ?? '',
+  short: inst.short ?? '',
+  address: inst.address ?? '',
+  established: inst.established ?? '',
+  campus: inst.campus ?? '',
+  location: inst.location ?? '',
+  website: inst.website ?? '',
+  blurb: rows('institute', 'ABOUT')[0]?.text ?? '',
+}
+
+// -------------------------------------------------------------- calendar --
+
+const term = calendarJson.calendars[0] ?? { title: '', events: [] }
 
 export const CALENDAR = {
-  title: 'ODD SEMESTER 2026-27',
-  audience: 'B.Tech (3rd, 5th & 7th sem), M.Tech (3rd sem) & Ph.D. scholars',
-  note: 'PLACEHOLDER — REPLACE WITH THE OFFICIAL NITKKR ACADEMIC CALENDAR',
-  events: [
-    { label: 'REGISTRATION', value: 'JUL 20 – 24, 2026', category: 'REGISTRATION' },
-    { label: 'CLASSES BEGIN', value: 'JUL 27, 2026 (MON)', category: 'CLASSES' },
-    { label: 'MID-TERM EXAMS', value: 'SEP 21 – 26, 2026', category: 'EXAMS' },
-    { label: 'CLASSES END', value: 'NOV 20, 2026 (FRI)', category: 'CLASSES' },
-    { label: 'END-TERM EXAMS', value: 'NOV 27 – DEC 08, 2026', category: 'EXAMS' },
-    { label: 'RESULT DECLARATION', value: 'DEC 22, 2026', category: 'GRADES' },
-    { label: 'WINTER BREAK', value: 'DEC 10, 2026 – JAN 03, 2027', category: 'BREAKS' },
-    { label: 'NEXT SEMESTER BEGINS', value: 'JAN 04, 2027 (MON)', category: 'CLASSES' },
-  ],
+  title: term.title,
+  audience: term.audience ?? '',
+  // The warning only shows while the file says it is unverified, so it
+  // disappears on its own the moment the real calendar lands.
+  note: term.verified ? '' : 'PLACEHOLDER — REPLACE WITH THE OFFICIAL NITKKR ACADEMIC CALENDAR',
+  verified: term.verified,
+  events: term.events,
 }
 
+/** Every category actually present, so no chip filters to an empty list. */
 export const CALENDAR_CATEGORIES = [
   'ALL',
-  'REGISTRATION',
-  'CLASSES',
-  'EXAMS',
-  'GRADES',
-  'BREAKS',
+  ...[...new Set(term.events.map((e) => e.category))].sort(),
 ]
 
-export const HELPLINE = [
-  { label: 'CAMPUS SECURITY', value: 'VERIFY & ADD' },
-  { label: 'MEDICAL EMERGENCY', value: '112' },
-  { label: 'HEALTH CENTRE', value: 'VERIFY & ADD' },
-  { label: 'STUDENT COUNSELLOR', value: 'SEE NOTICE BOARD' },
-]
+/** Exam schedule — same shape, its own content/exams/*.md files. */
+export const EXAMS = calendarJson.exams ?? []
 
-export const QUICK_LINKS = [
-  { label: 'INSTITUTE WEBSITE', url: 'https://nitkkr.ac.in/' },
-  { label: 'ACADEMIC SECTION', url: 'https://nitkkr.ac.in/' },
-  { label: 'CENTRAL LIBRARY', url: 'https://nitkkr.ac.in/' },
-  { label: 'TRAINING & PLACEMENT', url: 'https://nitkkr.ac.in/' },
-]
+/**
+ * Dates with no classes, as ISO strings. Attendance uses this to stop
+ * counting a holiday as an unmarked day. Only events that carry a real
+ * `Date` can contribute; a human-readable `value` alone is not enough.
+ */
+export const HOLIDAYS = [...calendarJson.calendars, ...(calendarJson.exams ?? [])]
+  .flatMap((c) => c.events)
+  .filter((e) => e.category === 'HOLIDAYS' || e.category === 'BREAKS')
+  .flatMap((e) => expandRange(e.date, e.endDate))
+  .filter(Boolean)
 
-export const USEFUL_LINKS = [
-  {
-    tag: 'CAMPUS',
-    title: 'NITKKR OFFICIAL',
-    description: 'Notices, academics and campus updates',
-    url: 'https://nitkkr.ac.in/',
-  },
-  {
-    tag: 'LEARN',
-    title: 'NPTEL',
-    description: 'Free engineering courses and certifications',
-    url: 'https://nptel.ac.in/',
-  },
-  {
-    tag: 'LEARN',
-    title: 'SWAYAM',
-    description: 'Government online learning platform',
-    url: 'https://swayam.gov.in/',
-  },
-  {
-    tag: 'DOCS',
-    title: 'DIGILOCKER',
-    description: 'Store marksheets and certificates securely',
-    url: 'https://www.digilocker.gov.in/',
-  },
-  {
-    tag: 'AID',
-    title: 'NATIONAL SCHOLARSHIP PORTAL',
-    description: 'Apply and track scholarship schemes',
-    url: 'https://scholarships.gov.in/',
-  },
-  {
-    tag: 'OFFICIAL',
-    title: 'AICTE',
-    description: 'Approvals, schemes and student resources',
-    url: 'https://www.aicte-india.org/',
-  },
-]
+function expandRange(from, to) {
+  if (!from) return []
+  if (!to) return [from]
+  const out = []
+  const cur = new Date(`${from}T00:00:00`)
+  const end = new Date(`${to}T00:00:00`)
+  // Bounded so a typo'd end date cannot hang the app.
+  for (let guard = 0; cur <= end && guard < 400; guard++) {
+    out.push(cur.toISOString().slice(0, 10))
+    cur.setDate(cur.getDate() + 1)
+  }
+  return out
+}
 
-const maps = (q) =>
-  `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(q)}`
+// --------------------------------------------------------------- helpline --
 
-export const TRANSPORT = [
-  { name: 'KURUKSHETRA JUNCTION', url: maps('Kurukshetra Junction Railway Station') },
-  { name: 'KURUKSHETRA BUS STAND', url: maps('Kurukshetra Bus Stand') },
-  { name: 'BRAHMA SAROVAR', url: maps('Brahma Sarovar Kurukshetra') },
-  { name: 'PIPLI', url: maps('Pipli Kurukshetra') },
-  { name: 'CHANDIGARH AIRPORT', url: maps('Chandigarh International Airport') },
-]
+export const HELPLINE = rows('helpline').map((r) => ({ label: r.label, value: r.value }))
 
-export const PLACEMENT_CHECKLIST = [
-  {
-    title: 'RESUME PACK',
-    body: 'One-page PDF plus a Drive folder with projects, certificates and transcripts.',
-  },
-  {
-    title: 'DRIVE TRACKER',
-    body: 'Company, role, CTC/stipend, eligibility, deadline, test date, interview status.',
-  },
-  {
-    title: 'UPDATE FORMAT',
-    body: 'Company | Role | Deadline | Eligible branches | Apply link | Point of contact.',
-  },
-  {
-    title: 'ELIGIBILITY WATCH',
-    body: 'CGPA cutoff, backlog rules and branch filters — check before you apply.',
-  },
-]
+// ------------------------------------------------------------------ links --
 
-export const LANDMARKS = [
-  { name: 'MAIN GATE', tag: 'ENTRANCE', query: 'NIT Kurukshetra Main Gate' },
-  { name: 'ADMIN BLOCK', tag: 'ADMIN', query: 'NIT Kurukshetra Administrative Block' },
-  { name: 'CENTRAL LIBRARY', tag: 'STUDY', query: 'NIT Kurukshetra Central Library' },
-  { name: 'LECTURE HALL COMPLEX', tag: 'ACADEMIC', query: 'NIT Kurukshetra Lecture Hall Complex' },
-  { name: 'COMPUTER CENTRE', tag: 'ACADEMIC', query: 'NIT Kurukshetra Computer Centre' },
-  { name: 'C.V. RAMAN HOSTEL', tag: 'HOSTEL', query: 'NIT Kurukshetra CV Raman Hostel' },
-  { name: 'KALPANA CHAWLA HOSTEL', tag: 'HOSTEL', query: 'NIT Kurukshetra Kalpana Chawla Hostel' },
-  { name: 'SPORTS COMPLEX', tag: 'SPORTS', query: 'NIT Kurukshetra Sports Complex' },
-  { name: 'WORKSHOPS', tag: 'LAB', query: 'NIT Kurukshetra Workshop' },
-  { name: 'STUDENT ACTIVITY CENTRE', tag: 'FOOD', query: 'NIT Kurukshetra Student Activity Centre' },
-  { name: 'HEALTH CENTRE', tag: 'ADMIN', query: 'NIT Kurukshetra Health Centre' },
-  { name: 'OPEN AIR THEATRE', tag: 'SPORTS', query: 'NIT Kurukshetra Open Air Theatre' },
-].map((l) => ({ ...l, url: maps(l.query) }))
+export const QUICK_LINKS = rows('links', 'QUICK').map((r) => ({ label: r.title, url: r.url }))
 
-export const LANDMARK_TAGS = ['ALL', 'ENTRANCE', 'ACADEMIC', 'HOSTEL', 'STUDY', 'LAB', 'SPORTS', 'ADMIN', 'FOOD']
+export const USEFUL_LINKS = rows('links', 'USEFUL').map((r) => ({
+  tag: r.tag,
+  title: r.title,
+  description: r.description,
+  url: r.url,
+}))
+
+export const TRANSPORT = rows('transport').map((r) => ({ name: r.name, url: r.url }))
+
+export const PLACEMENT_CHECKLIST = rows('placements').map((r) => ({
+  title: r.title,
+  body: r.description,
+}))
+
+// -------------------------------------------------------------- landmarks --
+
+const maps = (q) => `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(q)}`
+
+export const LANDMARKS = landmarksJson.map((l) => ({
+  name: l.name,
+  tag: l.tag,
+  // Coordinates beat a name search, which can land on a same-named place in
+  // another town. Fall back to the query only while lat/lng are missing.
+  url: l.lat !== null && l.lng !== null ? maps(`${l.lat},${l.lng}`) : maps(l.query),
+  hasCoords: l.lat !== null && l.lng !== null,
+}))
+
+export const LANDMARK_TAGS = ['ALL', ...[...new Set(landmarksJson.map((l) => l.tag))].sort()]
 
 export const MAP_EMBED =
   'https://maps.google.com/maps?q=NIT%20Kurukshetra&t=&z=16&ie=UTF8&iwloc=&output=embed'
 
-export const CREDITS = [
-  { role: 'BUILD', name: 'Akshath Kumar', detail: 'Add your branch & year' },
-]
+export const CREDITS = [{ role: 'BUILD', name: 'Akshath Kumar', detail: '' }]

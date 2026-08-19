@@ -1,81 +1,25 @@
 // ---------------------------------------------------------------------------
-// TIMETABLES — PLACEHOLDER DATA
+// TIMETABLES — generated from content/timetables/*.md
 //
-// Every session below is invented. Replace with real NITKKR timetables.
+// To add or fix a timetable, edit the markdown. One file per branch/year,
+// named <BRANCH>-<YEAR>.md:
 //
-// Shape:
-//   timetables[BRANCH][YEAR] = Session[]
+//   content/timetables/CSE-2.md
+//
+// Session IDs are derived from branch+year+day+start+course, so amending a
+// room or a group never breaks anyone's logged attendance. See
+// scripts/content/ids.mjs for why that matters, and ids.test.mjs for the
+// tests that keep it true.
 //
 //   Session = {
-//     id:    string   unique and stable — attendance records key off this
-//     day:   'MON' | 'TUE' | 'WED' | 'THU' | 'FRI'
-//     start: number   minutes since midnight (9:00 AM = 540)
-//     end:   number   minutes since midnight
-//     name:  string
-//     code:  string
-//     room:  string   '+' separates parallel rooms, e.g. 'CL1+CL2'
-//     group: string   optional batch, e.g. 'A1+A2'
-//     type:  'lecture' | 'lab' | 'tutorial' | 'break' | 'other'
+//     id, day: MON..FRI, start/end: minutes since midnight,
+//     name, code, room, group, type
 //   }
-//
-// Only CSE Year 2 is filled in, as a working reference. Every other
-// branch/year renders the "nothing on the board" empty state, and users can
-// still build their own via Edit Board.
 // ---------------------------------------------------------------------------
 
-const H = (h, m = 0) => h * 60 + m
+import generated from './generated/timetables.json'
 
-const LUNCH = (day) => ({
-  id: `lunch-${day}`,
-  day,
-  start: H(13),
-  end: H(14),
-  name: 'Lunch Break',
-  code: '',
-  room: '',
-  group: '',
-  type: 'break',
-})
-
-const CSE_2 = [
-  // MON
-  { id: 'cse2-mon-1', day: 'MON', start: H(9), end: H(10), name: 'Data Structures', code: 'CSPC-201', room: 'LT-3', group: '', type: 'lecture' },
-  { id: 'cse2-mon-2', day: 'MON', start: H(10), end: H(11), name: 'Discrete Mathematics', code: 'CSPC-203', room: 'LT-3', group: '', type: 'lecture' },
-  { id: 'cse2-mon-3', day: 'MON', start: H(11), end: H(13), name: 'Data Structures Lab', code: 'CSPC-251', room: 'CL-1+CL-2', group: 'A1+A2', type: 'lab' },
-  LUNCH('MON'),
-  { id: 'cse2-mon-4', day: 'MON', start: H(14), end: H(15), name: 'Digital Electronics', code: 'ECPC-207', room: 'LT-5', group: '', type: 'lecture' },
-
-  // TUE
-  { id: 'cse2-tue-1', day: 'TUE', start: H(9), end: H(10), name: 'Object Oriented Programming', code: 'CSPC-205', room: 'LT-2', group: '', type: 'lecture' },
-  { id: 'cse2-tue-2', day: 'TUE', start: H(10), end: H(11), name: 'Data Structures', code: 'CSPC-201', room: 'LT-3', group: '', type: 'lecture' },
-  { id: 'cse2-tue-3', day: 'TUE', start: H(11), end: H(12), name: 'Discrete Mathematics Tutorial', code: 'CSPC-203', room: 'TR-4', group: 'A1', type: 'tutorial' },
-  LUNCH('TUE'),
-  { id: 'cse2-tue-4', day: 'TUE', start: H(14), end: H(16), name: 'Digital Electronics Lab', code: 'ECPC-257', room: 'EL-2', group: 'A3+A4', type: 'lab' },
-
-  // WED
-  { id: 'cse2-wed-1', day: 'WED', start: H(9), end: H(10), name: 'Discrete Mathematics', code: 'CSPC-203', room: 'LT-3', group: '', type: 'lecture' },
-  { id: 'cse2-wed-2', day: 'WED', start: H(10), end: H(11), name: 'Digital Electronics', code: 'ECPC-207', room: 'LT-5', group: '', type: 'lecture' },
-  { id: 'cse2-wed-3', day: 'WED', start: H(11), end: H(12), name: 'Object Oriented Programming', code: 'CSPC-205', room: 'LT-2', group: '', type: 'lecture' },
-  LUNCH('WED'),
-  { id: 'cse2-wed-4', day: 'WED', start: H(14), end: H(16), name: 'OOP Lab', code: 'CSPC-255', room: 'CL-3+CL-4', group: 'A1+A2+A3+A4', type: 'lab' },
-
-  // THU
-  { id: 'cse2-thu-1', day: 'THU', start: H(10), end: H(11), name: 'Data Structures', code: 'CSPC-201', room: 'LT-3', group: '', type: 'lecture' },
-  { id: 'cse2-thu-2', day: 'THU', start: H(11), end: H(12), name: 'Economics for Engineers', code: 'HSMC-201', room: 'LT-1', group: '', type: 'lecture' },
-  { id: 'cse2-thu-3', day: 'THU', start: H(12), end: H(13), name: 'Object Oriented Programming', code: 'CSPC-205', room: 'LT-2', group: '', type: 'lecture' },
-  LUNCH('THU'),
-  { id: 'cse2-thu-4', day: 'THU', start: H(15), end: H(16), name: 'Discrete Mathematics', code: 'CSPC-203', room: 'LT-3', group: '', type: 'lecture' },
-
-  // FRI
-  { id: 'cse2-fri-1', day: 'FRI', start: H(9), end: H(10), name: 'Economics for Engineers', code: 'HSMC-201', room: 'LT-1', group: '', type: 'lecture' },
-  { id: 'cse2-fri-2', day: 'FRI', start: H(10), end: H(11), name: 'Digital Electronics', code: 'ECPC-207', room: 'LT-5', group: '', type: 'lecture' },
-  LUNCH('FRI'),
-  { id: 'cse2-fri-3', day: 'FRI', start: H(14), end: H(17), name: 'Mini Project', code: 'CSPW-291', room: 'CL-5', group: 'A1+A2+A3+A4', type: 'lab' },
-]
-
-export const TIMETABLES = {
-  CSE: { 1: [], 2: CSE_2, 3: [], 4: [] },
-}
+export const TIMETABLES = generated
 
 /** Published (non-editable-source) timetable for a branch/year. */
 export function baseTimetable(branch, year) {
@@ -92,6 +36,19 @@ export function allRooms() {
         s.room.split('+').forEach((r) => set.add(r.trim()))
       }
     }
+  }
+  return [...set].sort()
+}
+
+/** Group/section labels a student can pick from for a branch/year. */
+export function groupsFor(branch, year) {
+  const set = new Set()
+  for (const s of baseTimetable(branch, year)) {
+    if (!s.group) continue
+    s.group.split('+').forEach((g) => {
+      const t = g.trim()
+      if (t) set.add(t)
+    })
   }
   return [...set].sort()
 }

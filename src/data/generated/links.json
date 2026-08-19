@@ -1,0 +1,161 @@
+{
+  "links": {
+    "USEFUL": [
+      {
+        "tag": "CAMPUS",
+        "title": "NITKKR OFFICIAL",
+        "description": "Notices, academics and campus updates",
+        "url": "https://nitkkr.ac.in/"
+      },
+      {
+        "tag": "LEARN",
+        "title": "NPTEL",
+        "description": "Free engineering courses and certifications",
+        "url": "https://nptel.ac.in/"
+      },
+      {
+        "tag": "LEARN",
+        "title": "SWAYAM",
+        "description": "Government online learning platform",
+        "url": "https://swayam.gov.in/"
+      },
+      {
+        "tag": "DOCS",
+        "title": "DIGILOCKER",
+        "description": "Store marksheets and certificates securely",
+        "url": "https://www.digilocker.gov.in/"
+      },
+      {
+        "tag": "AID",
+        "title": "NATIONAL SCHOLARSHIP PORTAL",
+        "description": "Apply and track scholarship schemes",
+        "url": "https://scholarships.gov.in/"
+      },
+      {
+        "tag": "OFFICIAL",
+        "title": "AICTE",
+        "description": "Approvals, schemes and student resources",
+        "url": "https://www.aicte-india.org/"
+      }
+    ],
+    "QUICK": [
+      {
+        "title": "INSTITUTE WEBSITE",
+        "url": "https://nitkkr.ac.in/"
+      },
+      {
+        "title": "ACADEMIC SECTION",
+        "url": "https://nitkkr.ac.in/"
+      },
+      {
+        "title": "CENTRAL LIBRARY",
+        "url": "https://nitkkr.ac.in/"
+      },
+      {
+        "title": "TRAINING & PLACEMENT",
+        "url": "https://nitkkr.ac.in/"
+      }
+    ]
+  },
+  "transport": {
+    "DEFAULT": [
+      {
+        "name": "KURUKSHETRA JUNCTION",
+        "url": "https://www.google.com/maps/dir/?api=1&destination=Kurukshetra%20Junction%20Railway%20Station"
+      },
+      {
+        "name": "KURUKSHETRA BUS STAND",
+        "url": "https://www.google.com/maps/dir/?api=1&destination=Kurukshetra%20Bus%20Stand"
+      },
+      {
+        "name": "BRAHMA SAROVAR",
+        "url": "https://www.google.com/maps/dir/?api=1&destination=Brahma%20Sarovar%20Kurukshetra"
+      },
+      {
+        "name": "PIPLI",
+        "url": "https://www.google.com/maps/dir/?api=1&destination=Pipli%20Kurukshetra"
+      },
+      {
+        "name": "CHANDIGARH AIRPORT",
+        "url": "https://www.google.com/maps/dir/?api=1&destination=Chandigarh%20International%20Airport"
+      }
+    ]
+  },
+  "helpline": {
+    "DEFAULT": [
+      {
+        "label": "CAMPUS SECURITY",
+        "value": "VERIFY & ADD"
+      },
+      {
+        "label": "MEDICAL EMERGENCY",
+        "value": "112"
+      },
+      {
+        "label": "HEALTH CENTRE",
+        "value": "VERIFY & ADD"
+      },
+      {
+        "label": "STUDENT COUNSELLOR",
+        "value": "SEE NOTICE BOARD"
+      }
+    ]
+  },
+  "institute": {
+    "DEFAULT": [
+      {
+        "label": "Name",
+        "value": "National Institute of Technology Kurukshetra"
+      },
+      {
+        "label": "Address",
+        "value": "Thanesar, Kurukshetra, Haryana 136119"
+      },
+      {
+        "label": "Established",
+        "value": "1963"
+      },
+      {
+        "label": "Campus",
+        "value": "300 ACRES"
+      },
+      {
+        "label": "Website",
+        "value": "https://nitkkr.ac.in/"
+      },
+      {
+        "label": "Location",
+        "value": "KURUKSHETRA, HR"
+      },
+      {
+        "label": "Short",
+        "value": "NIT Kurukshetra"
+      }
+    ],
+    "ABOUT": [
+      {
+        "text": "NIT Kurukshetra is an Institute of National Importance with a large residential campus, established in 1963 as Regional Engineering College Kurukshetra."
+      }
+    ]
+  },
+  "placements": {
+    "DEFAULT": [
+      {
+        "title": "RESUME PACK",
+        "description": "One-page PDF plus a Drive folder with projects, certificates and transcripts."
+      },
+      {
+        "title": "DRIVE TRACKER",
+        "description": "Company, role, CTC/stipend, eligibility, deadline, test date, interview status."
+      },
+      {
+        "title": "UPDATE FORMAT",
+        "description": "Company"
+      },
+      {
+        "title": "ELIGIBILITY WATCH",
+        "description": "CGPA cutoff, backlog rules and branch filters — check before you apply."
+      }
+    ]
+  }
+}

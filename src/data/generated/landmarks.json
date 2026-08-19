@@ -1,0 +1,86 @@
+[
+  {
+    "name": "MAIN GATE",
+    "tag": "ENTRANCE",
+    "lat": null,
+    "lng": null,
+    "query": "NIT Kurukshetra Main Gate"
+  },
+  {
+    "name": "ADMIN BLOCK",
+    "tag": "ADMIN",
+    "lat": null,
+    "lng": null,
+    "query": "NIT Kurukshetra Administrative Block"
+  },
+  {
+    "name": "CENTRAL LIBRARY",
+    "tag": "STUDY",
+    "lat": null,
+    "lng": null,
+    "query": "NIT Kurukshetra Central Library"
+  },
+  {
+    "name": "LECTURE HALL COMPLEX",
+    "tag": "ACADEMIC",
+    "lat": null,
+    "lng": null,
+    "query": "NIT Kurukshetra Lecture Hall Complex"
+  },
+  {
+    "name": "COMPUTER CENTRE",
+    "tag": "ACADEMIC",
+    "lat": null,
+    "lng": null,
+    "query": "NIT Kurukshetra Computer Centre"
+  },
+  {
+    "name": "C.V. RAMAN HOSTEL",
+    "tag": "HOSTEL",
+    "lat": null,
+    "lng": null,
+    "query": "NIT Kurukshetra CV Raman Hostel"
+  },
+  {
+    "name": "KALPANA CHAWLA HOSTEL",
+    "tag": "HOSTEL",
+    "lat": null,
+    "lng": null,
+    "query": "NIT Kurukshetra Kalpana Chawla Hostel"
+  },
+  {
+    "name": "SPORTS COMPLEX",
+    "tag": "SPORTS",
+    "lat": null,
+    "lng": null,
+    "query": "NIT Kurukshetra Sports Complex"
+  },
+  {
+    "name": "WORKSHOPS",
+    "tag": "LAB",
+    "lat": null,
+    "lng": null,
+    "query": "NIT Kurukshetra Workshop"
+  },
+  {
+    "name": "STUDENT ACTIVITY CENTRE",
+    "tag": "FOOD",
+    "lat": null,
+    "lng": null,
+    "query": "NIT Kurukshetra Student Activity Centre"
+  },
+  {
+    "name": "HEALTH CENTRE",
+    "tag": "ADMIN",
+    "lat": null,
+    "lng": null,
+    "query": "NIT Kurukshetra Health Centre"
+  },
+  {
+    "name": "OPEN AIR THEATRE",
+    "tag": "SPORTS",
+    "lat": null,
+    "lng": null,
+    "query": "NIT Kurukshetra Open Air Theatre"
+  }
+]

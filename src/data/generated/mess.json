@@ -1,0 +1,175 @@
+{
+  "CVR": {
+    "MON": {
+      "breakfast": [
+        "Aloo Paratha + Curd",
+        "Boiled Egg (2) / Banana",
+        "Bread + Butter + Jam",
+        "Tea / Milk"
+      ],
+      "lunch": [
+        "Rajma",
+        "Jeera Rice",
+        "Chapati",
+        "Salad + Pickle"
+      ],
+      "snacks": [
+        "Samosa",
+        "Green Chutney",
+        "Tea / Coffee"
+      ],
+      "dinner": [
+        "Kadhi Pakora",
+        "Plain Rice",
+        "Chapati",
+        "Gulab Jamun"
+      ]
+    },
+    "TUE": {
+      "breakfast": [
+        "Poha + Sev",
+        "Boiled Egg (2) / Apple",
+        "Bread + Butter",
+        "Tea / Milk"
+      ],
+      "lunch": [
+        "Chole",
+        "Plain Rice",
+        "Chapati",
+        "Boondi Raita"
+      ],
+      "snacks": [
+        "Bread Pakora",
+        "Tea / Coffee",
+        "Biscuits (2)"
+      ],
+      "dinner": [
+        "Mix Veg",
+        "Dal Tadka",
+        "Chapati",
+        "Rice + Salad"
+      ]
+    },
+    "WED": {
+      "breakfast": [
+        "Idli + Sambar",
+        "Coconut Chutney",
+        "Boiled Egg (2) / Fruit",
+        "Tea / Milk"
+      ],
+      "lunch": [
+        "Paneer Butter Masala",
+        "Jeera Rice",
+        "Chapati",
+        "Salad"
+      ],
+      "snacks": [
+        "Veg Sandwich",
+        "Tea / Coffee",
+        "Namkeen"
+      ],
+      "dinner": [
+        "Aloo Gobhi",
+        "Dal Fry",
+        "Chapati",
+        "Rice + Papad"
+      ]
+    },
+    "THU": {
+      "breakfast": [
+        "Puri + Aloo Sabzi",
+        "Boiled Egg (2) / Banana",
+        "Bread + Jam",
+        "Tea / Milk"
+      ],
+      "lunch": [
+        "Kadhai Paneer",
+        "Plain Rice",
+        "Chapati",
+        "Cucumber Raita"
+      ],
+      "snacks": [
+        "Pav Bhaji",
+        "Tea / Coffee"
+      ],
+      "dinner": [
+        "Sarson Saag",
+        "Makki Roti / Chapati",
+        "Rice",
+        "Jaggery"
+      ]
+    },
+    "FRI": {
+      "breakfast": [
+        "Upma + Chutney",
+        "Boiled Egg (2) / Apple",
+        "Bread + Butter",
+        "Tea / Milk"
+      ],
+      "lunch": [
+        "Dal Makhani",
+        "Jeera Rice",
+        "Chapati",
+        "Salad + Pickle"
+      ],
+      "snacks": [
+        "Veg Cutlet",
+        "Ketchup",
+        "Tea / Coffee"
+      ],
+      "dinner": [
+        "Shahi Paneer",
+        "Plain Rice",
+        "Chapati",
+        "Ice Cream"
+      ]
+    },
+    "SAT": {
+      "breakfast": [
+        "Chole Bhature",
+        "Boiled Egg (2) / Fruit",
+        "Tea / Milk"
+      ],
+      "lunch": [
+        "Veg Biryani",
+        "Raita",
+        "Chapati",
+        "Papad"
+      ],
+      "snacks": [
+        "Maggi",
+        "Tea / Coffee"
+      ],
+      "dinner": [
+        "Malai Kofta",
+        "Plain Rice",
+        "Chapati",
+        "Salad"
+      ]
+    },
+    "SUN": {
+      "breakfast": [
+        "Masala Dosa",
+        "Sambar + Chutney",
+        "Boiled Egg (2) / Banana",
+        "Tea / Milk"
+      ],
+      "lunch": [
+        "Chicken Curry / Soya Chaap",
+        "Plain Rice",
+        "Chapati",
+        "Onion Salad"
+      ],
+      "snacks": [
+        "Fruit Chaat",
+        "Tea / Coffee"
+      ],
+      "dinner": [
+        "Dal Tadka",
+        "Mix Veg",
+        "Chapati",
+        "Rice + Kheer"
+      ]
+    }
+  }
+}

@@ -1,38 +1,21 @@
 // ---------------------------------------------------------------------------
-// CAMPUS REFERENCE DATA — NIT Kurukshetra
+// CAMPUS REFERENCE — generated from content/campus/*.md
 //
-// PLACEHOLDER WARNING
-// Branch and hostel lists below are a best-effort starting point and have NOT
-// been verified against official NITKKR sources. Check them against the
-// institute website before you ship, and edit freely — nothing else in the
-// codebase hardcodes these values.
+// Do not edit the lists here. Edit:
+//   content/campus/branches.md
+//   content/campus/hostels.md
+// and the JSON below is rebuilt on the next dev save or build.
+//
+// What stays hand-written in this file is presentation, not data: session
+// types, their colours, and the fallbacks used before a student has picked
+// anything.
 // ---------------------------------------------------------------------------
 
-export const BRANCHES = [
-  { code: 'CSE', name: 'Computer Engineering', group: 'ENGINEERING' },
-  { code: 'IT', name: 'Information Technology', group: 'ENGINEERING' },
-  { code: 'ECE', name: 'Electronics & Communication', group: 'ENGINEERING' },
-  { code: 'EE', name: 'Electrical Engineering', group: 'ENGINEERING' },
-  { code: 'MECH', name: 'Mechanical Engineering', group: 'ENGINEERING' },
-  { code: 'CIVIL', name: 'Civil Engineering', group: 'ENGINEERING' },
-  { code: 'PIE', name: 'Production & Industrial', group: 'ENGINEERING' },
-  { code: 'CHEM', name: 'Chemical Engineering', group: 'ENGINEERING' },
-  { code: 'META', name: 'Metallurgical & Materials', group: 'ENGINEERING' },
-  { code: 'MNC', name: 'Mathematics & Computing', group: 'SCIENCES' },
-  { code: 'PHY', name: 'Engineering Physics', group: 'SCIENCES' },
-]
+import campus from './generated/campus.json'
 
+export const BRANCHES = campus.branches
+export const HOSTELS = campus.hostels
 export const YEARS = ['1', '2', '3', '4']
-
-export const HOSTELS = [
-  { code: 'CVR', name: 'C.V. Raman Hostel' },
-  { code: 'HJB', name: 'H.J. Bhabha Hostel' },
-  { code: 'APJ', name: 'A.P.J. Abdul Kalam Hostel' },
-  { code: 'JCB', name: 'J.C. Bose Hostel' },
-  { code: 'SNB', name: 'S.N. Bose Hostel' },
-  { code: 'KLP', name: 'Kalpana Chawla Hostel' },
-  { code: 'GRG', name: 'Gargi Hostel' },
-]
 
 export const SESSION_TYPES = [
   { value: 'lecture', label: 'Lecture' },
@@ -58,6 +41,9 @@ export function hostelName(code) {
   return HOSTELS.find((h) => h.code === code)?.name ?? code
 }
 
-export const DEFAULT_BRANCH = 'CSE'
-export const DEFAULT_HOSTEL = 'CVR'
-export const DEFAULT_YEAR = '2'
+// Fallbacks for a profile that has not been filled in yet. Derived from the
+// content rather than hardcoded, so removing a branch from branches.md can
+// never leave the app pointing at one that does not exist.
+export const DEFAULT_BRANCH = BRANCHES[0]?.code ?? 'CSE'
+export const DEFAULT_HOSTEL = HOSTELS[0]?.code ?? 'CVR'
+export const DEFAULT_YEAR = '1'

@@ -1,0 +1,70 @@
+{
+  "calendars": [
+    {
+      "title": "ODD SEMESTER 2026-27",
+      "term": "odd-2026-27",
+      "audience": null,
+      "source": "PLACEHOLDER — replace with the official NITKKR academic calendar",
+      "verified": false,
+      "events": [
+        {
+          "label": "REGISTRATION",
+          "value": "JUL 20 – 24, 2026",
+          "category": "REGISTRATION",
+          "date": null,
+          "endDate": null
+        },
+        {
+          "label": "CLASSES BEGIN",
+          "value": "JUL 27, 2026 (MON)",
+          "category": "CLASSES",
+          "date": null,
+          "endDate": null
+        },
+        {
+          "label": "MID-TERM EXAMS",
+          "value": "SEP 21 – 26, 2026",
+          "category": "EXAMS",
+          "date": null,
+          "endDate": null
+        },
+        {
+          "label": "CLASSES END",
+          "value": "NOV 20, 2026 (FRI)",
+          "category": "CLASSES",
+          "date": null,
+          "endDate": null
+        },
+        {
+          "label": "END-TERM EXAMS",
+          "value": "NOV 27 – DEC 08, 2026",
+          "category": "EXAMS",
+          "date": null,
+          "endDate": null
+        },
+        {
+          "label": "RESULT DECLARATION",
+          "value": "DEC 22, 2026",
+          "category": "GRADES",
+          "date": null,
+          "endDate": null
+        },
+        {
+          "label": "WINTER BREAK",
+          "value": "DEC 10, 2026 – JAN 03, 2027",
+          "category": "BREAKS",
+          "date": null,
+          "endDate": null
+        },
+        {
+          "label": "NEXT SEMESTER BEGINS",
+          "value": "JAN 04, 2027 (MON)",
+          "category": "CLASSES",
+          "date": null,
+          "endDate": null
+        }
+      ]
+    }
+  ],
+  "exams": []
+}

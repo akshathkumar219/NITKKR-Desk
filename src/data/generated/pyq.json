@@ -1,0 +1,97 @@
+[
+  {
+    "session": "2023-24",
+    "sub": "SEMESTER I & II · B.TECH",
+    "available": true,
+    "papers": [
+      {
+        "code": "MAIR-11",
+        "title": "Mathematics I",
+        "sem": "SEMESTER I",
+        "url": null
+      },
+      {
+        "code": "PHIR-11",
+        "title": "Engineering Physics",
+        "sem": "SEMESTER I",
+        "url": null
+      },
+      {
+        "code": "CSIR-11",
+        "title": "Fundamentals of Computing",
+        "sem": "SEMESTER I",
+        "url": null
+      },
+      {
+        "code": "EEIR-11",
+        "title": "Basic Electrical Engineering",
+        "sem": "SEMESTER I",
+        "url": null
+      },
+      {
+        "code": "MAIR-12",
+        "title": "Mathematics II",
+        "sem": "SEMESTER II",
+        "url": null
+      },
+      {
+        "code": "MEIR-12",
+        "title": "Engineering Graphics",
+        "sem": "SEMESTER II",
+        "url": null
+      }
+    ],
+    "warnings": [
+      "content/pyq/2023-24.md:14  \"Mathematics I\" has no URL — it will render as \"no file attached\".",
+      "content/pyq/2023-24.md:15  \"Engineering Physics\" has no URL — it will render as \"no file attached\".",
+      "content/pyq/2023-24.md:16  \"Fundamentals of Computing\" has no URL — it will render as \"no file attached\".",
+      "content/pyq/2023-24.md:17  \"Basic Electrical Engineering\" has no URL — it will render as \"no file attached\".",
+      "content/pyq/2023-24.md:18  \"Mathematics II\" has no URL — it will render as \"no file attached\".",
+      "content/pyq/2023-24.md:19  \"Engineering Graphics\" has no URL — it will render as \"no file attached\"."
+    ]
+  },
+  {
+    "session": "2024-25",
+    "sub": "SEMESTER I & II · B.TECH",
+    "available": true,
+    "papers": [
+      {
+        "code": "CSPC-201",
+        "title": "Data Structures",
+        "sem": "SEMESTER III",
+        "url": null
+      },
+      {
+        "code": "CSPC-203",
+        "title": "Discrete Mathematics",
+        "sem": "SEMESTER III",
+        "url": null
+      },
+      {
+        "code": "CSPC-205",
+        "title": "Object Oriented Programming",
+        "sem": "SEMESTER III",
+        "url": null
+      },
+      {
+        "code": "ECPC-207",
+        "title": "Digital Electronics",
+        "sem": "SEMESTER III",
+        "url": null
+      }
+    ],
+    "warnings": [
+      "content/pyq/2024-25.md:14  \"Data Structures\" has no URL — it will render as \"no file attached\".",
+      "content/pyq/2024-25.md:15  \"Discrete Mathematics\" has no URL — it will render as \"no file attached\".",
+      "content/pyq/2024-25.md:16  \"Object Oriented Programming\" has no URL — it will render as \"no file attached\".",
+      "content/pyq/2024-25.md:17  \"Digital Electronics\" has no URL — it will render as \"no file attached\"."
+    ]
+  },
+  {
+    "session": "2025-26",
+    "sub": "COMING SOON",
+    "available": false,
+    "papers": [],
+    "warnings": []
+  }
+]

@@ -1,0 +1,89 @@
+{
+  "branches": [
+    {
+      "code": "CSE",
+      "name": "Computer Engineering",
+      "group": "ENGINEERING"
+    },
+    {
+      "code": "IT",
+      "name": "Information Technology",
+      "group": "ENGINEERING"
+    },
+    {
+      "code": "ECE",
+      "name": "Electronics & Communication",
+      "group": "ENGINEERING"
+    },
+    {
+      "code": "EE",
+      "name": "Electrical Engineering",
+      "group": "ENGINEERING"
+    },
+    {
+      "code": "MECH",
+      "name": "Mechanical Engineering",
+      "group": "ENGINEERING"
+    },
+    {
+      "code": "CIVIL",
+      "name": "Civil Engineering",
+      "group": "ENGINEERING"
+    },
+    {
+      "code": "PIE",
+      "name": "Production & Industrial",
+      "group": "ENGINEERING"
+    },
+    {
+      "code": "CHEM",
+      "name": "Chemical Engineering",
+      "group": "ENGINEERING"
+    },
+    {
+      "code": "META",
+      "name": "Metallurgical & Materials",
+      "group": "ENGINEERING"
+    },
+    {
+      "code": "MNC",
+      "name": "Mathematics & Computing",
+      "group": "SCIENCES"
+    },
+    {
+      "code": "PHY",
+      "name": "Engineering Physics",
+      "group": "SCIENCES"
+    }
+  ],
+  "hostels": [
+    {
+      "code": "CVR",
+      "name": "C.V. Raman Hostel"
+    },
+    {
+      "code": "HJB",
+      "name": "H.J. Bhabha Hostel"
+    },
+    {
+      "code": "APJ",
+      "name": "A.P.J. Abdul Kalam Hostel"
+    },
+    {
+      "code": "JCB",
+      "name": "J.C. Bose Hostel"
+    },
+    {
+      "code": "SNB",
+      "name": "S.N. Bose Hostel"
+    },
+    {
+      "code": "KLP",
+      "name": "Kalpana Chawla Hostel"
+    },
+    {
+      "code": "GRG",
+      "name": "Gargi Hostel"
+    }
+  ]
+}

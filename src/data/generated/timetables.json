@@ -1,0 +1,333 @@
+{
+  "CSE": {
+    "1": [],
+    "2": [
+      {
+        "day": "MON",
+        "start": 540,
+        "end": 600,
+        "name": "Data Structures",
+        "code": "CSPC-201",
+        "room": "LT-3",
+        "group": "",
+        "type": "lecture",
+        "id": "timlqc"
+      },
+      {
+        "day": "MON",
+        "start": 600,
+        "end": 660,
+        "name": "Discrete Mathematics",
+        "code": "CSPC-203",
+        "room": "LT-3",
+        "group": "",
+        "type": "lecture",
+        "id": "1w4w891"
+      },
+      {
+        "day": "MON",
+        "start": 660,
+        "end": 780,
+        "name": "Data Structures Lab",
+        "code": "CSPC-251",
+        "room": "CL-1+CL-2",
+        "group": "A1+A2",
+        "type": "lab",
+        "id": "2by7ls"
+      },
+      {
+        "day": "MON",
+        "start": 780,
+        "end": 840,
+        "name": "Lunch Break",
+        "code": "",
+        "room": "",
+        "group": "",
+        "type": "break",
+        "id": "18w7nuw"
+      },
+      {
+        "day": "MON",
+        "start": 840,
+        "end": 900,
+        "name": "Digital Electronics",
+        "code": "ECPC-207",
+        "room": "LT-5",
+        "group": "",
+        "type": "lecture",
+        "id": "mqm2r9"
+      },
+      {
+        "day": "TUE",
+        "start": 540,
+        "end": 600,
+        "name": "Object Oriented Programming",
+        "code": "CSPC-205",
+        "room": "LT-2",
+        "group": "",
+        "type": "lecture",
+        "id": "1smfvn4"
+      },
+      {
+        "day": "TUE",
+        "start": 600,
+        "end": 660,
+        "name": "Data Structures",
+        "code": "CSPC-201",
+        "room": "LT-3",
+        "group": "",
+        "type": "lecture",
+        "id": "1989s0n"
+      },
+      {
+        "day": "TUE",
+        "start": 660,
+        "end": 720,
+        "name": "Discrete Mathematics Tutorial",
+        "code": "CSPC-203",
+        "room": "TR-4",
+        "group": "A1",
+        "type": "tutorial",
+        "id": "13w1dzn"
+      },
+      {
+        "day": "TUE",
+        "start": 780,
+        "end": 840,
+        "name": "Lunch Break",
+        "code": "",
+        "room": "",
+        "group": "",
+        "type": "break",
+        "id": "1wipgw"
+      },
+      {
+        "day": "TUE",
+        "start": 840,
+        "end": 960,
+        "name": "Digital Electronics Lab",
+        "code": "ECPC-257",
+        "room": "EL-2",
+        "group": "A3+A4",
+        "type": "lab",
+        "id": "gts4ps"
+      },
+      {
+        "day": "WED",
+        "start": 540,
+        "end": 600,
+        "name": "Discrete Mathematics",
+        "code": "CSPC-203",
+        "room": "LT-3",
+        "group": "",
+        "type": "lecture",
+        "id": "3a9i38"
+      },
+      {
+        "day": "WED",
+        "start": 600,
+        "end": 660,
+        "name": "Digital Electronics",
+        "code": "ECPC-207",
+        "room": "LT-5",
+        "group": "",
+        "type": "lecture",
+        "id": "cwjlbp"
+      },
+      {
+        "day": "WED",
+        "start": 660,
+        "end": 720,
+        "name": "Object Oriented Programming",
+        "code": "CSPC-205",
+        "room": "LT-2",
+        "group": "",
+        "type": "lecture",
+        "id": "6a48uj"
+      },
+      {
+        "day": "WED",
+        "start": 780,
+        "end": 840,
+        "name": "Lunch Break",
+        "code": "",
+        "room": "",
+        "group": "",
+        "type": "break",
+        "id": "pxzgj6"
+      },
+      {
+        "day": "WED",
+        "start": 840,
+        "end": 960,
+        "name": "OOP Lab",
+        "code": "CSPC-255",
+        "room": "CL-3+CL-4",
+        "group": "A1+A2+A3+A4",
+        "type": "lab",
+        "id": "1fuiqaa"
+      },
+      {
+        "day": "THU",
+        "start": 600,
+        "end": 660,
+        "name": "Data Structures",
+        "code": "CSPC-201",
+        "room": "LT-3",
+        "group": "",
+        "type": "lecture",
+        "id": "1sidoac"
+      },
+      {
+        "day": "THU",
+        "start": 660,
+        "end": 720,
+        "name": "Economics for Engineers",
+        "code": "HSMC-201",
+        "room": "LT-1",
+        "group": "",
+        "type": "lecture",
+        "id": "1013cek"
+      },
+      {
+        "day": "THU",
+        "start": 720,
+        "end": 780,
+        "name": "Object Oriented Programming",
+        "code": "CSPC-205",
+        "room": "LT-2",
+        "group": "",
+        "type": "lecture",
+        "id": "vbogr"
+      },
+      {
+        "day": "THU",
+        "start": 780,
+        "end": 840,
+        "name": "Lunch Break",
+        "code": "",
+        "room": "",
+        "group": "",
+        "type": "break",
+        "id": "15h21o5"
+      },
+      {
+        "day": "THU",
+        "start": 900,
+        "end": 960,
+        "name": "Discrete Mathematics",
+        "code": "CSPC-203",
+        "room": "LT-3",
+        "group": "",
+        "type": "lecture",
+        "id": "1jw4wgl"
+      },
+      {
+        "day": "FRI",
+        "start": 540,
+        "end": 600,
+        "name": "Economics for Engineers",
+        "code": "HSMC-201",
+        "room": "LT-1",
+        "group": "",
+        "type": "lecture",
+        "id": "bgyvj1"
+      },
+      {
+        "day": "FRI",
+        "start": 600,
+        "end": 660,
+        "name": "Digital Electronics",
+        "code": "ECPC-207",
+        "room": "LT-5",
+        "group": "",
+        "type": "lecture",
+        "id": "1n6he0s"
+      },
+      {
+        "day": "FRI",
+        "start": 780,
+        "end": 840,
+        "name": "Lunch Break",
+        "code": "",
+        "room": "",
+        "group": "",
+        "type": "break",
+        "id": "1bh7r65"
+      },
+      {
+        "day": "FRI",
+        "start": 840,
+        "end": 1020,
+        "name": "Mini Project",
+        "code": "CSPW-291",
+        "room": "CL-5",
+        "group": "A1+A2+A3+A4",
+        "type": "lab",
+        "id": "1rtqphn"
+      }
+    ],
+    "3": [],
+    "4": []
+  },
+  "IT": {
+    "1": [],
+    "2": [],
+    "3": [],
+    "4": []
+  },
+  "ECE": {
+    "1": [],
+    "2": [],
+    "3": [],
+    "4": []
+  },
+  "EE": {
+    "1": [],
+    "2": [],
+    "3": [],
+    "4": []
+  },
+  "MECH": {
+    "1": [],
+    "2": [],
+    "3": [],
+    "4": []
+  },
+  "CIVIL": {
+    "1": [],
+    "2": [],
+    "3": [],
+    "4": []
+  },
+  "PIE": {
+    "1": [],
+    "2": [],
+    "3": [],
+    "4": []
+  },
+  "CHEM": {
+    "1": [],
+    "2": [],
+    "3": [],
+    "4": []
+  },
+  "META": {
+    "1": [],
+    "2": [],
+    "3": [],
+    "4": []
+  },
+  "MNC": {
+    "1": [],
+    "2": [],
+    "3": [],
+    "4": []
+  },
+  "PHY": {
+    "1": [],
+    "2": [],
+    "3": [],
+    "4": []
+  }
+}

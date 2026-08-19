@@ -1,12 +1,13 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { CalendarDays, Info, Moon, Sun, UtensilsCrossed } from 'lucide-react'
-import { Panel } from '../ui'
-import { initialsOf, useProfile, useTheme } from '../lib/storage'
+import { CalendarDays, ClipboardCheck, Info, Moon, Sun, UtensilsCrossed } from 'lucide-react'
+import Intro from '../components/Intro'
+import { initialsOf, useProfile, useRollcallSettings, useTheme } from '../lib/storage'
 import { branchName, hostelName } from '../data/campus'
-import { useBoard, currentSession, nextSession } from '../lib/board'
+import { coursesOf, currentSession, nextSession, sessionsForDay, useBoard } from '../lib/board'
 import { currentMeal } from '../data/mess'
-import { dayCode, fmtRange, minutesNow } from '../lib/time'
+import { status, tally, useRollcall } from '../lib/rollcall'
+import { dayCode, fmtRange, fmtTime, minutesNow } from '../lib/time'
 
 function useClock() {
   const [now, setNow] = useState(() => new Date())
@@ -17,10 +18,61 @@ function useClock() {
   return now
 }
 
+const NAV = [
+  { to: '/home', icon: CalendarDays, label: 'BOARD' },
+  { to: '/mess', icon: UtensilsCrossed, label: 'MESS' },
+  { to: '/rollcall', icon: ClipboardCheck, label: 'ROLL CALL' },
+  { to: '/info', icon: Info, label: 'INFO' },
+]
+
+/**
+ * The one question this page exists to answer: what is happening, and when.
+ *
+ * This is the page's SIGNAL (design.md §3.3) — it takes the strong colour and
+ * the top of the page, so that everything else staying quiet means something.
+ */
+function signalFor({ live, next, mins, onboarded }) {
+  if (!onboarded) {
+    return {
+      eyebrow: 'NOT SET UP YET',
+      title: 'PICK YOUR BRANCH',
+      detail: 'Choose a branch and year, and the board fills itself in.',
+      tone: 'var(--color-amber)',
+    }
+  }
+  if (live) {
+    const left = live.end - mins
+    return {
+      eyebrow: 'IN SESSION NOW',
+      title: live.name,
+      detail: [live.room, `until ${fmtTime(live.end)}`, live.code].filter(Boolean).join(' · '),
+      note: left <= 60 ? `${left} MIN LEFT` : null,
+      tone: 'var(--color-present)',
+    }
+  }
+  if (next) {
+    const until = next.start - mins
+    return {
+      eyebrow: until <= 60 ? `NEXT IN ${until} MIN` : 'NEXT UP',
+      title: next.name,
+      detail: [next.room, fmtRange(next.start, next.end), next.code].filter(Boolean).join(' · '),
+      tone: 'var(--color-sky)',
+    }
+  }
+  return {
+    eyebrow: 'NOTHING LEFT TODAY',
+    title: 'YOU ARE DONE',
+    detail: 'No more classes on the board today.',
+    tone: 'var(--color-present)',
+  }
+}
+
 export default function Landing() {
   const { profile, year, onboarded } = useProfile()
   const { theme, toggle } = useTheme()
   const { sessions } = useBoard(profile.branch, year)
+  const { marks } = useRollcall()
+  const [settings] = useRollcallSettings()
   const now = useClock()
   const navigate = useNavigate()
 
@@ -29,164 +81,172 @@ export default function Landing() {
   const live = currentSession(sessions, day, mins)
   const next = nextSession(sessions, day, mins)
   const meal = currentMeal(mins)
+  const signal = signalFor({ live, next, mins, onboarded })
+
+  const attendance = useMemo(() => {
+    const ids = coursesOf(sessions).flatMap((c) => c.sessions.map((s) => s.id))
+    return tally(marks, ids, settings.trackingSince)
+  }, [marks, sessions, settings.trackingSince])
+
+  // Classes still to come today, breaks excluded — "how much is left".
+  const remaining = useMemo(
+    () => sessionsForDay(sessions, day).filter((s) => s.type !== 'break' && s.end > mins).length,
+    [sessions, day, mins],
+  )
 
   const clock = now
     .toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })
     .toUpperCase()
   const weekday = now.toLocaleDateString('en-GB', { weekday: 'short' }).toUpperCase()
 
-  let headline = 'NOTHING ON THE BOARD YET.'
-  let detail = 'Pick a branch and the board fills itself in.'
-  if (onboarded && live) {
-    headline = 'IN SESSION NOW.'
-    detail = `${live.name}${live.room ? ` · ${live.room}` : ''} · until ${fmtRange(live.start, live.end).split('–')[1]}`
-  } else if (onboarded && next) {
-    headline = 'NEXT DEPARTURE.'
-    detail = `${next.name}${next.room ? ` · ${next.room}` : ''} at ${fmtRange(next.start, next.end)}`
-  } else if (onboarded) {
-    headline = 'BOARD IS CLEAR.'
-    detail = 'Nothing else scheduled today.'
-  }
-
-  const tiles = onboarded
-    ? [
-        {
-          to: '/home',
-          icon: CalendarDays,
-          accent: 'var(--color-sky)',
-          title: 'TIMETABLE',
-          sub: `${branchName(profile.branch)} · YEAR ${year}`,
-        },
-        {
-          to: '/mess',
-          icon: UtensilsCrossed,
-          accent: 'var(--color-coral)',
-          title: 'MESS BOARD',
-          sub: `${hostelName(profile.hostel)} · ${meal.label}`,
-        },
-        {
-          to: '/info',
-          icon: Info,
-          accent: 'var(--color-acid)',
-          title: 'INFO',
-          sub: 'PROFILE, TOOLS AND CAMPUS INFO',
-        },
-      ]
-    : [
-        {
-          to: '/select/branch',
-          icon: CalendarDays,
-          accent: 'var(--color-sky)',
-          title: 'PICK YOUR BRANCH',
-          sub: 'YEAR AND DEPARTMENT',
-        },
-        {
-          to: '/select/hostel',
-          icon: UtensilsCrossed,
-          accent: 'var(--color-coral)',
-          title: 'PICK YOUR HOSTEL',
-          sub: 'FOR THE RIGHT MESS MENU',
-        },
-        {
-          to: '/select/info',
-          icon: Info,
-          accent: 'var(--color-acid)',
-          title: 'INFO',
-          sub: 'PROFILE, TOOLS AND CAMPUS INFO',
-        },
-      ]
+  const st = status(attendance.percent, settings.required)
+  const tiles = [
+    {
+      label: 'ATTENDANCE',
+      value: attendance.percent === null ? '—' : `${Math.round(attendance.percent)}%`,
+      note: attendance.percent === null ? 'NOTHING LOGGED' : `TARGET ${settings.required}%`,
+      accent:
+        attendance.percent === null
+          ? 'var(--muted)'
+          : st === 'short'
+            ? 'var(--color-absent)'
+            : st === 'edge'
+              ? 'var(--color-amber)'
+              : 'var(--color-present)',
+      to: '/rollcall',
+    },
+    {
+      label: 'NEXT MEAL',
+      value: meal.label,
+      note: meal.time,
+      accent: 'var(--color-coral)',
+      to: '/mess',
+    },
+    {
+      label: 'LEFT TODAY',
+      value: String(remaining),
+      note: remaining === 1 ? 'CLASS REMAINING' : 'CLASSES REMAINING',
+      accent: 'var(--color-sky)',
+      to: '/home',
+    },
+  ]
 
   return (
-    <div className="min-h-dvh px-4 py-8 sm:px-8">
-      <div className="mx-auto max-w-5xl">
-        <div className="mb-8 flex justify-end">
-          <button type="button" className="btn" onClick={toggle}>
-            {theme === 'dark' ? <Sun size={14} strokeWidth={2.5} /> : <Moon size={14} strokeWidth={2.5} />}
-            {theme === 'dark' ? 'LIGHT' : 'DARK'} MODE
-          </button>
-        </div>
+    <div className="relative min-h-dvh overflow-hidden">
+      <Intro />
 
-        <div className="text-center">
-          <span className="chip" style={{ background: 'var(--color-acid)', color: 'var(--color-ink)' }}>
-            STUDENT DEPARTURE BOARD
-          </span>
-          <h1 className="heading mt-5 text-6xl sm:text-8xl">
-            NITKKR
-            <br />
-            BOARD
-          </h1>
-        </div>
+      {/* WORLD (§3.1) — atmosphere only: behind the content, no pointer
+          events, and faded out before it reaches the information layer. */}
+      <div className="world world-grain" aria-hidden />
+      <div
+        className="world world-halftone"
+        style={{
+          color: 'var(--primary)',
+          maskImage: 'linear-gradient(180deg, #000, transparent 60%)',
+          WebkitMaskImage: 'linear-gradient(180deg, #000, transparent 60%)',
+        }}
+        aria-hidden
+      />
 
-        <Panel className="mt-10 p-5 sm:p-7">
-          <div className="flex items-center justify-between gap-4">
-            <span className="chip" style={{ gap: '0.4rem' }}>
-              <span
-                className="animate-live inline-block size-2 rounded-full"
-                style={{ background: 'var(--color-present)' }}
-                aria-hidden
-              />
-              BOARD · LIVE
-            </span>
-            <span className="label muted">
+      <div className="relative z-10 mx-auto max-w-4xl px-4 py-6 sm:px-8 sm:py-8">
+        {/* The wordmark lives up here now, small. This page's job is to
+            answer a question, not to reintroduce itself every visit. */}
+        <header className="flex items-center justify-between gap-4">
+          <span className="display text-2xl sm:text-3xl">nitkkr board</span>
+          <div className="flex items-center gap-3">
+            <span className="label muted hidden sm:inline">
               {clock} · {weekday}
             </span>
-          </div>
-
-          <div className="mt-5 flex items-start gap-4">
-            <span
-              className="grid size-12 shrink-0 place-items-center border-2 border-[var(--border)] font-mono text-sm font-bold"
-              style={{ background: 'var(--color-amber)', borderRadius: 2, color: 'var(--color-ink)' }}
-              aria-hidden
+            <button
+              type="button"
+              className="btn !px-2.5"
+              onClick={toggle}
+              aria-label={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
             >
-              {initialsOf(profile.name)}
+              {theme === 'dark' ? <Sun size={15} strokeWidth={2.5} /> : <Moon size={15} strokeWidth={2.5} />}
+            </button>
+          </div>
+        </header>
+
+        <hr className="mt-4 border-t-2" style={{ borderColor: 'var(--border)' }} />
+
+        {/* ---- SIGNAL ---- */}
+        <section className="mt-8 sm:mt-12">
+          <div className="flex flex-wrap items-center gap-2">
+            <span
+              className="chip"
+              style={{
+                background: signal.tone,
+                borderColor: signal.tone,
+                color: 'var(--color-ink)',
+              }}
+            >
+              {signal.eyebrow}
             </span>
-            <div className="min-w-0">
-              <h2 className="heading text-2xl sm:text-3xl">{headline}</h2>
-              <p className="mt-2 text-sm font-medium">{detail}</p>
-            </div>
+            {signal.note ? <span className="chip">{signal.note}</span> : null}
           </div>
 
-          <p className="label muted mt-4">EVERYTHING STAYS ON THIS DEVICE.</p>
+          <h1 className="heading mt-4 text-4xl sm:text-6xl">{signal.title}</h1>
+          <p className="mt-3 text-sm font-medium">{signal.detail}</p>
 
-          <div className="mt-4 flex flex-wrap gap-2">
-            <span className="chip">
-              {profile.branch} · Y{year}
-            </span>
-            <span className="chip">{profile.hostel}</span>
-          </div>
-
-          <button
-            type="button"
-            className="btn btn-primary mt-5 w-full !py-3.5"
-            onClick={() => navigate(onboarded ? '/home' : '/select/branch')}
-          >
-            {onboarded ? 'OPEN THE BOARD' : 'PICK YOUR BRANCH'}
-          </button>
-
-          <p className="label muted mt-3">
-            WRONG NAME, BRANCH OR HOSTEL? INFO → EDIT PROFILE.
-          </p>
-        </Panel>
-
-        <div className="mt-6 grid gap-4 sm:grid-cols-3">
-          {tiles.map((t) => (
-            <Link key={t.to} to={t.to} className="board board-hard block p-5 transition-transform hover:-translate-y-0.5">
-              <span
-                className="grid size-10 place-items-center border-2 border-[var(--border)]"
-                style={{ background: t.accent, borderRadius: 'var(--radius-board)' }}
-                aria-hidden
-              >
-                <t.icon size={18} strokeWidth={2.5} color="var(--color-ink)" />
+          {onboarded ? (
+            <div className="mt-5 flex flex-wrap items-center gap-2">
+              {profile.name ? (
+                <span
+                  className="grid size-6 place-items-center text-[0.6rem] font-bold"
+                  style={{ background: 'var(--color-amber)', color: 'var(--color-ink)', borderRadius: 2 }}
+                  aria-hidden
+                >
+                  {initialsOf(profile.name)}
+                </span>
+              ) : null}
+              <span className="chip">
+                {branchName(profile.branch)} · Y{year}
               </span>
-              <p className="heading mt-4 text-lg">{t.title}</p>
-              <p className="label muted mt-1.5">{t.sub}</p>
+              <span className="chip">{hostelName(profile.hostel)}</span>
+            </div>
+          ) : (
+            /* Before onboarding there is no branch or hostel to report. The
+               previous build printed the DEFAULT_BRANCH / DEFAULT_HOSTEL
+               fallbacks as chips here, asserting a branch and hostel the
+               student never picked — directly underneath a headline saying
+               nothing was set up yet. */
+            <button
+              type="button"
+              className="btn btn-primary mt-6 w-full !py-3.5 sm:w-auto sm:!px-10"
+              onClick={() => navigate('/select/branch')}
+            >
+              PICK YOUR BRANCH
+            </button>
+          )}
+        </section>
+
+        {/* ---- INTERFACE ---- quiet on purpose, so the signal stays a signal */}
+        <section className="mt-8 grid gap-3 sm:grid-cols-3">
+          {tiles.map((t) => (
+            <Link key={t.label} to={t.to} className="board board-hard block p-4">
+              <p className="label muted">{t.label}</p>
+              <p className="heading mt-1.5 text-3xl" style={{ color: t.accent }}>
+                {t.value}
+              </p>
+              <p className="label muted mt-1.5">{t.note}</p>
             </Link>
           ))}
-        </div>
+        </section>
 
-        <p className="label muted mt-10 text-center">
-          UNOFFICIAL STUDENT PROJECT · NOT AFFILIATED WITH NIT KURUKSHETRA
-        </p>
+        <nav className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-4">
+          {NAV.map((n) => (
+            <Link key={n.to} to={n.to} className="btn !justify-start !py-3">
+              <n.icon size={15} strokeWidth={2.5} />
+              {n.label}
+            </Link>
+          ))}
+        </nav>
+
+        <footer className="mt-10 flex flex-wrap items-center justify-between gap-2">
+          <p className="label muted">EVERYTHING STAYS ON THIS DEVICE.</p>
+          <p className="label muted">UNOFFICIAL · NOT AFFILIATED WITH NIT KURUKSHETRA</p>
+        </footer>
       </div>
     </div>
   )

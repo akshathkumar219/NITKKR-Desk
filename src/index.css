@@ -477,3 +477,55 @@
     transform: none !important;
   }
 }
+
+/* ---- Entry animation (design.md §10 "make the entrance memorable") ----
+   An overlay, never a gate: the dashboard beneath is already rendered and
+   interactive (§1.3). Retires itself after a few visits — see Intro.jsx. */
+
+.intro-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: grid;
+  place-content: center;
+  gap: 0;
+  background-color: var(--bg);
+  transition: opacity 260ms var(--ease-out);
+}
+
+.intro-overlay[data-leaving] {
+  opacity: 0;
+}
+
+.intro-halftone {
+  color: var(--primary);
+  opacity: 0.14;
+}
+
+.intro-word {
+  position: relative;
+  margin: 0;
+  text-align: center;
+  font-size: clamp(3.5rem, 16vw, 11rem);
+  line-height: 0.86;
+  color: var(--text);
+}
+
+/* Second line lands just after the first — the plates settling in sequence. */
+.intro-word-2 {
+  animation-delay: 90ms;
+  color: var(--primary);
+}
+
+.intro-skip {
+  margin-top: 2rem;
+  text-align: center;
+  color: var(--muted);
+  animation: live-pulse 2.4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .intro-skip {
+    animation: none;
+  }
+}

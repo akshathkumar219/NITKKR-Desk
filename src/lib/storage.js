@@ -12,6 +12,7 @@ export const KEYS = {
   rollcallSettings: 'kkr.rollcall.settings',
   grades: 'kkr.grades',
   welcomed: 'kkr.welcomed',
+  introPlays: 'kkr.intro.plays', // entry animation is shown a few times, then retired
 }
 
 const listeners = new Set()

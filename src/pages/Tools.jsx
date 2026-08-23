@@ -68,25 +68,25 @@ function SkipGuard() {
   const next = nextSession(sessions, day, mins)
   const meal = currentMeal(mins)
   const menu = menuFor(profile.hostel, day)
-  const mealItems = (menu[meal.key] ?? []).slice(0, 2).join(', ')
+  const mealItems = (menu[meal.key]?.items ?? []).slice(0, 2).join(', ')
 
   return (
-    <Panel className="p-4 sm:p-5" id="skip">
-      <p className="label muted">SKIP GUARD</p>
-      <p className="heading mt-2 text-2xl">
+    <Panel className="pad-page" id="skip">
+      <p className="t-meta muted">SKIP GUARD</p>
+      <p className="t-section mt-2">
         {live ? 'YOU ARE IN CLASS' : next ? 'ONE MORE TO GO' : 'BOARD IS CLEAR'}
       </p>
-      <p className="mt-2 text-sm font-semibold">
+      <p className="t-body mt-2">
         {live
           ? `${live.name} · ${live.room || 'room TBA'} · ends ${fmtRange(live.start, live.end).split('–')[1]}`
           : next
             ? `${next.name} · ${next.room || 'room TBA'} · ${fmtRange(next.start, next.end)}`
             : 'Nothing else scheduled today.'}
       </p>
-      <p className="label muted mt-3">
+      <p className="t-meta muted mt-3">
         MESS · {meal.label}: {mealItems || 'SEE MESS BOARD'}
       </p>
-      <p className="label muted mt-3">
+      <p className="t-meta muted mt-3">
         SKIP GUARD ONLY READS YOUR BOARD. FOR SAFE-TO-SKIP COUNTS, SEE ROLL CALL.
       </p>
     </Panel>
@@ -118,11 +118,11 @@ function Cgpa() {
   const drop = (id) => setRows((r) => r.filter((row) => row.id !== id))
 
   return (
-    <Panel className="p-4 sm:p-5" id="cgpa">
+    <Panel className="pad-page" id="cgpa">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <p className="label muted">SGPA · LIVE ESTIMATE</p>
-          <p className="heading mt-1 text-5xl">{sgpa.toFixed(2)}</p>
+          <p className="t-meta muted">SGPA · LIVE ESTIMATE</p>
+          <p className="t-stat mt-1">{sgpa.toFixed(2)}</p>
         </div>
         <div className="grid grid-cols-2 gap-2">
           <StatTile label="CREDITS" value={credits} accent="var(--color-sky)" />
@@ -131,7 +131,7 @@ function Cgpa() {
       </div>
 
       {rows.length === 0 ? (
-        <p className="label muted mt-4">NO COURSES YET — ADD YOUR FIRST ROW TO START.</p>
+        <p className="t-meta muted mt-4">NO COURSES YET — ADD YOUR FIRST ROW TO START.</p>
       ) : (
         <div className="mt-4 space-y-2">
           {rows.map((r) => (
@@ -164,17 +164,17 @@ function Cgpa() {
                 onClick={() => drop(r.id)}
                 aria-label="Remove row"
               >
-                <Trash2 size={14} strokeWidth={2.5} />
+                <Trash2 className="icon-micro shrink-0" strokeWidth={2.5} />
               </button>
             </div>
           ))}
         </div>
       )}
 
-      <button type="button" className="btn btn-go mt-4" onClick={add}>
-        <Plus size={14} strokeWidth={3} /> ADD COURSE
+      <button type="button" className="btn btn-go mt-4 flex items-center gap-1.5" onClick={add}>
+        <Plus className="icon-micro shrink-0" strokeWidth={3} /> <span>ADD COURSE</span>
       </button>
-      <p className="label muted mt-3">
+      <p className="t-meta muted mt-3">
         ASSUMES A 10-POINT SCALE. CHANGE GRADE_POINTS IN SRC/PAGES/TOOLS.JSX IF YOURS DIFFERS.
       </p>
     </Panel>
@@ -211,20 +211,20 @@ function Backup() {
   }
 
   return (
-    <Panel className="p-4 sm:p-5" id="backup">
-      <p className="label muted">BACKUP / RESTORE</p>
-      <p className="heading mt-1 text-xl">OFFLINE JSON SNAPSHOT</p>
-      <p className="mt-2 text-sm font-medium">
+    <Panel className="pad-page" id="backup">
+      <p className="t-meta muted">BACKUP / RESTORE</p>
+      <p className="t-section mt-1">OFFLINE JSON SNAPSHOT</p>
+      <p className="t-body mt-2">
         Your board, roll call, grades and profile as one file. This is the only way to
         recover if you clear your browser data — do it every few weeks.
       </p>
 
       <div className="mt-4 flex flex-wrap gap-2">
-        <button type="button" className="btn btn-primary" onClick={doExport}>
-          <Download size={14} strokeWidth={2.5} /> EXPORT JSON
+        <button type="button" className="btn btn-primary flex items-center gap-1.5" onClick={doExport}>
+          <Download className="icon-micro shrink-0" strokeWidth={2.5} /> <span>EXPORT JSON</span>
         </button>
-        <button type="button" className="btn" onClick={() => fileRef.current?.click()}>
-          <Upload size={14} strokeWidth={2.5} /> IMPORT JSON
+        <button type="button" className="btn flex items-center gap-1.5" onClick={() => fileRef.current?.click()}>
+          <Upload className="icon-micro shrink-0" strokeWidth={2.5} /> <span>IMPORT JSON</span>
         </button>
         <input
           ref={fileRef}
@@ -241,7 +241,7 @@ function Backup() {
 
       {msg ? (
         <p
-          className="label mt-3 border-2 p-2"
+          className="t-body font-bold mt-3 border-2 p-2"
           style={{ borderColor: msg.ok ? 'var(--color-present)' : 'var(--color-absent)' }}
           role="status"
         >
@@ -267,22 +267,22 @@ export default function Tools() {
         sub="SKIP GUARD · CGPA · TRANSPORT · LINKS · PLACEMENTS · BACKUP"
       />
 
-      <Panel className="p-3">
+      <Panel className="pad-tight">
         <div className="flex flex-wrap gap-2">
           {SECTIONS.map((s) => (
             <a
               key={s.id}
               href={`#${s.id}`}
-              className="btn"
+              className="btn flex items-center gap-1.5"
               style={{ background: s.accent, color: s.neutral ? 'var(--text)' : 'var(--color-ink)' }}
             >
-              <s.icon size={14} strokeWidth={2.5} /> {s.label}
+              <s.icon className="icon-micro shrink-0" strokeWidth={2.5} /> <span className="t-micro">{s.label}</span>
             </a>
           ))}
         </div>
       </Panel>
 
-      <Panel className="grid gap-3 p-4 sm:grid-cols-3">
+      <Panel className="grid gap-3 pad-page sm:grid-cols-3">
         <Field label="BRANCH" id="t-branch">
           <Select
             id="t-branch"
@@ -313,9 +313,9 @@ export default function Tools() {
       <Cgpa />
 
       {/* ---- Transport ---- */}
-      <Panel className="p-4 sm:p-5" id="transport">
-        <p className="label muted">KURUKSHETRA TRANSPORT</p>
-        <p className="heading mt-1 text-xl">OPEN DIRECTIONS IN MAPS</p>
+      <Panel className="pad-page" id="transport">
+        <p className="t-meta muted">KURUKSHETRA TRANSPORT</p>
+        <p className="t-section mt-1">OPEN DIRECTIONS IN MAPS</p>
         <div className="mt-4 flex flex-wrap gap-2">
           {TRANSPORT.map((t) => (
             <a
@@ -332,11 +332,11 @@ export default function Tools() {
       </Panel>
 
       {/* ---- Links ---- */}
-      <Panel className="p-4 sm:p-5" id="links">
+      <Panel className="pad-page" id="links">
         <div className="flex items-center justify-between gap-3">
           <div>
-            <p className="label muted">USEFUL LINKS</p>
-            <p className="heading mt-1 text-xl">PORTALS & STUDY TOOLS</p>
+            <p className="t-meta muted">USEFUL LINKS</p>
+            <p className="t-section mt-1">PORTALS & STUDY TOOLS</p>
           </div>
           <Chip>{USEFUL_LINKS.length} LINKS</Chip>
         </div>
@@ -347,26 +347,26 @@ export default function Tools() {
               href={l.url}
               target="_blank"
               rel="noopener noreferrer"
-              className="board p-3 transition-transform hover:-translate-y-0.5"
+              className="board pad-card transition-transform hover:-translate-y-0.5"
             >
               <Chip tone="var(--color-amber)">{l.tag}</Chip>
-              <p className="heading mt-2 text-base">{l.title}</p>
-              <p className="label muted mt-1 normal-case">{l.description}</p>
+              <p className="t-card-title mt-2">{l.title}</p>
+              <p className="t-body muted mt-1 normal-case">{l.description}</p>
             </a>
           ))}
         </div>
       </Panel>
 
       {/* ---- Placements ---- */}
-      <Panel className="p-4 sm:p-5" id="placements">
-        <p className="label muted">PLACEMENT CHECKLIST</p>
-        <p className="heading mt-1 text-xl">DRIVE PREP ESSENTIALS</p>
+      <Panel className="pad-page" id="placements">
+        <p className="t-meta muted">PLACEMENT CHECKLIST</p>
+        <p className="t-section mt-1">DRIVE PREP ESSENTIALS</p>
         <ol className="mt-4 grid gap-3 sm:grid-cols-2">
           {PLACEMENT_CHECKLIST.map((item, i) => (
-            <li key={item.title} className="board p-3">
-              <span className="label muted">{String(i + 1).padStart(2, '0')}</span>
-              <p className="heading mt-1 text-base">{item.title}</p>
-              <p className="mt-1 text-sm font-medium">{item.body}</p>
+            <li key={item.title} className="board pad-card">
+              <span className="t-meta muted">{String(i + 1).padStart(2, '0')}</span>
+              <p className="t-card-title mt-1">{item.title}</p>
+              <p className="t-body mt-1">{item.body}</p>
             </li>
           ))}
         </ol>

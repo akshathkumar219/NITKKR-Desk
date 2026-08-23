@@ -11,7 +11,7 @@
 // anything.
 // ---------------------------------------------------------------------------
 
-import campus from './generated/campus.json'
+import campus from './generated/campus.json' with { type: 'json' }
 
 export const BRANCHES = campus.branches
 export const HOSTELS = campus.hostels
@@ -30,7 +30,7 @@ export const TYPE_STYLE = {
   lab: { bg: 'var(--color-violet)', label: 'LAB' },
   tutorial: { bg: 'var(--color-teal)', label: 'TUTORIAL' },
   break: { bg: 'transparent', label: 'BREAK' },
-  other: { bg: 'var(--color-amber)', label: 'OTHER' },
+  other: { bg: 'var(--color-lime)', label: 'OTHER' },
 }
 
 export function branchName(code) {
@@ -45,5 +45,18 @@ export function hostelName(code) {
 // content rather than hardcoded, so removing a branch from branches.md can
 // never leave the app pointing at one that does not exist.
 export const DEFAULT_BRANCH = BRANCHES[0]?.code ?? 'CSE'
-export const DEFAULT_HOSTEL = HOSTELS[0]?.code ?? 'CVR'
+export const DEFAULT_HOSTEL = HOSTELS[0]?.code ?? 'H1'
 export const DEFAULT_YEAR = '1'
+
+export const BRANCH_SUBSECTIONS = {
+  CSE: ['A1', 'A2', 'B3', 'B4'],
+  IT: ['G1', 'G2'],
+  AIDS: ['G1', 'G2'],
+  AIML: ['G1', 'G2'],
+  MNC: ['G1', 'G2'],
+}
+
+export function getSubsectionsForBranch(branch) {
+  return BRANCH_SUBSECTIONS[branch] || ['G1', 'G2']
+}
+

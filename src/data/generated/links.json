@@ -137,25 +137,5 @@
         "text": "NIT Kurukshetra is an Institute of National Importance with a large residential campus, established in 1963 as Regional Engineering College Kurukshetra."
       }
     ]
-  },
-  "placements": {
-    "DEFAULT": [
-      {
-        "title": "RESUME PACK",
-        "description": "One-page PDF plus a Drive folder with projects, certificates and transcripts."
-      },
-      {
-        "title": "DRIVE TRACKER",
-        "description": "Company, role, CTC/stipend, eligibility, deadline, test date, interview status."
-      },
-      {
-        "title": "UPDATE FORMAT",
-        "description": "Company"
-      },
-      {
-        "title": "ELIGIBILITY WATCH",
-        "description": "CGPA cutoff, backlog rules and branch filters — check before you apply."
-      }
-    ]
   }
 }

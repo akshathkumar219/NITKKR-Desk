@@ -8,6 +8,17 @@
 
 import generated from './generated/pyq.json'
 
+/**
+ * The three exam sittings. Kept in sync with EXAMS in
+ * scripts/content/datasets.mjs — that file validates the `Exam` column and
+ * writes these ids into the JSON.
+ */
+export const PYQ_EXAMS = [
+  { id: 'MID1', label: 'MID SEM 1' },
+  { id: 'MID2', label: 'MID SEM 2' },
+  { id: 'END', label: 'END SEM' },
+]
+
 export const PYQ_YEARS = generated.map((s) => ({
   id: s.session,
   label: s.session,

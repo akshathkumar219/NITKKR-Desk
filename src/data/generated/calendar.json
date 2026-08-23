@@ -1,66 +1,222 @@
 {
   "calendars": [
     {
-      "title": "ODD SEMESTER 2026-27",
-      "term": "odd-2026-27",
-      "audience": null,
-      "source": "PLACEHOLDER — replace with the official NITKKR academic calendar",
-      "verified": false,
+      "title": "ACADEMIC CALENDAR (EVEN SEMESTER 2026-27)",
+      "term": "even-2026-27",
+      "audience": "UG, PG & PhD Programmes",
+      "source": "Notification No. Acad./2026/1104 dated 18.06.2026 (Senate 59th Meeting)",
+      "verified": true,
       "events": [
         {
-          "label": "REGISTRATION",
-          "value": "JUL 20 – 24, 2026",
+          "label": "Registration for Even Semester Starts",
+          "value": "JAN 11, 2027",
           "category": "REGISTRATION",
-          "date": null,
+          "date": "2027-01-11",
           "endDate": null
         },
         {
-          "label": "CLASSES BEGIN",
-          "value": "JUL 27, 2026 (MON)",
-          "category": "CLASSES",
-          "date": null,
+          "label": "Commencement of Classes",
+          "value": "JAN 18, 2027",
+          "category": "ACADEMIC",
+          "date": "2027-01-18",
           "endDate": null
         },
         {
-          "label": "MID-TERM EXAMS",
-          "value": "SEP 21 – 26, 2026",
+          "label": "Registration for Even Semester Ends",
+          "value": "MAR 10, 2027",
+          "category": "REGISTRATION",
+          "date": "2027-03-10",
+          "endDate": null
+        },
+        {
+          "label": "CITIUS-2027",
+          "value": "FEB 05 – 07, 2027",
+          "category": "EVENTS",
+          "date": "2027-02-05",
+          "endDate": "2027-02-07"
+        },
+        {
+          "label": "Techspardha-2027",
+          "value": "MAR 05 – 07, 2027",
+          "category": "EVENTS",
+          "date": "2027-03-05",
+          "endDate": "2027-03-07"
+        },
+        {
+          "label": "Mid Semester Exam-I",
+          "value": "MAR 17 – 19, 2027",
           "category": "EXAMS",
-          "date": null,
-          "endDate": null
+          "date": "2027-03-17",
+          "endDate": "2027-03-19"
         },
         {
-          "label": "CLASSES END",
-          "value": "NOV 20, 2026 (FRI)",
-          "category": "CLASSES",
-          "date": null,
-          "endDate": null
-        },
-        {
-          "label": "END-TERM EXAMS",
-          "value": "NOV 27 – DEC 08, 2026",
-          "category": "EXAMS",
-          "date": null,
-          "endDate": null
-        },
-        {
-          "label": "RESULT DECLARATION",
-          "value": "DEC 22, 2026",
-          "category": "GRADES",
-          "date": null,
-          "endDate": null
-        },
-        {
-          "label": "WINTER BREAK",
-          "value": "DEC 10, 2026 – JAN 03, 2027",
+          "label": "Mid Semester Break",
+          "value": "MAR 22 – 26, 2027",
           "category": "BREAKS",
-          "date": null,
+          "date": "2027-03-22",
+          "endDate": "2027-03-26"
+        },
+        {
+          "label": "Mid Semester Exam-II",
+          "value": "APR 20 – 22, 2027",
+          "category": "EXAMS",
+          "date": "2027-04-20",
+          "endDate": "2027-04-22"
+        },
+        {
+          "label": "Practical Examination Begins",
+          "value": "APR 26, 2027",
+          "category": "EXAMS",
+          "date": "2027-04-26",
           "endDate": null
         },
         {
-          "label": "NEXT SEMESTER BEGINS",
-          "value": "JAN 04, 2027 (MON)",
-          "category": "CLASSES",
-          "date": null,
+          "label": "Teaching Closes",
+          "value": "APR 30, 2027",
+          "category": "ACADEMIC",
+          "date": "2027-04-30",
+          "endDate": null
+        },
+        {
+          "label": "End Semester Examination Begins",
+          "value": "MAY 07, 2027",
+          "category": "EXAMS",
+          "date": "2027-05-07",
+          "endDate": null
+        },
+        {
+          "label": "End Semester Examination Concludes",
+          "value": "MAY 24, 2027",
+          "category": "EXAMS",
+          "date": "2027-05-24",
+          "endDate": null
+        },
+        {
+          "label": "Summer Break",
+          "value": "JUN 04 – JUL 28, 2027",
+          "category": "BREAKS",
+          "date": "2027-06-04",
+          "endDate": "2027-07-28"
+        },
+        {
+          "label": "Registration for Odd Semester (2027-28)",
+          "value": "JUL 20 – AUG 19, 2027",
+          "category": "REGISTRATION",
+          "date": "2027-07-20",
+          "endDate": "2027-08-19"
+        },
+        {
+          "label": "Commencement of Classes (Odd Semester 2027-28)",
+          "value": "JUL 29, 2027",
+          "category": "ACADEMIC",
+          "date": "2027-07-29",
+          "endDate": null
+        }
+      ]
+    },
+    {
+      "title": "ACADEMIC CALENDAR (ODD SEMESTER 2026-27)",
+      "term": "odd-2026-27",
+      "audience": "UG, PG & PhD Programmes",
+      "source": "Notification No. Acad./2026/1104 dated 18.06.2026 (Senate 59th Meeting)",
+      "verified": true,
+      "events": [
+        {
+          "label": "Registration for Odd Semester Starts",
+          "value": "AUG 21, 2026",
+          "category": "REGISTRATION",
+          "date": "2026-08-21",
+          "endDate": null
+        },
+        {
+          "label": "Commencement of Classes",
+          "value": "AUG 24, 2026",
+          "category": "ACADEMIC",
+          "date": "2026-08-24",
+          "endDate": null
+        },
+        {
+          "label": "Talent Show",
+          "value": "SEP 19 – 20, 2026",
+          "category": "EVENTS",
+          "date": "2026-09-19",
+          "endDate": "2026-09-20"
+        },
+        {
+          "label": "Registration for Odd Semester Ends",
+          "value": "SEP 21, 2026",
+          "category": "REGISTRATION",
+          "date": "2026-09-21",
+          "endDate": null
+        },
+        {
+          "label": "Mid Semester Exam-I",
+          "value": "SEP 28 – 30, 2026",
+          "category": "EXAMS",
+          "date": "2026-09-28",
+          "endDate": "2026-09-30"
+        },
+        {
+          "label": "Confluence-2026",
+          "value": "OCT 09 – 11, 2026",
+          "category": "EVENTS",
+          "date": "2026-10-09",
+          "endDate": "2026-10-11"
+        },
+        {
+          "label": "Mid Semester Exam-II",
+          "value": "NOV 18 – 20, 2026",
+          "category": "EXAMS",
+          "date": "2026-11-18",
+          "endDate": "2026-11-20"
+        },
+        {
+          "label": "Practical Examination Begins",
+          "value": "NOV 30, 2026",
+          "category": "EXAMS",
+          "date": "2026-11-30",
+          "endDate": null
+        },
+        {
+          "label": "Teaching Closes",
+          "value": "DEC 04, 2026",
+          "category": "ACADEMIC",
+          "date": "2026-12-04",
+          "endDate": null
+        },
+        {
+          "label": "End Semester Examination Begins",
+          "value": "DEC 11, 2026",
+          "category": "EXAMS",
+          "date": "2026-12-11",
+          "endDate": null
+        },
+        {
+          "label": "End Semester Examination Concludes",
+          "value": "DEC 28, 2026",
+          "category": "EXAMS",
+          "date": "2026-12-28",
+          "endDate": null
+        },
+        {
+          "label": "Winter Break",
+          "value": "DEC 29, 2026 – JAN 17, 2027",
+          "category": "BREAKS",
+          "date": "2026-12-29",
+          "endDate": "2027-01-17"
+        },
+        {
+          "label": "Registration for Even Semester (2026-27)",
+          "value": "DEC 29, 2026 – JAN 28, 2027",
+          "category": "REGISTRATION",
+          "date": "2026-12-29",
+          "endDate": "2027-01-28"
+        },
+        {
+          "label": "Commencement of Classes (Even Semester)",
+          "value": "JAN 18, 2027",
+          "category": "ACADEMIC",
+          "date": "2027-01-18",
           "endDate": null
         }
       ]

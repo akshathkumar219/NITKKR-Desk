@@ -1,4 +1,4 @@
-# NITKKR BOARD
+# NITKKR DESK
 
 An unofficial student companion for NIT Kurukshetra — timetable, attendance ("roll call"),
 mess board, open-room checker, PYQ browser, campus map and a small toolkit.

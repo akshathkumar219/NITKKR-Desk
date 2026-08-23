@@ -20,6 +20,8 @@ const ROUTES = [
   ['map', '/map'],
   ['campus', '/campus'],
   ['info', '/info'],
+  ['subjects', '/subjects'],
+  ['calculator', '/calculator'],
   ['profile', '/profile'],
   ['about', '/about'],
   ['404', '/does-not-exist'],
@@ -46,16 +48,17 @@ async function run(label, viewport, theme, seed) {
     ([theme, seed]) => {
       localStorage.setItem('kkr.theme', JSON.stringify(theme))
       localStorage.setItem('kkr.welcomed', JSON.stringify(true))
-      // Retire the entry animation for route captures — it is an overlay
-      // on `/` and would otherwise be the only thing screenshotted there.
-      localStorage.setItem('kkr.intro.plays', JSON.stringify(99))
+      // Retire the entry animation for route captures. It now mounts at the
+      // app root, so without this it would cover every route screenshot, not
+      // just `/`. Session-scoped, so it survives the reloads in this tab.
+      sessionStorage.setItem('kkr.intro.plays', JSON.stringify(99))
       if (seed) {
         localStorage.setItem(
           'kkr.profile',
           JSON.stringify({
             name: 'Akshath',
             branch: 'CSE',
-            hostel: 'CVR',
+            hostel: 'H1',
             yearByBranch: { CSE: '2' },
             branchPicked: true,
             hostelPicked: true,
@@ -204,7 +207,7 @@ await run('fresh', { width: 1440, height: 900 }, 'light', false)
       JSON.stringify({
         name: 'Akshath',
         branch: 'CSE',
-        hostel: 'CVR',
+        hostel: 'H1',
         yearByBranch: { CSE: '2' },
         branchPicked: true,
         hostelPicked: true,
@@ -221,7 +224,7 @@ await run('fresh', { width: 1440, height: 900 }, 'light', false)
   await page.screenshot({ path: `${OUT}/interact-week-grid.png` })
 
   // Edit mode + add session
-  await page.getByRole('button', { name: 'EDIT BOARD' }).click()
+  await page.getByRole('button', { name: /EDIT (TIMETABLE|BOARD)/i }).click()
   await page.getByRole('button', { name: 'ADD SESSION', exact: true }).click()
   await page.waitForTimeout(200)
   await page.locator('#s-name').fill('Verification Seminar')
@@ -282,12 +285,12 @@ await run('fresh', { width: 1440, height: 900 }, 'light', false)
   await page.goto(BASE, { waitUntil: 'domcontentloaded' })
   await page.evaluate(() => {
     localStorage.setItem('kkr.welcomed', JSON.stringify(true))
-    localStorage.removeItem('kkr.intro.plays')
+    sessionStorage.removeItem('kkr.intro.plays')
   })
 
   const plays = async () => {
     await page.goto(BASE, { waitUntil: 'domcontentloaded' })
-    // Sample immediately — before the ~1.2s auto-dismiss.
+    // Sample immediately — before the 2s auto-dismiss.
     return page.locator('.intro-overlay').count()
   }
 
@@ -312,7 +315,7 @@ await run('fresh', { width: 1440, height: 900 }, 'light', false)
   }
   if ((await plays()) !== 0) errors.push('[intro] still playing after 5 loads')
 
-  const count = await page.evaluate(() => localStorage.getItem('kkr.intro.plays'))
+  const count = await page.evaluate(() => sessionStorage.getItem('kkr.intro.plays'))
   if (Number(JSON.parse(count ?? '0')) !== 5)
     errors.push(`[intro] play counter is ${count}, expected 5`)
 
@@ -329,7 +332,7 @@ await run('fresh', { width: 1440, height: 900 }, 'light', false)
   await page.goto(BASE, { waitUntil: 'domcontentloaded' })
   await page.evaluate(() => {
     localStorage.setItem('kkr.welcomed', JSON.stringify(true))
-    localStorage.removeItem('kkr.intro.plays')
+    sessionStorage.removeItem('kkr.intro.plays')
   })
   await page.goto(BASE, { waitUntil: 'domcontentloaded' })
   if ((await page.locator('.intro-overlay').count()) !== 0)

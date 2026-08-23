@@ -1,55 +1,72 @@
-import { useNavigate } from 'react-router-dom'
-import { UtensilsCrossed } from 'lucide-react'
+import { useState } from 'react'
+import { useLocation, useNavigate } from 'react-router-dom'
+import { Check } from 'lucide-react'
 import PlainShell from '../components/PlainShell'
-import { Eyebrow } from '../ui'
 import { HOSTELS } from '../data/campus'
 import { useProfile } from '../lib/storage'
 import { MESS } from '../data/mess'
 
+// Hostels are numbered, not named — sort H1..H10 numerically so H10 does not
+// land between H1 and H2 the way a plain string sort would put it.
+const SORTED_HOSTELS = [...HOSTELS].sort((a, b) => {
+  const n = (c) => Number(c.replace(/\D/g, '')) || 0
+  return n(a.code) - n(b.code) || a.code.localeCompare(b.code)
+})
+
 export default function SelectHostel() {
   const { profile, update } = useProfile()
+  const [picked, setPicked] = useState(profile.hostel)
   const navigate = useNavigate()
+  const location = useLocation()
+  const from = location.state?.from
+  const onboarding = location.state?.onboarding === true
 
-  function choose(code) {
-    update({ hostel: code, hostelPicked: true })
-    navigate('/mess')
+  function save() {
+    update({ hostel: picked, hostelPicked: true })
+    // Last step of setup — finish on the board, not the mess menu.
+    if (onboarding) navigate('/home')
+    else navigate(from || '/mess')
   }
 
   return (
-    <PlainShell back="/">
-      <Eyebrow icon={UtensilsCrossed}>HOSTEL SELECTION</Eyebrow>
+    <PlainShell back={from || '/select/branch'}>
+      <div className="flex flex-wrap items-start justify-between gap-4">
+        <div className="min-w-0">
+          <h1 className="display text-4xl sm:text-5xl">SELECT YOUR HOSTEL</h1>
+          <p className="label muted mt-3 max-w-md">
+            CHOOSE YOUR HOSTEL TO SEE THE RIGHT MESS MENU.
+          </p>
+        </div>
 
-      <div className="mt-3 flex flex-wrap items-end justify-between gap-6">
-        <h1 className="display text-5xl sm:text-6xl">
-          select your
-          <br />
-          hostel
-        </h1>
-        <p className="label muted max-w-xs sm:text-right">
-          CHOOSE YOUR HOSTEL TO SEE THE RIGHT MESS MENU.
-        </p>
+        <button
+          type="button"
+          onClick={save}
+          className="btn btn-go shrink-0 !py-2 !px-5 text-sm font-bold shadow-hard-sm cursor-pointer"
+        >
+          <Check size={15} strokeWidth={2.75} /> SAVE
+        </button>
       </div>
 
       <div className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-        {HOSTELS.map((h) => {
-          const active = h.code === profile.hostel
+        {SORTED_HOSTELS.map((h) => {
+          const active = h.code === picked
           const custom = Boolean(MESS[h.code])
           return (
             <button
               key={h.code}
               type="button"
-              onClick={() => choose(h.code)}
-              className="board board-hard p-4 text-left transition-transform hover:-translate-y-0.5"
+              aria-pressed={active}
+              onClick={() => setPicked(h.code)}
+              className="board board-hard p-3.5 sm:p-4 text-left transition-transform hover:-translate-y-0.5"
               style={active ? { borderColor: 'var(--color-brand)', borderWidth: 3 } : undefined}
             >
               <p className="heading text-2xl">{h.code}</p>
-              <p className="label muted mt-1.5">{h.name}</p>
               <hr className="my-3 border-t-2 border-black/10 dark:border-white/10" />
               <span
                 className="chip"
-                style={custom ? { background: 'var(--color-coral)', color: 'var(--color-ink)' } : undefined}
+                style={custom ? { background: 'var(--color-acid)', color: 'var(--on-accent)' } : undefined}
               >
-                {custom ? 'OWN MENU' : 'SHARED MENU'}
+                {custom ? 'MENU READY' : 'ADD MENU'}
               </span>
             </button>
           )
@@ -58,7 +75,6 @@ export default function SelectHostel() {
 
       <p className="label muted mt-10">
         HOSTELS WITHOUT THEIR OWN MENU FALL BACK TO A SHARED PLACEHOLDER WEEK.
-        ADD REAL MENUS IN CONTENT/MESS/ — ONE FILE PER HOSTEL
       </p>
     </PlainShell>
   )

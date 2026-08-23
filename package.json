@@ -11,7 +11,8 @@
     "lint": "oxlint",
     "test:ids": "node scripts/content/ids.test.mjs",
     "preview": "vite preview",
-    "verify": "node verify.mjs"
+    "verify": "node verify.mjs",
+    "verify:tokens": "node scripts/verify_design_tokens.mjs"
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.3.3",

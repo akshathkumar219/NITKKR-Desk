@@ -89,7 +89,7 @@ async function newPage(theme) {
   await page.evaluate((t) => {
     localStorage.setItem('kkr.theme', JSON.stringify(t))
     localStorage.setItem('kkr.welcomed', JSON.stringify(true))
-    localStorage.setItem('kkr.intro.plays', JSON.stringify(99))
+    sessionStorage.setItem('kkr.intro.plays', JSON.stringify(99))
     localStorage.setItem(
       'kkr.profile',
       JSON.stringify({

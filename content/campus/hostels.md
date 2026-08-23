@@ -1,16 +1,20 @@
 # Hostels
 
-> **NOT YET VERIFIED.** Check names and the full hostel list against official
-> sources. A missing hostel means those students see someone else's mess menu.
+> Official NIT Kurukshetra Hostels List.
 
 As with branches, `Code` is stored in student profiles — treat it as permanent.
+`Name` is intentionally blank: hostels are referred to by number only. Leaving
+it empty makes the parser fall back to the code, so nothing downstream breaks.
 
-| Code | Name                     |
-|------|--------------------------|
-| CVR  | C.V. Raman Hostel        |
-| HJB  | H.J. Bhabha Hostel       |
-| APJ  | A.P.J. Abdul Kalam Hostel|
-| JCB  | J.C. Bose Hostel         |
-| SNB  | S.N. Bose Hostel         |
-| KLP  | Kalpana Chawla Hostel    |
-| GRG  | Gargi Hostel             |
+| Code | Name |
+|------|------|
+| H1   |      |
+| H2   |      |
+| H3   |      |
+| H4   |      |
+| H5   |      |
+| H6   |      |
+| H7   |      |
+| H8   |      |
+| H9   |      |
+| H10  |      |

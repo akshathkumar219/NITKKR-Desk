@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react'
 import { X } from 'lucide-react'
+import { inkFor } from '../lib/palette'
 
 /* ---------------------------------------------------------------- Panel -- */
 
@@ -28,27 +29,27 @@ export function Eyebrow({ icon: Icon, children, className = '' }) {
 
 /* ------------------------------------------------------------- PageTitle -- */
 
-export function PageHeader({ icon: Icon, accent, eyebrow, title, sub, actions }) {
+export function PageHeader({ icon: Icon, accent, iconInk, eyebrow, title, sub, body, actions, className = '' }) {
   return (
-    <Panel className="p-4 sm:p-6">
-      <div className="flex flex-wrap items-start justify-between gap-4">
-        <div className="flex items-start gap-3 sm:gap-4">
-          {Icon ? (
-            <span
-              className="grid size-11 shrink-0 place-items-center border-2 border-[var(--border)]"
-              style={{ background: accent, borderRadius: 'var(--radius-board)' }}
-            >
-              <Icon size={20} strokeWidth={2.5} color="var(--color-ink)" aria-hidden />
-            </span>
-          ) : null}
-          <div className="min-w-0">
-            {eyebrow ? <Eyebrow className="mb-1">{eyebrow}</Eyebrow> : null}
-            <h1 className="heading text-3xl sm:text-4xl">{title}</h1>
-            {sub ? <p className="label muted mt-2">{sub}</p> : null}
+    <Panel className={`pad-page ${className}`}>
+      <div className="flex flex-wrap items-center justify-between gap-4">
+        <div className="min-w-0">
+          {eyebrow ? <Eyebrow className="mb-1.5">{eyebrow}</Eyebrow> : null}
+          <div className="flex items-center gap-3">
+            {Icon ? (
+              <span className="icon-tile shrink-0" style={accent ? { background: accent, color: iconInk ?? inkFor(accent) } : undefined}>
+                <Icon className="icon-lg" strokeWidth={2.5} aria-hidden />
+              </span>
+            ) : null}
+            <h1 className="t-masthead">{title}</h1>
           </div>
+          {sub ? <p className="t-meta muted mt-2.5">{sub}</p> : null}
         </div>
         {actions ? <div className="flex flex-wrap items-center gap-2">{actions}</div> : null}
       </div>
+      {/* Opt-in: a longer descriptive line (e.g. About's intro blurb) that
+          reads as body copy rather than the small-caps `sub` meta line. */}
+      {body ? <p className="t-body font-normal mt-4">{body}</p> : null}
     </Panel>
   )
 }
@@ -56,10 +57,11 @@ export function PageHeader({ icon: Icon, accent, eyebrow, title, sub, actions })
 /* ------------------------------------------------------------------ Chip -- */
 
 export function Chip({ children, tone, className = '', style, ...rest }) {
+  const inkColor = 'var(--on-accent)'
   return (
     <span
       className={`chip ${className}`}
-      style={tone ? { background: tone, color: 'var(--color-ink)', ...style } : style}
+      style={tone ? { background: tone, color: inkColor, ...style } : style}
       {...rest}
     >
       {children}
@@ -85,8 +87,7 @@ export function Segmented({ options, value, onChange, label, size = 'md' }) {
             onClick={() => onChange(val)}
             className="btn"
             style={{
-              padding: size === 'sm' ? '0.3rem 0.55rem' : '0.45rem 0.8rem',
-              fontSize: size === 'sm' ? '0.625rem' : '0.6875rem',
+              padding: size === 'sm' ? '0.35rem 0.65rem' : '0.45rem 0.8rem',
               ...(active
                 ? { background: 'var(--text)', color: 'var(--bg)' }
                 : null),
@@ -104,8 +105,6 @@ export function Segmented({ options, value, onChange, label, size = 'md' }) {
 
 export function EmptyState({ title, hint, action }) {
   return (
-    // §10 lists empty states as high-personality territory — one of the few
-    // places the display face earns its keep outside the landing page.
     <Panel className="relative overflow-hidden px-6 py-14 text-center" hard={false}>
       <div
         className="world world-halftone"
@@ -117,8 +116,8 @@ export function EmptyState({ title, hint, action }) {
         aria-hidden
       />
       <div className="relative z-10">
-        <p className="display text-3xl sm:text-4xl">{title}</p>
-        {hint ? <p className="label muted mx-auto mt-4 max-w-md normal-case">{hint}</p> : null}
+        <p className="t-masthead">{title}</p>
+        {hint ? <p className="t-body muted mx-auto mt-4 max-w-md">{hint}</p> : null}
         {action ? <div className="mt-7 flex justify-center">{action}</div> : null}
       </div>
     </Panel>
@@ -130,18 +129,29 @@ export function EmptyState({ title, hint, action }) {
 export function StatTile({ label, value, accent }) {
   return (
     <div
-      className="board px-3 py-2.5"
+      className="board p-2.5 sm:p-3"
       style={accent ? { borderBottomWidth: 5, borderBottomColor: accent } : undefined}
     >
-      <p className="label muted">{label}</p>
-      <p className="heading mt-1 text-lg">{value}</p>
+      <p className="t-meta muted">{label}</p>
+      <p className="t-stat mt-1">{value}</p>
     </div>
   )
 }
 
 /* ----------------------------------------------------------------- Modal -- */
 
-export function Modal({ open, onClose, title, sub, children, footer }) {
+export function Modal({
+  open,
+  onClose,
+  title,
+  sub,
+  subStyle,
+  children,
+  footer,
+  showCloseButton = true,
+  closeOnBackdrop = true,
+  closeOnEscape = true,
+}) {
   const ref = useRef(null)
 
   useEffect(() => {
@@ -151,7 +161,7 @@ export function Modal({ open, onClose, title, sub, children, footer }) {
 
     const onKey = (e) => {
       if (e.key === 'Escape') {
-        onClose()
+        if (closeOnEscape) onClose()
         return
       }
       // Without this, Tab walks straight out of the dialog and into the page
@@ -186,7 +196,7 @@ export function Modal({ open, onClose, title, sub, children, footer }) {
       // dump the user at the top of the document.
       if (previouslyFocused instanceof HTMLElement) previouslyFocused.focus()
     }
-  }, [open, onClose])
+  }, [open, onClose, closeOnEscape])
 
   if (!open) return null
 
@@ -194,7 +204,7 @@ export function Modal({ open, onClose, title, sub, children, footer }) {
     <div
       className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/55 p-4 sm:items-center"
       onMouseDown={(e) => {
-        if (e.target === e.currentTarget) onClose()
+        if (closeOnBackdrop && e.target === e.currentTarget) onClose()
       }}
     >
       <Panel
@@ -205,18 +215,24 @@ export function Modal({ open, onClose, title, sub, children, footer }) {
         aria-label={title}
         className="animate-flip my-auto w-full max-w-lg outline-none"
       >
-        <div className="flex items-start justify-between gap-4 border-b-2 border-[var(--border)] p-4">
+        <div className="flex items-start justify-between gap-4 border-b-2 border-[var(--border)] p-4 sm:p-5">
           <div>
-            <h2 className="heading text-xl">{title}</h2>
-            {sub ? <p className="label muted mt-1">{sub}</p> : null}
+            <h2 className="t-section">{title}</h2>
+            {sub ? (
+              <p className="t-meta muted mt-1" style={subStyle}>
+                {sub}
+              </p>
+            ) : null}
           </div>
-          <button type="button" className="btn !p-2" onClick={onClose} aria-label="Close">
-            <X size={16} strokeWidth={2.5} />
-          </button>
+          {showCloseButton ? (
+            <button type="button" className="btn !p-2 cursor-pointer" onClick={onClose} aria-label="Close">
+              <X size={16} strokeWidth={2.5} />
+            </button>
+          ) : null}
         </div>
-        <div className="p-4">{children}</div>
+        <div className="p-4 sm:p-5">{children}</div>
         {footer ? (
-          <div className="flex flex-wrap justify-end gap-2 border-t-2 border-[var(--border)] p-4">
+          <div className="flex flex-wrap justify-end gap-2 border-t-2 border-[var(--border)] p-4 sm:p-5">
             {footer}
           </div>
         ) : null}
@@ -227,12 +243,18 @@ export function Modal({ open, onClose, title, sub, children, footer }) {
 
 /* ----------------------------------------------------------------- Field -- */
 
-export function Field({ label, hint, children, id }) {
+export function Field({ label, hint, children, id, labelStyle, hintStyle }) {
   return (
     <label className="block" htmlFor={id}>
-      <span className="label muted mb-1.5 block">{label}</span>
+      <span className="t-meta muted mb-1.5 block" style={labelStyle}>
+        {label}
+      </span>
       {children}
-      {hint ? <span className="label muted mt-1.5 block normal-case">{hint}</span> : null}
+      {hint ? (
+        <span className="t-body muted mt-1.5 block" style={hintStyle}>
+          {hint}
+        </span>
+      ) : null}
     </label>
   )
 }
@@ -263,7 +285,7 @@ export function Select({ options, value, onChange, id, ...rest }) {
 
 export function LiveBadge({ children = 'LIVE' }) {
   return (
-    <span className="chip" style={{ gap: '0.4rem' }}>
+    <span className="chip text-[0.6rem] sm:text-xs font-black tracking-widest uppercase" style={{ gap: '0.4rem' }}>
       <span
         className="animate-live inline-block size-2 rounded-full"
         style={{ background: 'var(--color-present)' }}
@@ -301,8 +323,8 @@ export function Meter({ percent, color, required }) {
 
 /* ------------------------------------------------------------------ Ring -- */
 
-export function Ring({ percent, size = 104, color }) {
-  const stroke = 10
+export function Ring({ percent, size = 104, color, strokeWidth = 10, textSize }) {
+  const stroke = strokeWidth
   const r = (size - stroke) / 2
   const c = 2 * Math.PI * r
   const filled = percent === null ? 0 : (Math.min(100, Math.max(0, percent)) / 100) * c
@@ -331,7 +353,7 @@ export function Ring({ percent, size = 104, color }) {
       </svg>
       <div className="absolute inset-0 grid place-items-center text-center">
         <div>
-          <p className="heading text-xl leading-none">
+          <p className={`${textSize || 't-stat'}`}>
             {percent === null ? '—' : `${Math.round(percent)}%`}
           </p>
         </div>

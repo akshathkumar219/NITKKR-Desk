@@ -1,9 +1,16 @@
 import { ArrowLeft } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 
-/** Full-bleed layout for pre-onboarding and standalone pages (no sidebar). */
-export default function PlainShell({ children, back = -1, backLabel = 'BACK' }) {
+/**
+ * Full-bleed layout for pre-onboarding and standalone pages (no sidebar).
+ *
+ * `aside` is optional and renders opposite BACK on the same top row — used by
+ * the setup flow for its step trail. Default null, so every existing caller
+ * renders exactly as before.
+ */
+export default function PlainShell({ children, back = -1, backLabel = 'BACK', aside = null, preserveBackSpace = false }) {
   const navigate = useNavigate()
+  const hasTopRow = back !== null || aside !== null || preserveBackSpace
   return (
     <div className="world-grain relative min-h-dvh overflow-hidden px-4 py-6 sm:px-8 sm:py-10">
       {/* WORLD (§3.1) — printed-paper atmosphere, behind everything. */}
@@ -17,11 +24,21 @@ export default function PlainShell({ children, back = -1, backLabel = 'BACK' }) 
         aria-hidden
       />
       <div className="relative z-10 mx-auto max-w-5xl">
-        {back !== null ? (
-          <button type="button" className="btn mb-8" onClick={() => navigate(back)}>
-            <ArrowLeft size={15} strokeWidth={2.5} aria-hidden />
-            {backLabel}
-          </button>
+        {hasTopRow ? (
+          <div className="mb-8 flex flex-wrap items-center justify-between gap-3">
+            {back !== null ? (
+              <button type="button" className="btn" onClick={() => navigate(back)}>
+                <ArrowLeft size={15} strokeWidth={2.5} aria-hidden />
+                {backLabel}
+              </button>
+            ) : preserveBackSpace ? (
+              <div className="btn invisible pointer-events-none select-none" aria-hidden="true">
+                <ArrowLeft size={15} strokeWidth={2.5} />
+                {backLabel}
+              </div>
+            ) : null}
+            {aside}
+          </div>
         ) : null}
         {children}
       </div>

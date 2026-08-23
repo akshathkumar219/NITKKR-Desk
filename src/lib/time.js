@@ -5,6 +5,17 @@
 export const DAYS = ['MON', 'TUE', 'WED', 'THU', 'FRI']
 export const DAYS_7 = ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN']
 
+/** Day code -> full weekday name, for prose contexts. */
+export const DAY_NAMES = {
+  MON: 'Monday',
+  TUE: 'Tuesday',
+  WED: 'Wednesday',
+  THU: 'Thursday',
+  FRI: 'Friday',
+  SAT: 'Saturday',
+  SUN: 'Sunday',
+}
+
 /** JS Date.getDay() (0=Sun) -> our day code. */
 export function dayCode(date = new Date()) {
   return DAYS_7[(date.getDay() + 6) % 7]
@@ -91,3 +102,15 @@ export function fmtDateShort(iso) {
     .toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' })
     .toUpperCase()
 }
+
+/** "2026-08-01" -> "01-08-2026" */
+export function fmtDateDDMMYYYY(iso) {
+  if (!iso || typeof iso !== 'string') return ''
+  const parts = iso.split('-')
+  if (parts.length === 3) {
+    const [y, m, d] = parts
+    return `${d}-${m}-${y}`
+  }
+  return iso
+}
+

@@ -1,4 +1,4 @@
-# Student Utility Website — Design System & Art Direction
+# Student Utility Website — Design System & Art Direction (`design.md`)
 
 ## 0. Core Design Thesis
 
@@ -43,64 +43,110 @@ Therefore:
 
 ---
 
-# 2. Theme Strategy
+# 2. Theme Strategy & Color System
 
 Use **Light / Dark** as the primary theme switch.
 
-Do **NOT** implement a “Chaos / Zen” or equivalent visual mode as the main theme system.
+The expressive style is part of the permanent brand identity. It exists in both light and dark themes with dedicated high-contrast palettes.
 
-The expressive style is part of the permanent brand identity. It should exist in both light and dark themes, with different surfaces/backgrounds.
+## 2.1 Foundation Palettes
 
-## Dark theme
+### Dark Theme (`.dark`)
+Dark mode feels like deep navy-black, night poster, printed comic surface:
+- **Background (`--bg`)**: `#080D18` (Deep Navy-Black)
+- **Surface (`--surface`)**: `#111A2B` (Midnight Blue)
+- **Surface 2 (`--surface-2`)**: `#16223A` (Elevated Navy)
+- **Primary Text (`--text`)**: `#F4F7FF` (Luminous White)
+- **Muted Text (`--muted`)**: `#93A0B5` (Cool Slate)
+- **Border (`--border`)**: `#26324A` (Crisp Slate Outline)
+- **Border Strong (`--border-strong`)**: `#3A4A6B`
+- **Primary Action (`--primary`)**: `#6C63FF` (Vibrant Purple)
+- **Secondary (`--secondary`)**: `#38BDF8` (Sky Blue)
+- **Disruption Accent (`--disruption`)**: `#FF4D6D` (Neon Coral)
+- **Shadow Ink (`--shadow-ink`)**: `#808080` (Hard Cutout Lift)
 
-Dark mode should feel like:
-- deep navy-black,
-- ink,
-- night poster,
-- printed comic surface.
+### Light Theme (`:root`)
+Light mode feels like warm off-white paper, crisp black ink, printed poster:
+- **Background (`--bg`)**: `#FAF7F0` (Warm Paper Canvas)
+- **Surface (`--surface`)**: `#FFFFFF` (Pure White)
+- **Surface 2 (`--surface-2`)**: `#F4F1E8` (Soft Paper Tint)
+- **Primary Text (`--text`)**: `#111111` (Deep Ink Black)
+- **Muted Text (`--muted`)**: `#57534E` (Warm Slate)
+- **Border (`--border`)**: `#111111` (2px Solid Ink Outline)
+- **Border Strong (`--border-strong`)**: `#111111`
+- **Primary Action (`--primary`)**: `#4F46E5` (Indigo)
+- **Secondary (`--secondary`)**: `#0284C7` (Cobalt)
+- **Disruption Accent (`--disruption`)**: `#D92D55` (Deep Crimson)
+- **Shadow Ink (`--shadow-ink`)**: `#111111` (Hard Paper Cutout)
 
-Recommended starting palette:
+---
 
-- Background: `#080D18`
-- Surface: `#111A2B`
-- Primary: `#6C63FF`
-- Secondary: `#38BDF8`
-- Disruption accent: `#FF4D6D`
-- Primary text: `#F4F7FF`
-- Muted text: `#93A0B5`
-- Border: `#26324A`
+## 2.2 Accent & Card Theme Palettes
 
-## Light theme
+Each dashboard card and functional feature is mapped to a dedicated accent color pair:
 
-Light mode should feel like:
-- warm/off-white paper,
-- black ink,
-- printed poster,
-- clean daylight version of the same world.
+| Accent Token | Light Mode | Dark Mode | Usage |
+| :--- | :--- | :--- | :--- |
+| `--color-present` / `--color-acid` | `#16A34A` *(Emerald)* | `#36DA45` *(Acid Green)* | Top dividing line, Calendar card left line, Workspace icon button, active date cells, Classes Left card, event dots, text selection. |
+| `--color-coral` | `#E60000` *(Electric Red)* | `#FF4F4F` *(Bright Soft Red)* | Left border, circular SVG progress gauge stroke, attendance status indicators. |
+| `--color-amber` / `--warn-ink` | `#DAA520` *(Goldenrod)* | `#EFBF04` *(Electric Gold)* | Next Meal card, Student To-Dos left border, icon, and `+ ADD` button fill. |
+| `--color-violet` | `#6C3BAA` *(Deep Royal Purple)* | `#A5A0FF` *(Neon Violet)* | Left border, `TODAY'S TIMETABLE` header, `FULL BOARD →` link, Live Break banners. |
+| `--color-sky` | `#305CDE` *(Royal Blue)* | `#6395EE` *(Cornflower Blue)* | Student ID badge defaults, Info card (`/info`) border & label, maps & PYQ links. |
+| `--color-teal` | `#0A8DA3` *(Deep Teal)* | `#35D5F0` *(Electric Cyan)* | User-selectable accent (profile badge, subjects, sessions, calendar). |
+| `--color-orange` | `#EA580C` *(Burnt Orange)* | `#FF9F1C` *(Amber Orange)* | User-selectable accent; PYQs hub tile, one Mess meal card. |
+| `--color-fuchsia` | `#C026D3` *(Fuchsia)* | `#E040FB` *(Neon Fuchsia)* | User-selectable accent; Map hub tile. |
+| `--color-lime` | `#65A30D` *(Lime)* | `#99E80C` *(Electric Lime)* | User-selectable accent. |
+| `--primary` | `#4F46E5` *(Indigo)* | `#6C63FF` *(Vibrant Purple)* | Global action buttons, focus rings, and primary links. |
+| `--color-absent` / `--absent-ink` | `#DC2626` / `#B91C1C` | `#FF6B81` / `#FF8A99` | Short attendance warnings, critical alert chips. |
 
-Recommended starting palette:
+Every accent above (except `--primary`) carries a matching `-ink` token
+(`--color-<name>-ink`) that resolves to whichever of black or white keeps text
+legible on that specific fill. `--color-present` / `--color-absent` and their
+`-ink` companions are semantic state colors (attendance, not a picker choice)
+and are excluded from the user-facing accent palette in `src/lib/palette.js`.
 
-- Background: `#F4F1E8`
-- Surface: `#FFFFFF`
-- Primary: `#5146D8`
-- Secondary: `#0284C7`
-- Disruption accent: `#D92D55`
-- Primary text: `#111111`
-- Muted text: `#68707C`
-- Border: `#D9D5CB`
+---
 
-These are starting tokens, not permission to introduce dozens of additional colors.
+## 2.3 Universal Contrast & Inking Rules
 
-## Semantic colors
+### The Universal Text-on-Accent Rule
+> **Rule**: Whenever text, icons, or chips are rendered **inside** a solid accent color fill background (`var(--color-present)`, `var(--color-coral)`, `var(--color-sky)`, `var(--color-amber)`, `var(--color-violet)`, etc.):
+> * **Light Mode**: Text and icons **MUST BE PURE WHITE** (`#ffffff` / `var(--on-accent)`).
+> * **Dark Mode**: Text and icons **MUST BE CRISP BLACK** (`#111111` / `var(--on-accent)`).
 
-Semantic states must remain distinguishable from brand accents:
+```css
+:root {
+  --on-accent: #ffffff;
+}
+.dark {
+  --on-accent: #111111;
+}
+```
 
-- Success: green family
-- Warning: amber/orange family
-- Error / shortage: red family
-- Informational: blue/cyan family
+> **Note**: `--on-accent` is a single black/white flip and does not hold for
+> every hue in the wider *user-selectable* accent palette (profile badge,
+> subjects, sessions, calendar) — e.g. light-mode Orange and Lime need black
+> text, not the white `--on-accent` gives in light mode. Those accents use
+> their own `--color-<name>-ink` token instead; see `src/lib/palette.js`
+> (`inkFor`).
 
-Do not use the pink/red disruption accent as the default meaning for success, warning, or error unless the semantic state requires it.
+### Universal Green Rule
+> **Rule**: ALL green elements across the entire application (Workspace `Repeat` button, top dividing rule, Calendar card accent line, active date boxes, Classes Left card, event dots, and text selection highlights) **MUST ALWAYS BE EMERALD (`#16A34A`) IN LIGHT MODE AND ACID GREEN (`#36DA45`) IN DARK MODE**:
+> * **Light Mode**: `#16A34A` with white text/icon (`#ffffff` / `var(--on-accent)`).
+> * **Dark Mode**: `#36DA45` with black text/icon (`#111111` / `var(--on-accent)`).
+> * **Selection Rule**: Highlighted text anywhere receives `background: var(--color-present) !important; color: var(--on-accent) !important;`.
+
+### Reactive Student Profile Identity Rule
+* When a student customizes their avatar color in Profile Edit (`profile.avatarColor`), the **Student Keycard** dynamically adopts that exact color for:
+  * Branch text (`COMPUTER ENGINEERING`)
+  * Year chip border and text (`Y1`)
+  * Hostel name (`VISVESVARAYA BHAWAN (H-10)`)
+* Avatar initials automatically adapt for contrast via `inkFor()` in
+  `src/lib/palette.js`: each accent (including the new Teal/Orange/Fuchsia/Lime)
+  resolves to its own `--color-<name>-ink` token, and legacy raw-hex values
+  saved before that token existed (`#111827`, `#E60000`, `#305CDE`, `#4f46e5`,
+  `#6C3BAA`, `#36DA45`, `#F4F1E8`, `#FAF7F0`, `#FFFFFF`) fall back to a fixed
+  ink so old profiles keep rendering correctly.
 
 ---
 
@@ -109,562 +155,143 @@ Do not use the pink/red disruption accent as the default meaning for success, wa
 Every visual element belongs primarily to one of three layers.
 
 ## 3.1 WORLD — Environment / Atmosphere
-
-The World is decorative and establishes identity.
-
-Allowed:
-- subtle paper grain,
-- halftone texture,
-- screen-print texture,
+The World is decorative and establishes identity:
+- subtle halftone dot grid (`world-halftone`),
+- paper texture,
 - photocopy/Xerox imperfections,
-- comic-style lines,
-- abstract shapes,
-- grids,
-- oversized background typography,
-- layered paper-cutout shapes,
-- torn-paper silhouettes,
-- restrained print misregistration,
-- subtle motion in non-content areas.
+- print misregistration offsets.
 
-Rules:
+**Rules:**
 - World elements must stay behind the information layer.
-- They may be visually irregular.
 - They must never make primary content difficult to read.
 - Avoid constant high-frequency movement.
-- Do not fill the entire viewport with competing textures.
 
 ## 3.2 INTERFACE — Product / Information
-
 The Interface contains:
-- navigation,
-- timetable,
-- attendance,
-- subjects,
-- forms,
-- tables,
-- notices,
-- cards,
-- filters,
-- controls.
+- navigation & masthead,
+- timetable board,
+- attendance metrics,
+- student tasks,
+- calendar & upcoming events,
+- quick glance tiles.
 
-Rules:
+**Rules:**
 - predictable alignment,
 - consistent spacing,
-- consistent interaction patterns,
 - strong hierarchy,
 - readable typography,
 - restrained decoration.
 
-The Interface may borrow the visual language of printed material, but it must not become physically confusing or scrapbook-like.
-
 ## 3.3 SIGNAL — Attention / State
-
-Signal is reserved for things that matter now.
-
-Use stronger color, motion, or visual interruption for:
-- current class,
-- upcoming class,
-- new notice,
+Signal is reserved for things that matter now:
+- current live class session (`LIVE` badge),
+- active lunch / tea breaks,
+- real-time terminal status ticker,
 - attendance warning,
-- exam urgency,
-- selected navigation,
-- successful action,
-- active filters,
-- important state changes.
-
-Signal should be **rare enough that it means something**.
-
-If everything is bright, animated, or distorted, nothing is a signal.
+- pulsing live indicator dots (`●`).
 
 ---
 
-# 4. Art Direction
+# 4. Art Direction & Paper-Cutout Language
 
-## 4.1 Core aesthetic
+## 4.1 Core Aesthetic
+**Student Utility × Punk Print × Comic Editorial**
 
-Target:
+The website feels like a digital interface assembled from posters, zines, printed notices, cut paper, and technical labels.
 
-**student utility × punk print × comic editorial**
+## 4.2 Neobrutalist Paper-Cutout Shadows
+- Standard cards use `2px solid var(--border)` with hard paper cutout offset shadows:
+  - `shadow-hard-sm`: `2px 2px 0 0 var(--shadow-ink)`
+  - `shadow-hard`: `4px 4px 0 0 var(--shadow-ink)`
+  - `shadow-hard-lg`: `7px 7px 0 0 var(--shadow-ink)`
+- Tactile hover dynamics:
+  - Cards and buttons translate up-left on hover: `hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-hard-lg`.
+  - Buttons depress on click: `active:translate-x-0.5 active:translate-y-0.5`.
 
-The website should feel like a digital interface assembled from:
-- posters,
-- zines,
-- printed notices,
-- cut paper,
-- screen-printed graphics,
-- technical labels,
-- comic panels.
-
-## 4.2 The visual inspiration is NOT literal
-
-Do not directly reproduce:
-- Spider-Verse characters,
-- Spider-Man logos,
-- Marvel iconography,
-- movie-specific screenshots,
-- exact character costumes,
-- direct replicas of comic frames.
-
-Use the underlying design language instead:
-- rebellious composition,
-- layered print artifacts,
-- offset registration,
-- bold typography,
-- graphic contrast,
-- visual collage,
-- imperfect printing,
-- kinetic transitions.
+**Glassmorphism is explicitly NOT part of the design system.** Avoid frosted glass cards or giant blur effects.
 
 ---
 
-# 5. Paper / Cutout Language
+# 5. Typography — Single Font System: Spartan
 
-Paper-cutout styling is preferred over glassmorphism.
+Exactly **ONE font family** is used across the entire application: **Spartan** (`League Spartan` / `Spartan`, `system-ui`, `sans-serif`).
 
-**Glassmorphism is explicitly NOT part of the design system.**
+All typographic hierarchy and texture across the UI are achieved solely through weights, sizes, and tracking:
 
-Avoid:
-- frosted glass everywhere,
-- translucent glass cards,
-- giant blur effects,
-- glass buttons,
-- excessive glossy gradients.
+| Voice / Class | Font Family | Weight | Purpose |
+| :--- | :--- | :--- | :--- |
+| **`.display`** | `Spartan` | `900` (Black) | Expressive masthead `NITKKR DESK`, huge punchy stat figures, uppercase brand headers. |
+| **`.heading`** | `Spartan` | `700–800` (Bold / ExtraBold) | Clean structural card titles, timetable headers, student details, section titles. |
+| **`.body`** | `Spartan` | `500–600` (Medium / SemiBold) | Readable session descriptions, event details, timetable items, and prose text. |
+| **`.label`** | `Spartan` | `700` (Bold + Tracking) | Timestamps, micro badges, room numbers, chip indicators, attendance percentages. |
 
-Instead, use:
-- opaque or near-opaque surfaces,
-- paper-like blocks,
-- subtle texture,
-- cutout layers,
-- thin ink-like borders,
-- offset shadows,
-- pasted-label effects,
-- clipped/overlapping decorative shapes.
+### Font Scale & Sizing Rules
 
-### Important restraint
-
-Not every card should look like physical paper.
-
-Paper/cutout styling is a **decorative language**, not a mandatory component shape.
-
-Functional components must remain structurally consistent.
+| Typographic Level | Mobile Size (`< sm`) | Desktop Size (`lg+`) | Tailwind Class | Font Weight | Letter Spacing & Transform |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| **Brand Masthead** | `24px` (`1.5rem`) | `36px` (`2.25rem`) | `text-2xl lg:text-4xl` | `900` (Black) | `tracking-wide uppercase` |
+| **Card / Widget Title** | `13px` (`0.8125rem`) | `16px` (`1rem`) | `text-xs sm:text-base` | `800` (ExtraBold) | `tracking-normal uppercase` |
+| **Stat Figures** | `20px` (`1.25rem`) | `24px` (`1.5rem`) | `text-xl sm:text-2xl` | `800` (ExtraBold) | `tracking-tight` |
+| **Live Status Text** | `12px` (`0.75rem`) | `14px` (`0.875rem`) | `text-xs sm:text-sm` | `900` (Black) | `tracking-wide uppercase` |
+| **Body & Session Names**| `12px` (`0.75rem`) | `14px` (`0.875rem`) | `text-xs sm:text-sm` | `700` (Bold) | Normal case |
+| **Timestamps & Sub-labels** | `11px` (`0.6875rem`)| `13px` (`0.8125rem`) | `text-[0.6875rem] sm:text-xs` | `600` (SemiBold) | `tracking-wider` |
+| **Micro Badges & Chips**| `9.6px` (`0.6rem`) | `11px` (`0.7rem`) | `text-[0.6rem] sm:text-xs` | `900` (Black) | `tracking-widest uppercase` |
 
 ---
 
-# 6. Controlled Imperfection
+# 6. Responsive Design & Device Layout Hierarchy
 
-The visual style may break convention, but only in the decorative layer.
+The UI is decoupled into dedicated, optimized layouts for desktop and mobile devices:
 
-Good:
-- slightly offset decorative labels,
-- occasional squared corners,
-- occasional clipped corner,
-- overlapping stickers,
-- small print-registration offsets,
-- asymmetrical hero composition.
-
-Bad:
-- random alignment of important content,
-- inconsistent form controls,
-- intentionally awkward table layout,
-- different interaction patterns on every card,
-- decorative overlap covering text.
-
-**Composition can be rebellious. Information architecture cannot.**
+## 6.1 Desktop Edition (`lg:` $\ge$ 1024px)
+* **Top Header**: Classic `NITKKR DESK` title + Theme Toggle + full-width dividing rule (`<hr className="rule-ink" />`).
+* **Balanced 2-Column Grid**:
+  * **Left Column (`7 cols`)**:
+    1. **Hero Signal Card**: Contains real-time editable status (`IN SESSION NOW ✎`), Clock, full **Cyber-Student Keycard** (`[AK ●] | Branch · Year / Hostel`), Mini Month Calendar, and Upcoming Events board.
+    2. **2×2 Glance Tiles Grid**: Attendance gauge, Next Meal, Classes Left, More Tools.
+  * **Right Column (`5 cols`)**:
+    1. **Today's Timetable Widget** (with live active session and break banners).
+    2. **Student To-Dos Widget** (with interactive task creation and checkoffs).
 
 ---
 
-# 7. Typography
-
-## 7.1 Primary display — Tan Daisy
-
-Use **Tan Daisy** for expressive, high-impact text:
-- hero title,
-- major page headings,
-- selected section headings,
-- giant numbers where appropriate,
-- callouts,
-- playful empty states,
-- decorative labels,
-- Easter eggs.
-
-Tan Daisy should feel like the website’s **voice**.
-
-Do not use Tan Daisy for:
-- long paragraphs,
-- dense tables,
-- form labels,
-- navigation text,
-- small metadata,
-- body copy.
-
-Do not make every heading Tan Daisy. Use it selectively so it retains impact.
-
-## 7.2 Primary UI/body — Spartan
-
-Use **Spartan** for:
-- navigation,
-- body text,
-- timetable entries,
-- attendance details,
-- course names,
-- dates/times,
-- buttons,
-- forms,
-- notices,
-- helper text,
-- tooltips,
-- metadata.
-
-Spartan is the website’s **information voice**.
-
-## 7.3 Typographic hierarchy
-
-Use three functional voices without needing a third font:
-
-1. **Display:** Tan Daisy — expressive.
-2. **UI:** Spartan — readable.
-3. **Technical metadata:** Spartan with uppercase, tighter sizing, and controlled letter spacing.
-
-Example:
-
-`SYNC // ONLINE`
-
-`WED · 19 AUG`
-
-`ROOM 204`
-
-Technical labels should be visually distinct through typography, not through unnecessary extra colors.
+## 6.2 Mobile Edition (`< lg:`)
+* **Editorial Masthead Plate**:
+  ```
+   [🔄] NITKKR DESK                             [AK ●] [ 🌙 ]
+   ═════════════════════════════════════════════════════════════
+    ● IN SESSION NOW ✎                            FRI · 4:21 PM 
+   ─────────────────────────────────────────────────────────────
+  ```
+  * Distinct from content cards: No bulky card box enclosure or offset shadow; anchored with clean editorial double rules.
+  * Minimized profile avatar icon (`AK` with live pulsing status dot `●`).
+* **Priority Card Flow (Top to Bottom)**:
+  1. **Today's Timetable** *(Immediate class awareness above the fold)*
+  2. **Student To-Dos** *(Assignments and daily checklists)*
+  3. **2×2 Grid of Glance Cards** *(Attendance gauge, Next Meal, Classes Left, Info)*
+  4. **Calendar & Upcoming Events Board** *(Mini Month Calendar + Events list)*
 
 ---
 
-# 8. Component Styling
+# 7. Motion System & Micro-Interactions
 
-## Navigation
+Animation communicates **state, hierarchy, or personality** — it never forces the user to wait.
 
-- clean and predictable,
-- strong active state,
-- restrained decorative treatment,
-- expressive visual touches may appear in the logo/brand area,
-- do not make navigation difficult to scan.
+## UI Motion
+- Target 150–250 ms for micro-interactions (hover translations, checkoff fades).
+- Tactile hover offset lifts (`hover:-translate-x-0.5 hover:-translate-y-0.5`).
+- Active click depression (`active:translate-x-0.5 active:translate-y-0.5`).
 
-## Cards
-
-Cards are functional containers, not decorations.
-
-Use:
-- strong hierarchy,
-- modest border radius or selective square corners,
-- clear internal spacing,
-- subtle borders/shadows,
-- optional paper texture on selected featured cards.
-
-Avoid:
-- every card having a different shape,
-- excessive shadows,
-- excessive rounded pills,
-- glass treatment.
-
-## Buttons
-
-Buttons must look like controls.
-
-Primary actions may use the main accent color.
-
-Use expressive styling primarily for:
-- hover,
-- focus,
-- active state,
-- selected actions.
-
-Do not make every button look like a poster sticker.
-
-## Tables / Timetables
-
-These are high-priority usability surfaces.
-
-They should be among the cleanest parts of the website.
-
-Use expressive styling mainly for:
-- current class,
-- current time indicator,
-- selected day,
-- important status.
-
-Do not add decorative textures behind every row.
+## Live Pulse Dots
+Active states (live timetable session, on-campus status, live breaks) use two-layer CSS pulse dots:
+- Outer: `animate-ping rounded-full bg-[var(--color-present)] opacity-75`.
+- Inner: `relative rounded-full bg-[var(--color-present)] border border-[var(--surface)]`.
 
 ---
 
-# 9. Motion System
-
-Animation should communicate **state, hierarchy, or personality**.
-
-It should not exist solely because animation is possible.
-
-## Normal UI motion
-
-Target approximately:
-- 150–250 ms for small interactions,
-- 250–450 ms for meaningful transitions.
-
-Use:
-- opacity,
-- small translation,
-- subtle scale,
-- border/accent transitions.
-
-Avoid unnecessarily slow UI animations.
-
-## Expressive motion
-
-Reserve stronger motion for:
-- landing/entry experience,
-- important transitions,
-- current-class state,
-- meaningful data changes,
-- notifications,
-- loading/sync states,
-- Easter eggs.
-
-## Glitch / RGB effects
-
-Use sparingly.
-
-Good examples:
-- tiny registration shift on page entry,
-- brief RGB separation when a state changes,
-- short glitch on an Easter egg,
-- restrained distortion during a transition.
-
-Bad:
-- continuous glitching,
-- repeated screen shake,
-- aggressive chromatic aberration behind text,
-- animated distortion on dense information.
-
-### Critical rule
-
-If an animation causes the user to wait before reading information, the animation is too strong or in the wrong place.
-
----
-
-# 10. Intensity by Page
-
-The site should not have one uniform intensity level.
-
-## Landing / entry
-
-**High personality.**
-
-Approximate balance:
-- 70–80% visual personality
-- 20–30% utility
-
-This is where the site can feel “cool as hell.”
-
-Allowed:
-- expressive typography,
-- collage,
-- animated textures,
-- print effects,
-- stronger transitions,
-- illustrated elements,
-- Easter eggs.
-
-## Dashboard
-
-**Medium personality.**
-
-Approximate balance:
-- 30% personality
-- 70% utility
-
-## Timetable / attendance
-
-**Low-to-medium personality.**
-
-Approximate balance:
-- 15–20% personality
-- 80–85% utility.
-
-These pages should prioritize rapid scanning.
-
-## Settings / forms / data entry
-
-**Low personality.**
-
-Approximate balance:
-- 5–10% personality
-- 90–95% utility.
-
-## Easter eggs / 404 / empty states
-
-**High personality.**
-
-These are safe places to be deliberately ridiculous.
-
----
-
-# 11. Easter Eggs
-
-Easter eggs are encouraged, but they must be optional and non-blocking.
-
-Examples:
-- subtle logo hover behavior,
-- hidden comic panels,
-- unusual 404 page,
-- playful empty state,
-- tiny system messages,
-- occasional illustrated reactions,
-- secret visual interactions.
-
-Rules:
-- never hide core navigation,
-- never block content,
-- never require an Easter egg to understand the interface,
-- never make core functionality dependent on a joke.
-
----
-
-# 12. Accessibility / Motion
-
-The website must support reduced-motion preferences.
-
-When reduced motion is active:
-- remove large transforms,
-- remove prolonged transitions,
-- minimize glitch effects,
-- minimize parallax,
-- avoid decorative movement that can distract.
-
-The information architecture and state communication must remain understandable without animation.
-
-Do not use color alone to communicate critical status.
-
----
-
-# 13. Responsive Design
-
-Design mobile-first at the interaction level even if the desktop design is visually richer.
-
-On mobile:
-- preserve large tap targets,
-- prioritize the next class and key attendance information,
-- simplify decorative composition,
-- reduce background effects,
-- prevent horizontal overflow,
-- keep text readable without zooming.
-
-Decorative complexity may decrease on smaller screens; the brand identity must not disappear.
-
----
-
-# 14. Performance Rules
-
-Visual effects must never create noticeable UI lag.
-
-Prefer:
-- CSS transforms,
-- opacity transitions,
-- SVG graphics,
-- lightweight textures,
-- static or low-cost decorative layers.
-
-Avoid:
-- heavy continuously running canvas effects without clear need,
-- excessive blur,
-- dozens of independent animated DOM elements,
-- large unoptimized images,
-- animation on every component simultaneously.
-
-The site should still feel fast on a normal student laptop and phone.
-
----
-
-# 15. Anti-Patterns — DO NOT DO THESE
-
-### Do not turn the website into:
-- a Marvel/Spider-Man fan site,
-- a generic SaaS dashboard,
-- a glassmorphism showcase,
-- a permanently glitching screen,
-- a neon cyberpunk UI,
-- a scrapbook where information is hard to find,
-- a collection of unrelated card styles.
-
-### Avoid:
-- too many colors,
-- too many fonts,
-- excessive gradients,
-- excessive blur,
-- constant animation,
-- random asymmetry in functional content,
-- decorative noise behind text,
-- every component trying to be memorable.
-
-The goal is **controlled visual disruption**, not visual chaos.
-
----
-
-# 16. Design Decision Test
-
-Before adding any visual effect, ask:
-
-1. Does it reinforce the comic/punk print identity?
-2. Does it improve hierarchy, state communication, or personality?
-3. Can the user still understand the information immediately?
-4. Does it remain attractive after repeated daily use?
-5. Does it work in both light and dark themes?
-6. Does it remain acceptable with reduced motion?
-7. Is the effect better than simply leaving the component clean?
-
-If the answer to several of these is “no,” remove the effect.
-
----
-
-# 17. Implementation Summary
-
-Build a **single cohesive visual system**, not separate Chaos and Zen interfaces.
-
-### Permanent identity
-- comic/editorial/punk print influence,
-- paper-cutout language,
-- controlled imperfection,
-- expressive display typography,
-- restrained motion,
-- selective visual disruption.
-
-### Theme switch
-- Light ↔ Dark.
-
-### Typography
-- Tan Daisy = expressive display.
-- Spartan = UI/body/functional content.
-
-### Visual hierarchy
-- WORLD = atmosphere.
-- INTERFACE = information.
-- SIGNAL = attention/state.
-
-### Aesthetic principle
-
-> **The world can be loud. The interface must stay clear.**
-
-### Product principle
-
-> **Make the entrance memorable. Make the daily use effortless.**
-
----
-
-# 18. Final Quality Bar
-
-A successful implementation should feel like:
-
-**a beautifully designed student utility built by someone with strong visual taste, not a student portal with random Spider-Verse effects added on top.**
-
-Every visual decision should feel like it belongs to the same world.
-
-When in doubt:
-
-**Remove effects before adding more.**
-
-The design should be recognizable from a screenshot even with the text removed — but the user should still be able to understand the actual product in seconds.
+# 8. Implementation Summary
+
+1. **Single Font**: Spartan in 4 distinct voices (`.display`, `.heading`, `.body`, `.label`).
+2. **Universal Contrast Rule**: Solid accent fills always use white text in Light mode and black text in Dark mode (`--on-accent`).
+3. **Universal Green Rule**: Emerald (`#16A34A`) in Light mode, Acid Green (`#36DA45`) in Dark mode.
+4. **Permanent Neobrutalist Identity**: Tactile paper cutouts, crisp 2px ink borders, solid hard shadows, and disciplined information hierarchy.

@@ -17,7 +17,8 @@
 //   }
 // ---------------------------------------------------------------------------
 
-import generated from './generated/timetables.json'
+import generated from './generated/timetables.json' with { type: 'json' }
+import { getSubsectionsForBranch } from './campus'
 
 export const TIMETABLES = generated
 
@@ -50,5 +51,9 @@ export function groupsFor(branch, year) {
       if (t) set.add(t)
     })
   }
+  if (set.size === 0) {
+    return getSubsectionsForBranch(branch)
+  }
   return [...set].sort()
 }
+

@@ -11,9 +11,9 @@ import { assignIds } from './ids.mjs'
 import { parseTime } from '../../src/lib/time.js'
 
 const DAYS_5 = ['MON', 'TUE', 'WED', 'THU', 'FRI']
-const DAYS_7 = [...DAYS_5, 'SAT', 'SUN']
+const DAYS_7 = ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN']
 const TYPES = ['lecture', 'lab', 'tutorial', 'break', 'other']
-const MEAL_KEYS = ['breakfast', 'lunch', 'snacks', 'dinner']
+const MEAL_KEYS = ['breakfast', 'lunch', 'dinner']
 
 function required(data, key, file, what) {
   const v = (data[key] ?? '').trim()
@@ -81,6 +81,7 @@ export function parseTimetable(text, file) {
           code: row.get('code'),
           room: row.get('room'),
           group: row.get('group'),
+          instructor: row.get('instructor') || row.get('teacher') || row.get('professor') || null,
           type,
           line: row.line,
         })
@@ -153,7 +154,7 @@ function splitPlus(v) {
  */
 export function parseMess(text, file) {
   const { data, lines, bodyStart } = parseFrontMatter(text, file)
-  const hostel = required(data, 'hostel', file, 'e.g. `hostel: CVR`').toUpperCase()
+  const hostel = required(data, 'hostel', file, 'e.g. `hostel: H10`').toUpperCase()
 
   const week = {}
   for (const section of parseSections(lines, bodyStart, file)) {
@@ -171,7 +172,7 @@ export function parseMess(text, file) {
       requireColumns(table, ['meal', 'items'], file)
       for (const row of table.rows) {
         const meal = row.get('meal').toLowerCase()
-        if (!MEAL_KEYS.includes(meal)) {
+        if (!MEAL_KEYS.includes(meal) && meal !== 'snacks') {
           row.fail(`\`meal\` is "${meal}". Use one of: ${MEAL_KEYS.join(', ')}.`)
         }
         const items = row
@@ -180,7 +181,11 @@ export function parseMess(text, file) {
           .map((x) => x.trim())
           .filter(Boolean)
         if (!items.length) row.fail(`\`items\` is empty for ${meal}.`)
-        meals[meal] = items
+        const extra = row.has('extra') ? row.get('extra').trim() : ''
+        meals[meal] = {
+          items,
+          extra: extra || null,
+        }
       }
     }
     const missing = MEAL_KEYS.filter((m) => !meals[m])
@@ -316,6 +321,24 @@ export function parseCalendar(text, file) {
 // -------------------------------------------------------------------- pyq --
 
 /** content/pyq/<session>.md — `| Code | Title | Semester | URL |` */
+/**
+ * The three exams a paper can belong to. `id` is what lands in the JSON;
+ * matching is loose on purpose so "Mid Sem 1", "MIDSEM-1" and "MID 1" all
+ * land on the same bucket. An empty cell means "not tagged yet" and the
+ * paper shows under every exam.
+ */
+export const EXAMS = [
+  { id: 'MID1', label: 'MID SEM 1', match: /^mid\s*(sem)?\s*[-_ ]?1$/ },
+  { id: 'MID2', label: 'MID SEM 2', match: /^mid\s*(sem)?\s*[-_ ]?2$/ },
+  { id: 'END', label: 'END SEM', match: /^end\s*(sem)?$/ },
+]
+
+function normaliseExam(raw) {
+  const v = (raw || '').trim().toLowerCase()
+  if (!v) return null
+  return EXAMS.find((e) => e.match.test(v))?.id ?? null
+}
+
 export function parsePyq(text, file) {
   const { data, lines, bodyStart } = parseFrontMatter(text, file)
   const session = required(data, 'session', file, 'e.g. `session: 2024-25`')
@@ -332,10 +355,17 @@ export function parsePyq(text, file) {
         if (!url) {
           warnings.push(`${file}:${row.line}  "${row.get('title')}" has no URL — it will render as "no file attached".`)
         }
+        const exam = normaliseExam(row.get('exam'))
+        if (row.get('exam') && !exam) {
+          row.fail(
+            `\`exam\` is "${row.get('exam')}". Use one of: ${EXAMS.map((e) => e.label).join(', ')}.`,
+          )
+        }
         papers.push({
           code: row.get('code'),
           title: row.get('title'),
           sem: row.get('semester') || row.get('sem') || '',
+          exam,
           url: url || null,
         })
       }

@@ -1,175 +1,516 @@
 {
-  "CVR": {
+  "H1": {
     "MON": {
-      "breakfast": [
-        "Aloo Paratha + Curd",
-        "Boiled Egg (2) / Banana",
-        "Bread + Butter + Jam",
-        "Tea / Milk"
-      ],
-      "lunch": [
-        "Rajma",
-        "Jeera Rice",
-        "Chapati",
-        "Salad + Pickle"
-      ],
-      "snacks": [
-        "Samosa",
-        "Green Chutney",
-        "Tea / Coffee"
-      ],
-      "dinner": [
-        "Kadhi Pakora",
-        "Plain Rice",
-        "Chapati",
-        "Gulab Jamun"
-      ]
+      "breakfast": {
+        "items": [
+          "Aaloo Pyaz Paratha",
+          "Green Chatni",
+          "Tea",
+          "Dahi",
+          "Bread",
+          "Achaar / Butter / Jam / Sauce"
+        ],
+        "extra": "Hot Milk"
+      },
+      "lunch": {
+        "items": [
+          "Rajma",
+          "Petha",
+          "Jeera Rice",
+          "Dahi",
+          "Chapati",
+          "Friers",
+          "Lemon",
+          "Salad",
+          "Achar"
+        ],
+        "extra": "Milk, Chanch"
+      },
+      "dinner": {
+        "items": [
+          "Kadhai Paneer",
+          "Tandoori + Missi Roti",
+          "Urad Sabut Dal",
+          "Rice",
+          "Salad",
+          "Butter"
+        ],
+        "extra": "Milk"
+      }
     },
     "TUE": {
-      "breakfast": [
-        "Poha + Sev",
-        "Boiled Egg (2) / Apple",
-        "Bread + Butter",
-        "Tea / Milk"
-      ],
-      "lunch": [
-        "Chole",
-        "Plain Rice",
-        "Chapati",
-        "Boondi Raita"
-      ],
-      "snacks": [
-        "Bread Pakora",
-        "Tea / Coffee",
-        "Biscuits (2)"
-      ],
-      "dinner": [
-        "Mix Veg",
-        "Dal Tadka",
-        "Chapati",
-        "Rice + Salad"
-      ]
+      "breakfast": {
+        "items": [
+          "Poha + Upma",
+          "Chutney",
+          "Two Banana",
+          "Tea",
+          "Sprouts",
+          "Bread",
+          "Butter / Jam / Sauce / Achaar"
+        ],
+        "extra": "Hot Milk"
+      },
+      "lunch": {
+        "items": [
+          "Kadi Pakoda",
+          "Sambhar",
+          "Rice",
+          "Chapati",
+          "Salad",
+          "Achar"
+        ],
+        "extra": "Milk, Ice-Cream"
+      },
+      "dinner": {
+        "items": [
+          "Mix Veg",
+          "Malai Kofta",
+          "Rice",
+          "Chana Dal",
+          "Chapati",
+          "Salad",
+          "Achar"
+        ],
+        "extra": "Milk, Milk Cake"
+      }
     },
     "WED": {
-      "breakfast": [
-        "Idli + Sambar",
-        "Coconut Chutney",
-        "Boiled Egg (2) / Fruit",
-        "Tea / Milk"
-      ],
-      "lunch": [
-        "Paneer Butter Masala",
-        "Jeera Rice",
-        "Chapati",
-        "Salad"
-      ],
-      "snacks": [
-        "Veg Sandwich",
-        "Tea / Coffee",
-        "Namkeen"
-      ],
-      "dinner": [
-        "Aloo Gobhi",
-        "Dal Fry",
-        "Chapati",
-        "Rice + Papad"
-      ]
+      "breakfast": {
+        "items": [
+          "Paneer Pyaj Parantha",
+          "Tea",
+          "Dahi",
+          "Bread",
+          "Butter / Jam / Sauce / Achaar"
+        ],
+        "extra": "Hot Milk"
+      },
+      "lunch": {
+        "items": [
+          "White Chana Gravy",
+          "Moong Dal",
+          "Veg Rice",
+          "Chapati",
+          "Dahi",
+          "Salad",
+          "Friers"
+        ],
+        "extra": "Milk, Chanch"
+      },
+      "dinner": {
+        "items": [
+          "Aloo Zeera",
+          "Dal Makhni",
+          "Kheer",
+          "Chapati",
+          "Rice",
+          "Salad"
+        ],
+        "extra": "Milk"
+      }
     },
     "THU": {
-      "breakfast": [
-        "Puri + Aloo Sabzi",
-        "Boiled Egg (2) / Banana",
-        "Bread + Jam",
-        "Tea / Milk"
-      ],
-      "lunch": [
-        "Kadhai Paneer",
-        "Plain Rice",
-        "Chapati",
-        "Cucumber Raita"
-      ],
-      "snacks": [
-        "Pav Bhaji",
-        "Tea / Coffee"
-      ],
-      "dinner": [
-        "Sarson Saag",
-        "Makki Roti / Chapati",
-        "Rice",
-        "Jaggery"
-      ]
+      "breakfast": {
+        "items": [
+          "Macroni",
+          "2 Banana",
+          "Tea",
+          "Sprouts",
+          "Bread",
+          "Daliya"
+        ],
+        "extra": "Hot Milk"
+      },
+      "lunch": {
+        "items": [
+          "Fried Rice",
+          "Rajma",
+          "Seasonal Veg",
+          "Dahi",
+          "Chapati",
+          "Salad",
+          "Achaar",
+          "Thandai"
+        ],
+        "extra": "Milk, Ice-Cream"
+      },
+      "dinner": {
+        "items": [
+          "Palak Paneer / Bhindi",
+          "Malka Masoor",
+          "Salad",
+          "Chapati",
+          "Achaar"
+        ],
+        "extra": "Milk, Rasmalai"
+      }
     },
     "FRI": {
-      "breakfast": [
-        "Upma + Chutney",
-        "Boiled Egg (2) / Apple",
-        "Bread + Butter",
-        "Tea / Milk"
-      ],
-      "lunch": [
-        "Dal Makhani",
-        "Jeera Rice",
-        "Chapati",
-        "Salad + Pickle"
-      ],
-      "snacks": [
-        "Veg Cutlet",
-        "Ketchup",
-        "Tea / Coffee"
-      ],
-      "dinner": [
-        "Shahi Paneer",
-        "Plain Rice",
-        "Chapati",
-        "Ice Cream"
-      ]
+      "breakfast": {
+        "items": [
+          "Veg Mayo Sandwich",
+          "Bread",
+          "Tea",
+          "Butter / Jam / Sauce / Achaar"
+        ],
+        "extra": "Hot Milk"
+      },
+      "lunch": {
+        "items": [
+          "Aloo Zeera",
+          "Chana Chilka Dal",
+          "Fried Rice",
+          "Dahi",
+          "Chapati",
+          "Papad",
+          "Salad",
+          "Achaar"
+        ],
+        "extra": "Chanch, Milk"
+      },
+      "dinner": {
+        "items": [
+          "White Chana Gravy",
+          "Sabut Masoor Dal",
+          "Chapati",
+          "Suji / Moong Halwa",
+          "Achaar",
+          "Salad"
+        ],
+        "extra": "Milk"
+      }
     },
     "SAT": {
-      "breakfast": [
-        "Chole Bhature",
-        "Boiled Egg (2) / Fruit",
-        "Tea / Milk"
-      ],
-      "lunch": [
-        "Veg Biryani",
-        "Raita",
-        "Chapati",
-        "Papad"
-      ],
-      "snacks": [
-        "Maggi",
-        "Tea / Coffee"
-      ],
-      "dinner": [
-        "Malai Kofta",
-        "Plain Rice",
-        "Chapati",
-        "Salad"
-      ]
+      "breakfast": {
+        "items": [
+          "Chhole Kulche",
+          "Nariyal Chutney",
+          "Daliya",
+          "Sprouts",
+          "Bread",
+          "Butter / Jam / Achaar",
+          "Coffee"
+        ],
+        "extra": "Hot Milk"
+      },
+      "lunch": {
+        "items": [
+          "Veg Biryani",
+          "Black Chana Dry",
+          "Arhar Dal",
+          "Dahi",
+          "Chapati",
+          "Salad",
+          "Achaar"
+        ],
+        "extra": "Milk, Ice-Cream"
+      },
+      "dinner": {
+        "items": [
+          "Paneer Bhurji / Chilli Paneer",
+          "Rice",
+          "Mix Dal",
+          "Dahi Balle",
+          "Salad",
+          "Chapati",
+          "Achaar"
+        ],
+        "extra": "Milk"
+      }
     },
     "SUN": {
-      "breakfast": [
-        "Masala Dosa",
-        "Sambar + Chutney",
-        "Boiled Egg (2) / Banana",
-        "Tea / Milk"
-      ],
-      "lunch": [
-        "Chicken Curry / Soya Chaap",
-        "Plain Rice",
-        "Chapati",
-        "Onion Salad"
-      ],
-      "snacks": [
-        "Fruit Chaat",
-        "Tea / Coffee"
-      ],
-      "dinner": [
-        "Dal Tadka",
-        "Mix Veg",
-        "Chapati",
-        "Rice + Kheer"
-      ]
+      "breakfast": {
+        "items": [
+          "Besan Chilla / Vada Pav",
+          "Green Chutney",
+          "Green Chilli",
+          "Bread",
+          "Butter / Jam / Achaar",
+          "Tea",
+          "Dahi"
+        ],
+        "extra": "Hot Milk"
+      },
+      "lunch": {
+        "items": [
+          "Chole Bhature",
+          "Rice",
+          "Lassi (Masala + Sweet)",
+          "Salad",
+          "Achaar"
+        ],
+        "extra": "Milk"
+      },
+      "dinner": {
+        "items": [
+          "Mix Veg",
+          "Malai Kofta",
+          "Rice",
+          "Urad + Chana Dal",
+          "Chapati",
+          "Achaar",
+          "Sevya"
+        ],
+        "extra": "Milk, Fruit Cream"
+      }
+    }
+  },
+  "H10": {
+    "MON": {
+      "breakfast": {
+        "items": [
+          "Aaloo Pyaz Paratha",
+          "Green Chatni",
+          "Tea",
+          "Dahi",
+          "Bread",
+          "Achaar / Butter / Jam / Sauce"
+        ],
+        "extra": "Hot Milk"
+      },
+      "lunch": {
+        "items": [
+          "Rajma",
+          "Petha",
+          "Jeera Rice",
+          "Dahi",
+          "Chapati",
+          "Friers",
+          "Lemon",
+          "Salad",
+          "Achar"
+        ],
+        "extra": "Milk, Chanch"
+      },
+      "dinner": {
+        "items": [
+          "Kadhai Paneer",
+          "Tandoori + Missi Roti",
+          "Urad Sabut Dal",
+          "Rice",
+          "Salad",
+          "Butter"
+        ],
+        "extra": "Milk"
+      }
+    },
+    "TUE": {
+      "breakfast": {
+        "items": [
+          "Poha + Upma",
+          "Chutney",
+          "Two Banana",
+          "Tea",
+          "Sprouts",
+          "Bread",
+          "Butter / Jam / Sauce / Achaar"
+        ],
+        "extra": "Hot Milk"
+      },
+      "lunch": {
+        "items": [
+          "Kadi Pakoda",
+          "Sambhar",
+          "Rice",
+          "Chapati",
+          "Salad",
+          "Achar"
+        ],
+        "extra": "Milk, Ice-Cream"
+      },
+      "dinner": {
+        "items": [
+          "Mix Veg",
+          "Malai Kofta",
+          "Rice",
+          "Chana Dal",
+          "Chapati",
+          "Salad",
+          "Achar"
+        ],
+        "extra": "Milk, Milk Cake"
+      }
+    },
+    "WED": {
+      "breakfast": {
+        "items": [
+          "Paneer Pyaj Parantha",
+          "Tea",
+          "Dahi",
+          "Bread",
+          "Butter / Jam / Sauce / Achaar"
+        ],
+        "extra": "Hot Milk"
+      },
+      "lunch": {
+        "items": [
+          "White Chana Gravy",
+          "Moong Dal",
+          "Veg Rice",
+          "Chapati",
+          "Dahi",
+          "Salad",
+          "Friers"
+        ],
+        "extra": "Milk, Chanch"
+      },
+      "dinner": {
+        "items": [
+          "Aloo Zeera",
+          "Dal Makhni",
+          "Kheer",
+          "Chapati",
+          "Rice",
+          "Salad"
+        ],
+        "extra": "Milk"
+      }
+    },
+    "THU": {
+      "breakfast": {
+        "items": [
+          "Macroni",
+          "2 Banana",
+          "Tea",
+          "Sprouts",
+          "Bread",
+          "Daliya"
+        ],
+        "extra": "Hot Milk"
+      },
+      "lunch": {
+        "items": [
+          "Fried Rice",
+          "Rajma",
+          "Seasonal Veg",
+          "Dahi",
+          "Chapati",
+          "Salad",
+          "Achaar",
+          "Thandai"
+        ],
+        "extra": "Milk, Ice-Cream"
+      },
+      "dinner": {
+        "items": [
+          "Palak Paneer / Bhindi",
+          "Malka Masoor",
+          "Salad",
+          "Chapati",
+          "Achaar"
+        ],
+        "extra": "Milk, Rasmalai"
+      }
+    },
+    "FRI": {
+      "breakfast": {
+        "items": [
+          "Veg Mayo Sandwich",
+          "Bread",
+          "Tea",
+          "Butter / Jam / Sauce / Achaar"
+        ],
+        "extra": "Hot Milk"
+      },
+      "lunch": {
+        "items": [
+          "Aloo Zeera",
+          "Chana Chilka Dal",
+          "Fried Rice",
+          "Dahi",
+          "Chapati",
+          "Papad",
+          "Salad",
+          "Achaar"
+        ],
+        "extra": "Chanch, Milk"
+      },
+      "dinner": {
+        "items": [
+          "White Chana Gravy",
+          "Sabut Masoor Dal",
+          "Chapati",
+          "Suji / Moong Halwa",
+          "Achaar",
+          "Salad"
+        ],
+        "extra": "Milk"
+      }
+    },
+    "SAT": {
+      "breakfast": {
+        "items": [
+          "Chhole Kulche",
+          "Nariyal Chutney",
+          "Daliya",
+          "Sprouts",
+          "Bread",
+          "Butter / Jam / Achaar",
+          "Coffee"
+        ],
+        "extra": "Hot Milk"
+      },
+      "lunch": {
+        "items": [
+          "Veg Biryani",
+          "Black Chana Dry",
+          "Arhar Dal",
+          "Dahi",
+          "Chapati",
+          "Salad",
+          "Achaar"
+        ],
+        "extra": "Milk, Ice-Cream"
+      },
+      "dinner": {
+        "items": [
+          "Paneer Bhurji / Chilli Paneer",
+          "Rice",
+          "Mix Dal",
+          "Dahi Balle",
+          "Salad",
+          "Chapati",
+          "Achaar"
+        ],
+        "extra": "Milk"
+      }
+    },
+    "SUN": {
+      "breakfast": {
+        "items": [
+          "Besan Chilla / Vada Pav",
+          "Green Chutney",
+          "Green Chilli",
+          "Bread",
+          "Butter / Jam / Achaar",
+          "Tea",
+          "Dahi"
+        ],
+        "extra": "Hot Milk"
+      },
+      "lunch": {
+        "items": [
+          "Chole Bhature",
+          "Rice",
+          "Lassi (Masala + Sweet)",
+          "Salad",
+          "Achaar"
+        ],
+        "extra": "Milk"
+      },
+      "dinner": {
+        "items": [
+          "Mix Veg",
+          "Malai Kofta",
+          "Rice",
+          "Urad + Chana Dal",
+          "Chapati",
+          "Achaar",
+          "Sevya"
+        ],
+        "extra": "Milk, Fruit Cream"
+      }
     }
   }
 }

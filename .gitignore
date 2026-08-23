@@ -3,3 +3,18 @@ dist
 dev-dist
 shots
 .DS_Store
+
+# Personal Obsidian vault / planning notes (not part of the app)
+.obsidian/
+.agents/
+_to_delete/
+CGPA.md
+Color.md
+Fonts and sizes.md
+HANDOFF-design-consistency.md
+Map.canvas
+Map2.canvas
+More Colors.md
+SITEMAP.md
+UI_UX_Pro.md
+rules.md

@@ -91,9 +91,21 @@ export function useBoard(branch, year) {
   return { sessions, addSession, removeSession, moveSession, resetBoard, isCustomised }
 }
 
+/** Filter sessions by group/batch (e.g. G1, G2). Sessions without a group apply to all. */
+export function filterSessionsByGroup(sessions, group) {
+  if (!group || group === 'ALL') return sessions
+  const target = group.toUpperCase()
+  return sessions.filter((s) => {
+    if (!s.group) return true
+    const parts = s.group.split('+').map((g) => g.trim().toUpperCase())
+    return parts.includes(target) || s.group.toUpperCase().includes(target)
+  })
+}
+
 /** Sessions for one weekday, chronological. */
-export function sessionsForDay(sessions, day) {
-  return sessions.filter((s) => s.day === day).sort((a, b) => a.start - b.start)
+export function sessionsForDay(sessions, day, group) {
+  const list = group ? filterSessionsByGroup(sessions, group) : sessions
+  return list.filter((s) => s.day === day).sort((a, b) => a.start - b.start)
 }
 
 /** Distinct courses (excludes breaks) — the roll-call subject list. */
@@ -101,39 +113,62 @@ export function coursesOf(sessions) {
   const map = new Map()
   for (const s of sessions) {
     if (s.type === 'break') continue
-    const key = s.code || s.name
+    const isLab = s.type === 'lab' || (s.name || '').toUpperCase().includes('LAB')
+    const baseCode = s.code || s.name || ''
+    const key = isLab
+      ? (baseCode.toUpperCase().includes('LAB') || baseCode.includes('(P)') ? baseCode : `${baseCode} (Lab)`)
+      : baseCode
     if (!map.has(key)) {
-      map.set(key, { key, name: s.name, code: s.code, type: s.type, sessions: [] })
+      map.set(key, {
+        key,
+        name: s.name,
+        code: s.code || '',
+        type: isLab ? 'lab' : (s.type || 'lecture'),
+        category: isLab ? 'LAB' : 'THEORY',
+        sessions: [],
+      })
     }
     map.get(key).sessions.push(s)
   }
   return [...map.values()]
 }
 
-/** Grid bounds for the week view, snapped to whole hours with padding. */
+/** Grid bounds for the week view, snapped to whole hours with padding (up to 7 PM / 19:00 minimum). */
 export function gridBounds(sessions) {
-  if (!sessions.length) return { from: 8 * 60, to: 18 * 60 }
+  const minFrom = 8 * 60
+  const minTo = 19 * 60 // 7:00 PM
+  if (!sessions.length) return { from: minFrom, to: minTo }
   const from = Math.min(...sessions.map((s) => s.start))
   const to = Math.max(...sessions.map((s) => s.end))
   return {
-    from: Math.floor(from / 60) * 60,
-    to: Math.ceil(to / 60) * 60,
+    from: Math.min(minFrom, Math.floor(from / 60) * 60),
+    to: Math.max(minTo, Math.ceil(to / 60) * 60),
   }
 }
 
-/** The next session today after `mins`, or null. */
-export function nextSession(sessions, day = dayCode(), mins = minutesNow()) {
+/** Check if a specific session is currently in progress. */
+export function isLiveSession(session, day = dayCode(), mins = minutesNow()) {
   return (
-    sessionsForDay(sessions, day)
+    session.day === day &&
+    session.type !== 'break' &&
+    session.start <= mins &&
+    mins < session.end
+  )
+}
+
+/** The next session today after `mins`, or null. */
+export function nextSession(sessions, day = dayCode(), mins = minutesNow(), group = null) {
+  return (
+    sessionsForDay(sessions, day, group)
       .filter((s) => s.type !== 'break' && s.start >= mins)
       .sort((a, b) => a.start - b.start)[0] ?? null
   )
 }
 
 /** The session happening right now, or null. */
-export function currentSession(sessions, day = dayCode(), mins = minutesNow()) {
+export function currentSession(sessions, day = dayCode(), mins = minutesNow(), group = null) {
   return (
-    sessionsForDay(sessions, day).find(
+    sessionsForDay(sessions, day, group).find(
       (s) => s.type !== 'break' && s.start <= mins && mins < s.end,
     ) ?? null
   )
@@ -141,9 +176,12 @@ export function currentSession(sessions, day = dayCode(), mins = minutesNow()) {
 
 /** The next weekday that has any sessions — used by empty states. */
 export function nextClassDay(sessions, from = dayCode()) {
+  // `start` is -1 on a weekend (from not in DAYS, which only lists Mon–Fri).
+  // Don't clamp that to 0 — it would skip Monday and start the search at
+  // Tuesday. Leaving it at -1 makes `start + 1` land on Monday, as intended.
   const start = DAYS.indexOf(from)
   for (let i = 1; i <= DAYS.length; i += 1) {
-    const day = DAYS[(Math.max(start, 0) + i) % DAYS.length]
+    const day = DAYS[(start + i) % DAYS.length]
     if (sessions.some((s) => s.day === day && s.type !== 'break')) return day
   }
   return null

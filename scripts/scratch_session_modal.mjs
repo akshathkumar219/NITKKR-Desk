@@ -1,0 +1,17 @@
+import { chromium } from 'playwright'
+const browser = await chromium.launch()
+const ctx = await browser.newContext({ viewport: { width: 1440, height: 900 } })
+const page = await ctx.newPage()
+page.on('pageerror', e => console.log('PAGEERROR', e.message))
+page.on('console', m => { if (m.type()==='error') console.log('CONSOLE', m.text()) })
+await page.goto('http://localhost:4173', { waitUntil: 'domcontentloaded' })
+await page.evaluate(() => {
+  localStorage.setItem('kkr.welcomed', JSON.stringify(true))
+  localStorage.setItem('kkr.profile', JSON.stringify({ name: 'Akshath', branch: 'CSE', hostel: 'CVR', yearByBranch: { CSE: '2' }, branchPicked: true, hostelPicked: true }))
+})
+await page.goto('http://localhost:4173/home', { waitUntil: 'networkidle' })
+await page.getByRole('button', { name: /EDIT (TIMETABLE|BOARD)/i }).click()
+await page.getByRole('button', { name: 'ADD SESSION', exact: true }).click()
+await page.waitForTimeout(300)
+await page.screenshot({ path: '/tmp/session-modal.png', fullPage: true })
+await browser.close()

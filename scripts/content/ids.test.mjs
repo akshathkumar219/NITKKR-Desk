@@ -10,12 +10,27 @@
 // Run: node scripts/content/ids.test.mjs
 // ---------------------------------------------------------------------------
 
-import { readFileSync, writeFileSync } from 'node:fs'
-import { fileURLToPath } from 'node:url'
 import { assignIds, sessionId } from './ids.mjs'
 import { parseTimetable } from './datasets.mjs'
 
-const FIXTURE = fileURLToPath(new URL('../../content/timetables/CSE-2.md', import.meta.url))
+const TEST_TIMETABLE_FIXTURE = `---
+branch: CSE
+year: 2
+source: Test Fixture
+---
+
+# CSE · Year 2
+
+## MON
+
+| Start | End   | Course               | Code     | Room      | Group | Type    |
+|-------|-------|----------------------|----------|-----------|-------|---------|
+| 09:00 | 10:00 | Data Structures      | CSPC-201 | LT-3      |       | lecture |
+| 10:00 | 11:00 | Discrete Mathematics | CSPC-203 | LT-3      |       | lecture |
+| 11:00 | 13:00 | Data Structures Lab  | CSPC-251 | CL-1+CL-2 | G1+G2 | lab     |
+| 13:00 | 14:00 | Lunch Break          |          |           |       | break   |
+| 14:00 | 15:00 | Digital Electronics  | ECPC-207 | LT-5      |       | lecture |
+`
 
 let failed = 0
 function check(name, fn) {
@@ -35,7 +50,7 @@ function ne(a, b, msg) {
 }
 
 const ids = (text) => parseTimetable(text, 'test.md').sessions.map((s) => s.id)
-const original = readFileSync(FIXTURE, 'utf8')
+const original = TEST_TIMETABLE_FIXTURE
 
 check('same input produces the same IDs', () => {
   eq(ids(original).join(','), ids(original).join(','), 'Two parses of one file disagreed.')
@@ -55,8 +70,8 @@ check('changing a ROOM keeps every ID (rooms get reassigned mid-semester)', () =
 
 check('changing a GROUP keeps every ID', () => {
   const before = ids(original)
-  const after = ids(original.replace('A1+A2', 'B1+B2'))
-  ne(original.indexOf('A1+A2'), -1, 'Fixture no longer contains the group being edited.')
+  const after = ids(original.replace('G1+G2', 'B1+B2'))
+  ne(original.indexOf('G1+G2'), -1, 'Fixture no longer contains the group being edited.')
   eq(after.join(','), before.join(','), 'A group change altered session IDs.')
 })
 
@@ -113,8 +128,6 @@ check('hash function is unchanged (snapshot)', () => {
     'The ID hash changed. Every existing attendance record would detach.',
   )
 })
-
-writeFileSync(FIXTURE, original) // paranoia: nothing above writes, but be sure
 
 console.log('')
 if (failed) {

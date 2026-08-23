@@ -25,7 +25,7 @@ export default class ErrorBoundary extends Component {
     // No telemetry in this app by design, so the console is the only place
     // this can go. Keep the component stack — it is what makes a user's bug
     // report actionable.
-    console.error('[nitkkr board] render error', error, info?.componentStack)
+    console.error('[NITKKR DESK] render error', error, info?.componentStack)
   }
 
   render() {
@@ -38,7 +38,7 @@ export default class ErrorBoundary extends Component {
             SOMETHING BROKE
           </span>
 
-          <h1 className="display mt-5 text-3xl sm:text-4xl">that wasn&apos;t supposed to happen</h1>
+          <h1 className="display mt-5 text-3xl sm:text-4xl uppercase">THAT WASN&apos;T SUPPOSED TO HAPPEN</h1>
 
           <p className="mt-4 text-sm font-medium">
             The page failed to render. Your saved data has not been touched — it is still on this
@@ -55,7 +55,7 @@ export default class ErrorBoundary extends Component {
               EXPORT A BACKUP
             </a>
             <a href="/" className="btn">
-              HOME
+              DASHBOARD
             </a>
           </div>
         </div>

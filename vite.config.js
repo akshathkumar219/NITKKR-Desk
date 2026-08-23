@@ -16,7 +16,7 @@ export default defineConfig({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.svg'],
       manifest: {
-        name: 'NITKKR BOARD',
+        name: 'NITKKR DESK',
         short_name: 'KKR BOARD',
         description:
           'Timetable, roll call, mess board and campus info for NIT Kurukshetra',

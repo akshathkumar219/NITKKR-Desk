@@ -1,13 +1,23 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { KEYS, read, write } from '../lib/storage'
+import { SESSION_KEYS, readSession, writeSession } from '../lib/storage'
+import IntroWeb from './IntroWeb'
 
-// How many times a returning visitor sees the entry animation before it
-// retires itself. design.md §10 wants a memorable entrance; §1 says the site
-// is a utility people open several times a day. Both are true — so the
-// entrance is real, and then it gets out of the way for good.
+// How many times a tab replays the entrance before it goes quiet.
 const MAX_PLAYS = 5
 
-/** True when the OS asks for reduced motion (§12). */
+// Fixed choreography, matched to the keyframes in src/index.css:
+//   0-150     web scale-slam + corner collage shards pop in
+//   0-500     web draws in
+//   250-650   anchor threads draw
+//   500-850   multiverse plate glitch drift + collage shards flicker on steps()
+//   850-900   SNAP into register, overlay impact, halftone strobe flash
+//   850-1080  the wordmark card + sticker backing stamp on with chromatic jitter
+//   950-1350  "NITKKR DESK" wordmark prints in with CMYK staccato vibration
+//   1350-1800 clean hold
+//   1800      smooth fade-out
+const HOLD_MS = 1800
+const FADE_MS = 220
+
 function prefersReducedMotion() {
   return (
     typeof window !== 'undefined' &&
@@ -15,33 +25,27 @@ function prefersReducedMotion() {
   )
 }
 
-/**
- * Decides once, on mount, whether this load gets the intro — and records the
- * play immediately rather than on completion, so a visitor who reloads
- * mid-animation still burns a play and can never get stuck seeing it forever.
- */
+let decided = false
+let decision = false
+
 function useShouldPlay() {
   const [play, setPlay] = useState(false)
 
   useEffect(() => {
-    if (prefersReducedMotion()) return
-    const plays = Number(read(KEYS.introPlays, 0)) || 0
-    if (plays >= MAX_PLAYS) return
-    write(KEYS.introPlays, plays + 1)
-    setPlay(true)
+    if (!decided) {
+      decided = true
+      const plays = Number(readSession(SESSION_KEYS.introPlays, 0)) || 0
+      if (!prefersReducedMotion() && plays < MAX_PLAYS) {
+        writeSession(SESSION_KEYS.introPlays, plays + 1)
+        decision = true
+      }
+    }
+    if (decision) setPlay(true)
   }, [])
 
   return play
 }
 
-/**
- * Entry animation.
- *
- * Critically, this is an OVERLAY, not a gate. design.md §1.3: "Important
- * information must never require an animation to finish before it can be
- * read." The dashboard underneath is already rendered and interactive; this
- * sits on top, ignores pointer events on its decorative parts, and leaves.
- */
 export default function Intro() {
   const play = useShouldPlay()
   const [gone, setGone] = useState(false)
@@ -50,15 +54,14 @@ export default function Intro() {
 
   const dismiss = useCallback(() => {
     setLeaving(true)
-    timers.current.push(setTimeout(() => setGone(true), 260))
+    timers.current.push(setTimeout(() => setGone(true), FADE_MS))
   }, [])
 
   useEffect(() => {
     if (!play) return
-    // Auto-dismiss. Total on-screen time ~1.2s.
-    timers.current.push(setTimeout(dismiss, 1200))
+    timers.current.push(setTimeout(dismiss, HOLD_MS))
 
-    // §11: never block content. Any intent to interact ends it at once.
+    // Skip on any intent to interact
     const skip = () => dismiss()
     window.addEventListener('pointerdown', skip)
     window.addEventListener('keydown', skip)
@@ -81,13 +84,110 @@ export default function Intro() {
     <div
       className="intro-overlay"
       data-leaving={leaving ? '' : undefined}
-      // Decorative and transient. Announcing it would interrupt a screen
-      // reader that is already being read the real page underneath.
       aria-hidden
     >
       <div className="world world-halftone intro-halftone" />
-      <p className="display animate-settle intro-word">NITKKR</p>
-      <p className="display animate-settle intro-word intro-word-2">BOARD</p>
+
+      {/* Spider-Punk Multiverse Web Artwork */}
+      <IntroWeb />
+
+      {/* Corner Zine Collage Paper Shards flickering around web anchors */}
+      <svg
+        className="intro-shards-svg fixed inset-0 w-full h-full pointer-events-none"
+        viewBox="0 0 1920 1080"
+        preserveAspectRatio="none"
+      >
+        <defs>
+          <pattern
+            id="intro-shard-dots"
+            width="14"
+            height="14"
+            patternUnits="userSpaceOnUse"
+          >
+            <circle cx="7" cy="7" r="3.5" fill="currentColor" />
+          </pattern>
+          <pattern
+            id="intro-shard-hatch"
+            width="16"
+            height="16"
+            patternTransform="rotate(45 0 0)"
+            patternUnits="userSpaceOnUse"
+          >
+            <line x1="0" y1="0" x2="0" y2="16" stroke="currentColor" strokeWidth="3" />
+          </pattern>
+        </defs>
+
+        {/* Top-Left Acid Green Polka-Dot Shard */}
+        <g className="intro-shard-tl">
+          <path
+            d="M -30 -30 L 420 -30 L 320 140 L 160 80 L -30 220 Z"
+            fill="var(--color-sky)"
+            stroke="#111111"
+            strokeWidth="4"
+          />
+          <path
+            d="M -30 -30 L 420 -30 L 320 140 L 160 80 L -30 220 Z"
+            fill="url(#intro-shard-dots)"
+            className="text-[#111111] opacity-30"
+          />
+        </g>
+
+        {/* Top-Right Disruption Pink Hatch Shard */}
+        <g className="intro-shard-tr">
+          <path
+            d="M 1950 -30 L 1540 -30 L 1640 120 L 1800 60 L 1950 190 Z"
+            fill="var(--disruption)"
+            stroke="#111111"
+            strokeWidth="4"
+          />
+          <path
+            d="M 1950 -30 L 1540 -30 L 1640 120 L 1800 60 L 1950 190 Z"
+            fill="url(#intro-shard-hatch)"
+            className="text-[#111111] opacity-25"
+          />
+        </g>
+
+        {/* Bottom-Left Disruption Pink Shard */}
+        <g className="intro-shard-bl">
+          <path
+            d="M -30 880 L 220 840 L 360 990 L -30 1110 Z"
+            fill="var(--disruption)"
+            stroke="#111111"
+            strokeWidth="4"
+          />
+          <path
+            d="M -30 880 L 220 840 L 360 990 L -30 1110 Z"
+            fill="url(#intro-shard-hatch)"
+            className="text-[#111111] opacity-25"
+          />
+        </g>
+
+        {/* Bottom-Right Acid Green Polka-Dot Shard */}
+        <g className="intro-shard-br">
+          <path
+            d="M 1950 860 L 1680 820 L 1540 980 L 1820 1020 L 1950 1110 Z"
+            fill="var(--color-sky)"
+            stroke="#111111"
+            strokeWidth="4"
+          />
+          <path
+            d="M 1950 860 L 1680 820 L 1540 980 L 1820 1020 L 1950 1110 Z"
+            fill="url(#intro-shard-dots)"
+            className="text-[#111111] opacity-30"
+          />
+        </g>
+      </svg>
+
+      {/* Wordmark Center Card with Backing Sticker Layer */}
+      <div className="intro-words-container">
+        {/* Jagged Disruption/Acid Sticker Backing Trim */}
+        <div className="intro-words-sticker" aria-hidden="true" />
+        <div className="intro-words">
+          <p className="display intro-word">NITKKR</p>
+          <p className="display intro-word intro-word-2">DESK</p>
+        </div>
+      </div>
+
       <span className="label intro-skip">TAP TO SKIP</span>
     </div>
   )

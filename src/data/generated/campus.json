@@ -11,6 +11,26 @@
       "group": "ENGINEERING"
     },
     {
+      "code": "AIML",
+      "name": "Artificial Intelligence & Machine Learn",
+      "group": "ENGINEERING"
+    },
+    {
+      "code": "AIDS",
+      "name": "Artificial Intelligence & Data Science",
+      "group": "ENGINEERING"
+    },
+    {
+      "code": "MNC",
+      "name": "Mathematics & Computing",
+      "group": "SCIENCES"
+    },
+    {
+      "code": "IIOT",
+      "name": "Industrial Internet of Things",
+      "group": "ENGINEERING"
+    },
+    {
       "code": "ECE",
       "name": "Electronics & Communication",
       "group": "ENGINEERING"
@@ -34,56 +54,48 @@
       "code": "PIE",
       "name": "Production & Industrial",
       "group": "ENGINEERING"
-    },
-    {
-      "code": "CHEM",
-      "name": "Chemical Engineering",
-      "group": "ENGINEERING"
-    },
-    {
-      "code": "META",
-      "name": "Metallurgical & Materials",
-      "group": "ENGINEERING"
-    },
-    {
-      "code": "MNC",
-      "name": "Mathematics & Computing",
-      "group": "SCIENCES"
-    },
-    {
-      "code": "PHY",
-      "name": "Engineering Physics",
-      "group": "SCIENCES"
     }
   ],
   "hostels": [
     {
-      "code": "CVR",
-      "name": "C.V. Raman Hostel"
+      "code": "H1",
+      "name": "H1"
     },
     {
-      "code": "HJB",
-      "name": "H.J. Bhabha Hostel"
+      "code": "H2",
+      "name": "H2"
     },
     {
-      "code": "APJ",
-      "name": "A.P.J. Abdul Kalam Hostel"
+      "code": "H3",
+      "name": "H3"
     },
     {
-      "code": "JCB",
-      "name": "J.C. Bose Hostel"
+      "code": "H4",
+      "name": "H4"
     },
     {
-      "code": "SNB",
-      "name": "S.N. Bose Hostel"
+      "code": "H5",
+      "name": "H5"
     },
     {
-      "code": "KLP",
-      "name": "Kalpana Chawla Hostel"
+      "code": "H6",
+      "name": "H6"
     },
     {
-      "code": "GRG",
-      "name": "Gargi Hostel"
+      "code": "H7",
+      "name": "H7"
+    },
+    {
+      "code": "H8",
+      "name": "H8"
+    },
+    {
+      "code": "H9",
+      "name": "H9"
+    },
+    {
+      "code": "H10",
+      "name": "H10"
     }
   ]
 }

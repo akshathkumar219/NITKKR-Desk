@@ -1,6 +1,6 @@
 import { useCallback } from 'react'
-import { KEYS, useStored } from './storage'
-import { DAYS, isoToDate, todayISO } from './time'
+import { KEYS, useStored } from './storage.js'
+import { DAYS, isoToDate, todayISO } from './time.js'
 
 // Attendance ("roll call") marks are keyed by `${isoDate}|${sessionId}` so a
 // session can be marked independently on each date it occurs.
@@ -13,18 +13,62 @@ export function markKey(iso, sessionId) {
 
 export function useRollcall() {
   const [marks, setMarks] = useStored(KEYS.rollcall, {})
+  const [adjustments, setAdjustments] = useStored('kkr.rollcall.adjustments', {})
 
   const setMark = useCallback(
     (iso, sessionId, mark) =>
       setMarks((prev) => {
         const key = markKey(iso, sessionId)
         const next = { ...prev }
-        // Clicking the active mark again clears it.
-        if (next[key] === mark) delete next[key]
+        // Setting null or clicking the active mark again clears it.
+        if (!mark || next[key] === mark) delete next[key]
         else next[key] = mark
         return next
       }),
     [setMarks],
+  )
+
+  const markBatch = useCallback(
+    (entries, mark) => {
+      setMarks((prev) => {
+        const next = { ...prev }
+        for (const item of entries) {
+          const key = markKey(item.iso, item.sessionId || item.id)
+          if (!mark) delete next[key]
+          else next[key] = mark
+        }
+        return next
+      })
+    },
+    [setMarks],
+  )
+
+  const unmarkBatch = useCallback(
+    (entries) => {
+      setMarks((prev) => {
+        const next = { ...prev }
+        for (const item of entries) {
+          const key = markKey(item.iso, item.sessionId || item.id)
+          delete next[key]
+        }
+        return next
+      })
+    },
+    [setMarks],
+  )
+
+  const adjustSubject = useCallback(
+    (courseKey, delta) => {
+      setAdjustments((prev) => {
+        const current = prev[courseKey] || 0
+        const nextVal = current + delta
+        const next = { ...prev }
+        if (nextVal === 0) delete next[courseKey]
+        else next[courseKey] = nextVal
+        return next
+      })
+    },
+    [setAdjustments],
   )
 
   const getMark = useCallback(
@@ -32,9 +76,12 @@ export function useRollcall() {
     [marks],
   )
 
-  const clearAll = useCallback(() => setMarks({}), [setMarks])
+  const clearAll = useCallback(() => {
+    setMarks({})
+    setAdjustments({})
+  }, [setMarks, setAdjustments])
 
-  return { marks, setMark, getMark, clearAll }
+  return { marks, adjustments, setMark, markBatch, unmarkBatch, adjustSubject, getMark, clearAll }
 }
 
 /** Marks are ignored before the tracking-since date. */
@@ -44,12 +91,12 @@ function inWindow(iso, since) {
 }
 
 /**
- * Tally marks for a set of session ids.
+ * Tally marks for a set of session ids with optional manual adjustments.
  *
  *   held    = present + absent      (cancelled classes never count)
  *   percent = attended / held
  */
-export function tally(marks, sessionIds, since) {
+export function tally(marks, sessionIds, since, manualAdjustment = 0, baseAttendance = { present: 0, held: 0 }) {
   const ids = new Set(sessionIds)
   let present = 0
   let absent = 0
@@ -66,42 +113,106 @@ export function tally(marks, sessionIds, since) {
     else if (mark === 'cancelled') cancelled += 1
   }
 
-  const held = present + absent
+  const baseP = Number(baseAttendance?.present) || 0
+  const baseH = Math.max(baseP, Number(baseAttendance?.held) || 0)
+  const baseAbsent = Math.max(0, baseH - baseP)
+
+  const adj = Number(manualAdjustment) || 0
+  const rawPresent = present + baseP
+  const totalPresent = Math.max(0, rawPresent + adj)
+  const extraMissed = Math.max(0, -(rawPresent + adj))
+  const totalAbsent = absent + baseAbsent + (adj < 0 && rawPresent + adj >= 0 ? -adj : extraMissed)
+  const totalHeld = Math.max(totalPresent + totalAbsent, (present + absent + baseH) + (adj > 0 ? adj : 0))
+
   return {
-    present,
-    absent,
+    present: totalPresent,
+    absent: totalAbsent,
     cancelled,
-    held,
-    percent: held === 0 ? null : (present / held) * 100,
+    held: totalHeld,
+    loggedPresent: present,
+    loggedHeld: present + absent,
+    basePresent: baseP,
+    baseHeld: baseH,
+    manualAdjustment: adj,
+    percent: totalHeld === 0 ? null : (totalPresent / totalHeld) * 100,
   }
 }
 
 /**
  * How many more classes you can miss and still sit at or above `required`.
- * Solves: present / (held + x) >= required  =>  x <= present/required - held
+ * Solves: present / (held + x) >= required / 100
+ * => 100 * present >= required * (held + x)
+ * => required * x <= 100 * present - required * held
+ * => x <= (100 * present - required * held) / required
  */
 export function canSkip(present, held, required) {
-  const r = required / 100
-  if (r <= 0) return Infinity
-  return Math.max(0, Math.floor(present / r - held))
+  const req = Number(required)
+  if (!Number.isFinite(req) || req <= 0) return Infinity
+  const p = Number(present) || 0
+  const h = Number(held) || 0
+  if (h === 0) return 0
+  const numerator = 100 * p - req * h
+  if (numerator < 0) return 0
+  return Math.floor(numerator / req)
 }
 
 /**
  * How many consecutive classes you must attend to climb back to `required`.
- * Solves: (present + x) / (held + x) >= required
+ * Solves: (present + x) / (held + x) >= required / 100
+ * => 100 * (present + x) >= required * (held + x)
+ * => 100 * present + 100 * x >= required * held + required * x
+ * => x * (100 - required) >= required * held - 100 * present
+ * => x >= (required * held - 100 * present) / (100 - required)
  */
 export function mustAttend(present, held, required) {
-  const r = required / 100
-  if (r >= 1) return Infinity
-  if (held === 0) return 0
-  const need = Math.ceil((r * held - present) / (1 - r))
-  return Math.max(0, need)
+  const req = Number(required)
+  if (!Number.isFinite(req) || req <= 0) return 0
+  const p = Number(present) || 0
+  const h = Number(held) || 0
+  if (h === 0) return 0
+  if (req >= 100) return p >= h ? 0 : Infinity
+  const numerator = req * h - 100 * p
+  if (numerator <= 0) return 0
+  return Math.ceil(numerator / (100 - req))
+}
+
+export const classDeficit = mustAttend
+
+/**
+ * Simulate the resulting percentage if user skips next N classes.
+ */
+export function simulateSkip(present, held, skipCount, required = 75) {
+  const nextHeld = held + skipCount
+  if (nextHeld <= 0) return { percent: null, status: 'untracked', delta: 0 }
+  const nextPercent = (present / nextHeld) * 100
+  const currentPercent = held > 0 ? (present / held) * 100 : null
+  return {
+    percent: nextPercent,
+    status: status(nextPercent, required),
+    delta: currentPercent !== null ? nextPercent - currentPercent : 0,
+  }
+}
+
+/**
+ * Simulate the resulting percentage if user attends next N classes.
+ */
+export function simulateAttend(present, held, attendCount, required = 75) {
+  const nextHeld = held + attendCount
+  if (nextHeld <= 0) return { percent: null, status: 'untracked', delta: 0 }
+  const nextPresent = present + attendCount
+  const nextPercent = (nextPresent / nextHeld) * 100
+  const currentPercent = held > 0 ? (present / held) * 100 : null
+  return {
+    percent: nextPercent,
+    status: status(nextPercent, required),
+    delta: currentPercent !== null ? nextPercent - currentPercent : 0,
+  }
 }
 
 /** Verdict for a subject or the overall figure. */
 export function status(percent, required) {
   if (percent === null) return 'untracked'
-  if (percent >= required) return 'safe'
+  if (percent > required) return 'safe'
   if (percent >= required - 10) return 'edge'
   return 'short'
 }

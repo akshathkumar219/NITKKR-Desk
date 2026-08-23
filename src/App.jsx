@@ -7,17 +7,22 @@ import SelectHostel from './pages/SelectHostel'
 import SelectInfo from './pages/SelectInfo'
 import Board from './pages/Board'
 import Mess from './pages/Mess'
-import RollCall from './pages/RollCall'
-import Rooms from './pages/Rooms'
+import Attendance from './pages/Attendance'
 import Tools from './pages/Tools'
 import Pyq from './pages/Pyq'
 import CampusMap from './pages/CampusMap'
 import CampusInfo from './pages/CampusInfo'
 import InfoHub from './pages/InfoHub'
+import Subjects from './pages/Subjects'
+import CalculatorPage from './pages/Calculator'
 import Profile from './pages/Profile'
+import CalendarPage from './pages/Calendar'
+import Guide from './pages/Guide'
 import About from './pages/About'
 import NotFound from './pages/NotFound'
 import ErrorBoundary from './components/ErrorBoundary'
+import Intro from './components/Intro'
+import ThemeBurst from './components/ThemeBurst'
 import { KEYS, read, useTheme } from './lib/storage'
 
 function ScrollToTop() {
@@ -53,6 +58,12 @@ export default function App() {
   return (
     <ErrorBoundary>
       <ScrollToTop />
+      {/* Spider-Punk themed radial transition on theme switch */}
+      <ThemeBurst />
+      {/* Mounted at the root, not per-page: a refresh of any route earns the
+          entrance, while client-side navigation never remounts it. Returns
+          null on the loads it decides to sit out. */}
+      <Intro />
       <Routes>
         <Route path="/" element={<RootGate />} />
         <Route path="/welcome" element={<Welcome />} />
@@ -63,22 +74,32 @@ export default function App() {
 
         <Route path="/home" element={<RequireWelcome><Board /></RequireWelcome>} />
         <Route path="/mess" element={<RequireWelcome><Mess /></RequireWelcome>} />
-        <Route path="/rollcall" element={<RequireWelcome><RollCall /></RequireWelcome>} />
-        <Route path="/rooms" element={<RequireWelcome><Rooms /></RequireWelcome>} />
+        <Route path="/attendance" element={<RequireWelcome><Attendance /></RequireWelcome>} />
+        <Route path="/attendance/:tabKey" element={<RequireWelcome><Attendance /></RequireWelcome>} />
+        <Route path="/attendance/*" element={<RequireWelcome><Attendance /></RequireWelcome>} />
         <Route path="/tools" element={<RequireWelcome><Tools /></RequireWelcome>} />
         <Route path="/pyq" element={<Pyq />} />
         <Route path="/map" element={<CampusMap />} />
         <Route path="/campus" element={<RequireWelcome><CampusInfo /></RequireWelcome>} />
         <Route path="/info" element={<RequireWelcome><InfoHub /></RequireWelcome>} />
+        <Route path="/subjects" element={<RequireWelcome><Subjects /></RequireWelcome>} />
+        <Route path="/subjects/:subjectKey" element={<RequireWelcome><Subjects /></RequireWelcome>} />
+        <Route path="/subjects/*" element={<RequireWelcome><Subjects /></RequireWelcome>} />
+        <Route path="/subject/:subjectKey" element={<RequireWelcome><Subjects /></RequireWelcome>} />
+        <Route path="/calculator" element={<RequireWelcome><CalculatorPage /></RequireWelcome>} />
         <Route path="/profile" element={<RequireWelcome><Profile /></RequireWelcome>} />
+        <Route path="/calendar" element={<RequireWelcome><CalendarPage /></RequireWelcome>} />
+        <Route path="/guide" element={<Guide />} />
         <Route path="/about" element={<About />} />
 
         {/* Legacy query-tab URLs from the reference app */}
-        <Route path="/attendance" element={<Navigate to="/rollcall" replace />} />
-        <Route path="/freenow" element={<Navigate to="/rooms" replace />} />
+        <Route path="/rollcall" element={<Navigate to="/attendance" replace />} />
+        <Route path="/rollcall/:tabKey" element={<RequireWelcome><Attendance /></RequireWelcome>} />
+        <Route path="/rollcall/*" element={<RequireWelcome><Attendance /></RequireWelcome>} />
 
         <Route path="*" element={<NotFound />} />
       </Routes>
     </ErrorBoundary>
+
   )
 }

@@ -205,7 +205,7 @@ export default function Profile() {
 
                 return (
                   <div
-                    className={`flex items-center justify-center size-22 sm:size-24 ${avatarEmoji ? 'text-6xl sm:text-7xl' : 'text-3xl sm:text-4xl'} font-black border-3 border-[var(--border-strong)] shadow-hard transition-transform hover:scale-105 overflow-hidden`}
+                    className={`flex items-center justify-center size-22 sm:size-24 ${avatarEmoji ? 'avatar-emoji-box' : 'text-3xl sm:text-4xl'} font-black border-3 border-[var(--border-strong)] shadow-hard transition-transform hover:scale-105 overflow-hidden`}
                     style={{
                       background: effectiveAvatarBg,
                       color: avatarTextColor,
@@ -213,9 +213,11 @@ export default function Profile() {
                     }}
                   >
                     <span
-                      className={`inline-flex items-center justify-center leading-none select-none ${
-                        avatarEmoji ? 'translate-y-[2px] sm:translate-y-[3px]' : ''
-                      }`}
+                      className={
+                        avatarEmoji
+                          ? 'avatar-emoji'
+                          : 'inline-flex items-center justify-center leading-none select-none'
+                      }
                     >
                       {previewAvatar}
                     </span>

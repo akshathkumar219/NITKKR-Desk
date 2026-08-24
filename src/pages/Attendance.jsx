@@ -540,9 +540,11 @@ export default function Attendance() {
     ? sessionsForDay(effectiveSessions, fixDay).filter((s) => s.type !== 'break')
     : []
 
-  // Overall Safe Skips and recovery calculations
-  const totalSkips = canSkip(overall.present, overall.held, required)
-  const totalRecover = mustAttend(overall.present, overall.held, required)
+  // NOTE: overall safe-skip / recovery figures were removed deliberately.
+  // Attendance is enforced per subject, so pooling present/held across all
+  // subjects invents margin that does not exist (3/3 across 3 subjects read as
+  // "+1 bunk" while every subject individually had 0). Per-subject margins are
+  // shown on each subject row instead.
 
   /* ---------------------- Scope-Aware Simulator Calculations ---------------------- */
 
@@ -692,8 +694,8 @@ export default function Attendance() {
       overall.percent === null
         ? 'No marks logged'
         : overall.percent >= required
-          ? totalSkips === 0 ? 'On the cutoff (0 safe skips)' : `+${totalSkips} Safe Bunks`
-          : `Attend ${totalRecover} classes to reach ${required}%`
+          ? `At or above ${required}%`
+          : `Below ${required}%`
 
     let text = `📚 NITKKR ATTENDANCE SUMMARY\n`
     text += `📅 ${dateStr} · ${weekStr} · Target: ${required}%\n`
@@ -885,74 +887,19 @@ export default function Attendance() {
                   Classes Attended · Target {required}%
                 </p>
 
-                {/* Status Badges */}
-                <div className="mt-2 flex flex-wrap items-center gap-1.5">
-                  {overall.percent === null ? (
-                    <span className="chip !py-0.5 sm:!py-1 !px-2.5 text-xs font-bold uppercase tracking-wider border-2 border-[var(--border)]">NO LOGS YET</span>
-                  ) : overall.percent >= required ? (
-                    <span
-                      className="chip !py-0.5 sm:!py-1 !px-2.5 text-xs font-black uppercase tracking-wider border-2 border-[var(--border)]"
-                      style={{ background: 'var(--color-present)', color: 'var(--on-accent)' }}
-                    >
-                      {totalSkips === 0 ? 'ON THE CUTOFF' : `+${totalSkips} SAFE BUNKS`}
-                    </span>
-                  ) : overall.percent >= required - 10 ? (
-                    <span
-                      className="chip !py-0.5 sm:!py-1 !px-2.5 text-xs font-black uppercase tracking-wider border-2 border-[var(--border)]"
-                      style={{ background: 'var(--color-amber)', color: 'var(--on-accent)' }}
-                    >
-                      ATTEND {totalRecover} MORE TO REACH {required}%
-                    </span>
-                  ) : (
-                    <span
-                      className="chip !py-0.5 sm:!py-1 !px-2.5 text-xs font-black uppercase tracking-wider border-2 border-[var(--border)]"
-                      style={{ background: 'var(--color-absent)', color: 'var(--on-accent)' }}
-                    >
-                      ATTEND {totalRecover} MORE TO REACH {required}%
-                    </span>
-                  )}
-                  {baseAttendance.held > 0 ? (
+                {/* Base Attendance Chip */}
+                {baseAttendance.held > 0 ? (
+                  <div className="mt-2 flex flex-wrap items-center gap-1.5">
                     <span className="chip !py-0.5 sm:!py-1 !px-2 text-xs border-2 border-dashed border-[var(--border)] font-bold uppercase tracking-wider">
                       Base: {baseAttendance.present}/{baseAttendance.held}
                     </span>
-                  ) : null}
-                </div>
+                  </div>
+                ) : null}
               </div>
             </div>
 
-            {/* Mobile Single-Line Summary Strip (< sm) */}
-            <div className="flex sm:hidden items-center justify-between gap-2 pt-2.5 border-t-2 border-[var(--border)] text-xs font-bold text-[var(--muted)]">
-              <span className="truncate">
-                📚 <span className="text-[var(--text)] font-black">{subjectStats.safe}/{courses.length}</span> safe
-              </span>
-              <span>·</span>
-              <span className="truncate">
-                📅 <span className="text-[var(--text)] font-black">{todayMarks.marked}/{todaySessions.length}</span> logged
-              </span>
-              <span>·</span>
-              <span
-                className="font-black shrink-0"
-                style={{
-                  color:
-                    overall.percent === null
-                      ? 'var(--muted)'
-                      : overall.percent >= required
-                        ? 'var(--present-ink)'
-                        : overall.percent >= required - 10
-                          ? 'var(--warn-ink)'
-                          : 'var(--absent-ink)',
-                }}
-              >
-                {overall.percent === null
-                  ? '—'
-                  : overall.percent >= required
-                    ? totalSkips === 0 ? 'on cutoff' : `+${totalSkips} bunks`
-                    : `-${totalRecover} classes`}
-              </span>
-            </div>
-
-            {/* Full 3-Column Metrics on Tablet & Desktop (>= sm) */}
-            <div className="hidden sm:grid grid-cols-3 gap-4 lg:gap-4 pt-4 lg:pt-0 border-t-2 lg:border-t-0 border-[var(--border)] shrink-0 divide-x-2 divide-[var(--border)]">
+            {/* Metrics Grid (all breakpoints) */}
+            <div className="grid grid-cols-2 gap-4 lg:gap-4 pt-4 lg:pt-0 border-t-2 lg:border-t-0 border-[var(--border)] shrink-0 divide-x-2 divide-[var(--border)]">
               {/* Subject Health Column */}
               <div className="pr-2">
                 <span className="t-meta muted block">
@@ -985,38 +932,6 @@ export default function Attendance() {
                 </p>
               </div>
 
-              {/* Status / Bunk Forecast Column */}
-              <div className="pl-4 lg:pl-6">
-                <span className="t-meta muted block">
-                  CUMULATIVE STATUS
-                </span>
-                <p
-                  className="t-stat mt-1"
-                  style={{
-                    color:
-                      overall.percent === null
-                        ? 'var(--muted)'
-                        : overall.percent >= required
-                          ? 'var(--present-ink)'
-                          : overall.percent >= required - 10
-                            ? 'var(--warn-ink)'
-                            : 'var(--absent-ink)',
-                  }}
-                >
-                  {overall.percent === null
-                    ? '—'
-                    : overall.percent >= required
-                      ? totalSkips === 0 ? 'ON CUTOFF' : `+${totalSkips} BUNKS`
-                      : `-${totalRecover} CLASSES`}
-                </p>
-                <p className="t-meta muted mt-0.5">
-                  {overall.percent === null
-                    ? 'Log classes to view buffer'
-                    : overall.percent >= required
-                      ? totalSkips === 0 ? 'Zero skip margin remaining' : 'Safe to bunk if needed'
-                      : `Must attend next ${totalRecover} classes`}
-                </p>
-              </div>
             </div>
           </div>
         </Panel>
@@ -2037,9 +1952,11 @@ export default function Attendance() {
               >
                 {overall.percent === null
                   ? 'NO LOGS'
-                  : overall.percent >= required
-                    ? totalSkips === 0 ? 'ON CUTOFF' : `+${totalSkips} BUNKS`
-                    : `NEED ${totalRecover}`}
+                  : overallStatus === 'safe'
+                    ? 'ABOVE CUTOFF'
+                    : overallStatus === 'edge'
+                      ? 'ON THE LINE'
+                      : 'AT RISK'}
               </span>
             </div>
 

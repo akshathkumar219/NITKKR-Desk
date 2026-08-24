@@ -1,7 +1,8 @@
-import { Info } from 'lucide-react'
+import { useState } from 'react'
+import { ChevronDown, ChevronUp, Info } from 'lucide-react'
 import Shell from '../components/Shell'
 import { PageHeader, Panel } from '../ui'
-import { CREDITS, INSPIRED_BY, INSTITUTE } from '../data/info'
+import { CREDITS, INSPIRED_BY, INSTITUTE, VERSION } from '../data/info'
 
 /* Lucide dropped brand marks a while back, so these two are hand-drawn to
    match its exact stroke language (24x24, currentColor, 2px round strokes)
@@ -47,6 +48,7 @@ function InstagramIcon({ className = 'icon-sm' }) {
 
 export default function About() {
   const credit = CREDITS[0]
+  const [showChanges, setShowChanges] = useState(false)
 
   return (
     <Shell>
@@ -123,6 +125,38 @@ export default function About() {
               {INSPIRED_BY.url}
             </a>
           </div>
+        </div>
+      </Panel>
+
+      <Panel className="pad-page border-l-6 border-l-[var(--color-violet)]">
+        <h2 className="t-section">VERSION</h2>
+        <div className="mt-3 board pad-page">
+          <div className="flex items-center justify-between gap-3">
+            <div>
+              <p className="t-meta muted">CURRENT VERSION</p>
+              <p className="t-card-title mt-1.5" style={{ fontSize: 20 }}>{VERSION.number}</p>
+            </div>
+            <button
+              type="button"
+              onClick={() => setShowChanges((prev) => !prev)}
+              aria-expanded={showChanges}
+              className="btn !py-1 !px-2.5 text-xs font-normal uppercase cursor-pointer"
+            >
+              WHAT'S NEW
+              {showChanges ? (
+                <ChevronUp className="icon-micro" strokeWidth={2.5} />
+              ) : (
+                <ChevronDown className="icon-micro" strokeWidth={2.5} />
+              )}
+            </button>
+          </div>
+          {showChanges ? (
+            <ul className="t-body font-normal mt-4 space-y-1.5 border-t border-[var(--border)] pt-3">
+              {VERSION.changes.map((change) => (
+                <li key={change}>· {change}</li>
+              ))}
+            </ul>
+          ) : null}
         </div>
       </Panel>
 

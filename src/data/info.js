@@ -299,3 +299,16 @@ export const INSPIRED_BY = {
   name: 'PEC MANAGE',
   url: 'https://pecmanage.netlify.app/',
 }
+
+// --------------------------------------------------------------- version --
+
+export const VERSION = {
+  number: '1.1',
+  changes: [
+    'Updated academic data for the IT branch',
+    'Updated the H4 hostel mess menu',
+    'Added girls hostels',
+    'Added the Cauvery hostel mess menu',
+    'Fixed a bug on the Attendance page',
+  ],
+}

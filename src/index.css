@@ -1454,5 +1454,31 @@
   }
 }
 
+/* ---------------------------------------------------------------------------
+   Emoji avatars
+   One rule instead of a text-* class plus a pixel nudge at each call site.
+   The glyph is sized from its own box (68% of the shorter side) via container
+   query units, so it lands identically on desktop and phone at every
+   breakpoint. Colour-emoji fonts sit high in their line box, so the optical
+   correction is expressed in em and scales with the glyph.
+   No overflow/paint containment here — call sites that want clipping already
+   set overflow-hidden, and the header avatar's status dot sits outside its box.
+   --------------------------------------------------------------------------- */
+.avatar-emoji-box {
+  container-type: size;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
 
-
+.avatar-emoji {
+  display: block;
+  line-height: 1;
+  user-select: none;
+  /* Both values are measured from the live emoji font by lib/emojiMetrics.js.
+     The fallbacks are Apple Color Emoji's numbers: its ink is 1.03x the
+     font-size (so 76% coverage needs 73.8%) and sits 0.135em high in the box. */
+  font-size: calc(var(--emoji-scale, 73.8) * 1cqmin);
+  transform: translateY(calc(var(--emoji-nudge, 0.135) * 1em));
+}

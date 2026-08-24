@@ -80,13 +80,13 @@ export default function AppHeader({ variant = 'paper' }) {
         <Link
           to="/profile"
           className={`${CONTROL} relative font-black shadow-hard-sm ${
-            profile.avatarEmoji ? 'text-2xl leading-none' : 'text-xs tracking-widest'
+            profile.avatarEmoji ? 'avatar-emoji-box' : 'text-xs tracking-widest'
           }`}
           style={{ background: avatarBg, color: avatarInk }}
           title="Profile"
           aria-label="Profile"
         >
-          <span className={profile.avatarEmoji ? 'leading-none select-none' : ''}>
+          <span className={profile.avatarEmoji ? 'avatar-emoji' : ''}>
             {avatarOf(profile)}
           </span>
           <span className="absolute -bottom-0.5 -right-0.5 flex size-2.5" aria-hidden>

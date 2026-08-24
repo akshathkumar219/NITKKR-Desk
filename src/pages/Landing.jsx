@@ -32,7 +32,7 @@ import {
 import { branchName, hostelName } from '../data/campus'
 import { coursesOf, currentSession, filterSessionsByGroup, nextSession, sessionsForDay, useBoard } from '../lib/board'
 import { currentMeal } from '../data/mess'
-import { canSkip, mustAttend, status, STATUS_COLOR, tally, useRollcall } from '../lib/rollcall'
+import { status, STATUS_COLOR, tally, useRollcall } from '../lib/rollcall'
 import { dayCode, fmtRange, minutesNow, todayISO, fmtDateDDMMYYYY } from '../lib/time'
 import AppHeader from '../components/AppHeader'
 import { inkFor } from '../lib/palette'
@@ -528,20 +528,6 @@ export default function Landing() {
           ? 'CUTTING IT FINE'
           : 'ON TRACK'
 
-  const skips = canSkip(attendance.present, attendance.held, settings.required)
-  const need = mustAttend(attendance.present, attendance.held, settings.required)
-
-  const marginText = useMemo(() => {
-    if (attendance.percent === null) return 'TRACK TO SEE MARGIN'
-    if (st === 'short') {
-      return `NEED ${need} ${need === 1 ? 'CLASS' : 'CLASSES'} FOR ${settings.required}%`
-    }
-    if (skips > 0) {
-      return `CAN BUNK ${skips} ${skips === 1 ? 'CLASS' : 'CLASSES'}`
-    }
-    return `AT CUTOFF (${settings.required}%)`
-  }, [attendance.percent, st, need, skips, settings.required])
-
   const classNote = useMemo(() => {
     if (live) {
       return `LIVE: ${live.name || live.code}${live.room ? ` · RM ${live.room}` : ''}`
@@ -768,7 +754,7 @@ export default function Landing() {
                         {profile.name || profile.avatarEmoji ? (
                           <span
                             className={`grid size-8.5 sm:size-9 place-items-center shrink-0 border border-black/20 font-bold ${
-                              profile.avatarEmoji ? 'text-2xl leading-none' : 'text-sm'
+                              profile.avatarEmoji ? 'avatar-emoji-box' : 'text-sm'
                             }`}
                             style={{
                               background: idAccent,
@@ -776,7 +762,7 @@ export default function Landing() {
                               borderRadius: 3,
                             }}
                           >
-                            <span className={profile.avatarEmoji ? 'leading-none select-none' : ''}>
+                            <span className={profile.avatarEmoji ? 'avatar-emoji' : ''}>
                               {avatarOf(profile)}
                             </span>
                           </span>
@@ -891,15 +877,15 @@ export default function Landing() {
                   <ArrowRight size={14} strokeWidth={2.5} className="shrink-0" aria-hidden />
                 </p>
 
-                <div className="flex items-center gap-3 my-1.5">
-                  <div className="relative shrink-0 size-12 sm:size-13">
+                <div className="flex items-center gap-3 my-1.5 flex-1">
+                  <div className="relative shrink-0 size-16 sm:size-20">
                     <svg viewBox="0 0 52 52" className="size-full -rotate-90" aria-hidden>
                       <circle
                         cx="26"
                         cy="26"
                         r="21"
                         fill="none"
-                        strokeWidth="4.5"
+                        strokeWidth="5"
                         className="stroke-[var(--border)]"
                       />
                       <circle
@@ -907,21 +893,21 @@ export default function Landing() {
                         cy="26"
                         r="21"
                         fill="none"
-                        strokeWidth="4.5"
+                        strokeWidth="5"
                         stroke={attendance.percent === null ? 'var(--border)' : STATUS_COLOR[st]}
                         strokeDasharray={`${filledCircle} ${circumference}`}
                         strokeLinecap="round"
                       />
                     </svg>
                     <div className="absolute inset-0 grid place-items-center">
-                      <span className="heading text-xs sm:text-sm font-extrabold leading-none">
+                      <span className="heading text-base sm:text-xl font-extrabold leading-none">
                         {attendance.percent === null ? '—' : `${Math.round(attendance.percent)}%`}
                       </span>
                     </div>
                   </div>
 
                   <span
-                    className="heading text-sm sm:text-base font-extrabold truncate"
+                    className="heading text-lg sm:text-[22px] font-extrabold leading-none min-w-0"
                     style={{
                       color:
                         attendance.percent === null
@@ -936,21 +922,6 @@ export default function Landing() {
                     {attendanceWord}
                   </span>
                 </div>
-
-                <p
-                  className="label mt-1.5 text-xs sm:text-[0.8125rem] font-bold truncate"
-                  style={
-                    attendance.percent === null
-                      ? { color: 'var(--muted)' }
-                      : st === 'short'
-                        ? { color: 'var(--absent-ink)' }
-                        : st === 'edge'
-                          ? { color: 'var(--warn-ink)' }
-                          : undefined
-                  }
-                >
-                  {marginText}
-                </p>
               </Link>
 
               {/* 2. NEXT MEAL */}

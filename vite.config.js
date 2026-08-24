@@ -14,10 +14,10 @@ export default defineConfig({
     tailwindcss(),
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['favicon.svg'],
+      includeAssets: ['favicon.svg', 'icon-192.png', 'icon-512.png'],
       manifest: {
         name: 'NITKKR DESK',
-        short_name: 'KKR BOARD',
+        short_name: 'DESK',
         description:
           'Timetable, roll call, mess board and campus info for NIT Kurukshetra',
         start_url: '/',
@@ -28,12 +28,13 @@ export default defineConfig({
         scope: '/',
         orientation: 'portrait-primary',
         icons: [
-          {
-            src: '/favicon.svg',
-            sizes: 'any',
-            type: 'image/svg+xml',
-            purpose: 'any maskable',
-          },
+          // PNGs first: Android's launcher ignores SVG icons, which is why the
+          // installed app fell back to a generated placeholder.
+          { src: '/icon-192.png', sizes: '192x192', type: 'image/png', purpose: 'any' },
+          { src: '/icon-512.png', sizes: '512x512', type: 'image/png', purpose: 'any' },
+          // Full-bleed gradient, so it survives any launcher mask shape.
+          { src: '/icon-512.png', sizes: '512x512', type: 'image/png', purpose: 'maskable' },
+          { src: '/favicon.svg', sizes: 'any', type: 'image/svg+xml', purpose: 'any' },
         ],
       },
     }),

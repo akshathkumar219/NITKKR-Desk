@@ -132,15 +132,17 @@ export default function Shell({ children }) {
               >
                 <span
                   className={`flex size-9 sm:size-9.5 shrink-0 items-center justify-center border-2 border-[var(--border)] font-black shadow-sm overflow-hidden ${
-                    profile.avatarEmoji ? 'text-2xl leading-none' : 'text-[0.6rem] sm:text-xs tracking-widest'
+                    profile.avatarEmoji ? 'avatar-emoji-box' : 'text-[0.6rem] sm:text-xs tracking-widest'
                   }`}
                   style={{ background: avatarBg, borderRadius: 2, color: textColor }}
                   aria-hidden
                 >
                   <span
-                    className={`inline-flex items-center justify-center leading-none select-none ${
-                      profile.avatarEmoji ? 'translate-y-[0.5px]' : ''
-                    }`}
+                    className={
+                      profile.avatarEmoji
+                        ? 'avatar-emoji'
+                        : 'inline-flex items-center justify-center leading-none select-none'
+                    }
                   >
                     {avatarOf(profile)}
                   </span>

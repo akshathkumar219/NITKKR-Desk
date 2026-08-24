@@ -717,7 +717,7 @@ export default function Attendance() {
     }
 
     text += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`
-    text += `Generated via NITKKR Desk`
+    text += `Generated via NITKKR DESK`
 
     const markCopied = () => {
       setCopiedSummary(true)

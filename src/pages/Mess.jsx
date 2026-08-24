@@ -93,7 +93,7 @@ function generateShareText(hostel, dayName, dayMenu) {
   })
 
   lines.push('\n────────────────────────')
-  lines.push('📱 Shared from NITKKR Desk')
+  lines.push('📱 Shared from NITKKR DESK')
   return lines.join('\n')
 }
 

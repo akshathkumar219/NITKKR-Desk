@@ -900,3 +900,77 @@ export function useSubjectStore(courseKey, initialMeta = {}) {
   }
 }
 
+// ---------------------------------------------------------------------------
+// One-time migration — attendance requirement 75% -> 65%
+//
+// The DEFAULT_ROLLCALL_SETTINGS / DEFAULT_SUBJECT_DATA changes above only
+// apply to a value that was never set. Anyone who used the app before the
+// institute lowered the requirement already has `required: 75` (and often
+// per-subject `targetCutoff: 75`) sitting in their own localStorage, and a
+// stored value always wins over a new default — so without this, "75%"
+// keeps showing up everywhere for existing profiles even though the code
+// itself has moved on. Runs once per browser, guarded by a flag so a
+// student who deliberately dials a subject back up to 75% later doesn't get
+// silently overridden.
+// ---------------------------------------------------------------------------
+
+const OLD_REQUIRED = 75
+const NEW_REQUIRED = 65
+
+function migrateAttendanceRequirement() {
+  if (typeof window === 'undefined') return
+  const FLAG = 'kkr.migrations.attendance65'
+  try {
+    if (localStorage.getItem(FLAG)) return
+
+    const settings = read(KEYS.rollcallSettings, null)
+    if (settings && Number(settings.required) === OLD_REQUIRED) {
+      write(KEYS.rollcallSettings, { ...settings, required: NEW_REQUIRED })
+    }
+
+    const migrateCutoff = (obj) =>
+      obj && Number(obj.targetCutoff) === OLD_REQUIRED ? { ...obj, targetCutoff: NEW_REQUIRED } : obj
+
+    const subjects = read(KEYS.subjectData, null)
+    if (subjects && typeof subjects === 'object') {
+      const next = {}
+      let changed = false
+      for (const [key, subj] of Object.entries(subjects)) {
+        const migrated = migrateCutoff(subj)
+        if (migrated !== subj) changed = true
+        next[key] = migrated
+      }
+      if (changed) write(KEYS.subjectData, next)
+    }
+
+    // Custom timetable sessions (added/moved via SessionModal) can carry
+    // their own targetCutoff override too.
+    const board = read(KEYS.board, null)
+    if (board && typeof board === 'object') {
+      const next = {}
+      let changed = false
+      for (const [key, override] of Object.entries(board)) {
+        const added = (override?.added || []).map((s) => {
+          const migrated = migrateCutoff(s)
+          if (migrated !== s) changed = true
+          return migrated
+        })
+        const moved = {}
+        for (const [id, patch] of Object.entries(override?.moved || {})) {
+          const migrated = migrateCutoff(patch)
+          if (migrated !== patch) changed = true
+          moved[id] = migrated
+        }
+        next[key] = { ...override, added, moved }
+      }
+      if (changed) write(KEYS.board, next)
+    }
+
+    localStorage.setItem(FLAG, '1')
+  } catch {
+    // Best-effort — a failed migration should never block the app loading.
+  }
+}
+
+migrateAttendanceRequirement()
+

@@ -13,6 +13,7 @@ import SubjectDetail from "../components/SubjectDetail";
 import SubjectModal from "../components/SubjectModal";
 import AddSubjectModal from "../components/AddSubjectModal";
 import { Meter, PageHeader, Ring } from "../ui";
+import { BRANCHES, branchName } from "../data/campus";
 import {
   useProfile,
   useRollcallSettings,
@@ -350,20 +351,24 @@ export default function Subjects() {
             {filteredSubjects.length === 0 ? (
               <div className="board board-hard bg-[var(--surface)] pad-page text-center flex flex-col items-center justify-center gap-3">
                 <p className="t-section">
-                  NO MATCHING SUBJECTS FOUND
+                  {subjects.length === 0 ? "NO PUBLISHED SUBJECTS" : "NO MATCHING SUBJECTS FOUND"}
                 </p>
                 <p className="t-meta muted max-w-sm">
-                  Try adjusting your search query, or add a custom course row.
+                  {subjects.length === 0
+                    ? `No subjects found for ${branchName(profile.branch)} Year ${year}. Timetable hasn't been uploaded yet.`
+                    : "Try adjusting your search query, or add a custom course row."}
                 </p>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setSearchQuery("");
-                  }}
-                  className="btn !py-1.5 !px-3 text-xs font-bold mt-2"
-                >
-                  CLEAR FILTERS
-                </button>
+                {subjects.length > 0 && searchQuery ? (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setSearchQuery("");
+                    }}
+                    className="btn !py-1.5 !px-3 text-xs font-bold mt-2"
+                  >
+                    CLEAR FILTERS
+                  </button>
+                ) : null}
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 items-stretch">

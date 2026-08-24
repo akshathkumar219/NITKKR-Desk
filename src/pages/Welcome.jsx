@@ -15,7 +15,7 @@ export default function Welcome() {
       update({ name: name.trim() })
     }
     write(KEYS.welcomed, true)
-    navigate('/select/branch', { state: { onboarding: true } })
+    navigate('/select/branch', { replace: true, state: { onboarding: true } })
   }
 
   return (

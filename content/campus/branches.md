@@ -19,3 +19,8 @@ students are using it** — their saved profile points at it. Renaming the
 | MECH  | Mechanical Engineering                  | ENGINEERING |
 | CIVIL | Civil Engineering                       | ENGINEERING |
 | PIE   | Production & Industrial                 | ENGINEERING |
+| VLSI  | Microelectronics & VLSI                 | ENGINEERING |
+| RA    | Robotics & Automation                   | ENGINEERING |
+| SE    | Sustainable Energy Technologies         | ENGINEERING |
+| ARCH  | Architecture & Planning                 | ARCHITECTURE |
+

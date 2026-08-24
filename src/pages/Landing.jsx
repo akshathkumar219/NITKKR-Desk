@@ -539,11 +539,14 @@ export default function Landing() {
       }
       return `NEXT: ${fmtRange(next.start, next.end)}${next.room ? ` · RM ${next.room}` : ''}`
     }
+    if (effectiveSessions.length === 0) {
+      return 'NO TIMETABLE UPLOADED'
+    }
     if (remaining === 0) {
       return 'ALL DONE TODAY'
     }
     return remaining === 1 ? '1 CLASS REMAINING' : `${remaining} CLASSES REMAINING`
-  }, [live, next, mins, remaining])
+  }, [live, next, mins, remaining, effectiveSessions.length])
 
   const circumference = 131.95 // 2 * Math.PI * 21
   const filledCircle =

@@ -1,7 +1,7 @@
 import { useCallback, useMemo } from 'react'
-import { KEYS, useStored } from './storage'
-import { baseTimetable } from '../data/timetables'
-import { DAYS, dayCode, minutesNow } from './time'
+import { KEYS, useStored } from './storage.js'
+import { baseTimetable } from '../data/timetables.js'
+import { DAYS, dayCode, minutesNow } from './time.js'
 
 // The "board" is the user's effective timetable: the published one for their
 // branch/year, plus their own edits layered on top.
@@ -102,10 +102,42 @@ export function filterSessionsByGroup(sessions, group) {
   })
 }
 
+/** Automatically insert break sessions if the gap between two consecutive classes on a day is > 50 minutes. */
+export function insertAutoBreaks(daySessions) {
+  if (!daySessions || daySessions.length < 2) return daySessions || []
+  const sorted = [...daySessions].sort((a, b) => a.start - b.start)
+  const out = []
+
+  for (let i = 0; i < sorted.length; i++) {
+    const cur = sorted[i]
+    if (out.length > 0) {
+      const prev = out[out.length - 1]
+      const gap = cur.start - prev.end
+      // If the time difference in 2 classes is more than 50 minutes
+      if (cur.start > prev.end && gap > 50) {
+        out.push({
+          id: `break-auto-${cur.day}-${prev.end}-${cur.start}`,
+          day: cur.day,
+          start: prev.end,
+          end: cur.start,
+          name: 'Break',
+          code: '',
+          room: '',
+          group: '',
+          type: 'break',
+        })
+      }
+    }
+    out.push(cur)
+  }
+  return out
+}
+
 /** Sessions for one weekday, chronological. */
-export function sessionsForDay(sessions, day, group) {
+export function sessionsForDay(sessions, day, group, includeAutoBreaks = false) {
   const list = group ? filterSessionsByGroup(sessions, group) : sessions
-  return list.filter((s) => s.day === day).sort((a, b) => a.start - b.start)
+  const dayList = list.filter((s) => s.day === day).sort((a, b) => a.start - b.start)
+  return includeAutoBreaks ? insertAutoBreaks(dayList) : dayList
 }
 
 /** Distinct courses (excludes breaks) — the roll-call subject list. */

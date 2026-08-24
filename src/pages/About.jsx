@@ -1,8 +1,9 @@
 import { useState } from 'react'
-import { ChevronDown, ChevronUp, Info } from 'lucide-react'
+import { Check, ChevronDown, ChevronUp, Info, RefreshCw } from 'lucide-react'
 import Shell from '../components/Shell'
 import { PageHeader, Panel } from '../ui'
 import { CREDITS, INSPIRED_BY, INSTITUTE, VERSION } from '../data/info'
+import { usePwa } from '../lib/pwa'
 
 /* Lucide dropped brand marks a while back, so these two are hand-drawn to
    match its exact stroke language (24x24, currentColor, 2px round strokes)
@@ -49,6 +50,7 @@ function InstagramIcon({ className = 'icon-sm' }) {
 export default function About() {
   const credit = CREDITS[0]
   const [showChanges, setShowChanges] = useState(false)
+  const { checkStatus, checkForUpdates, needRefresh, updateApp } = usePwa()
 
   return (
     <Shell>
@@ -62,16 +64,8 @@ export default function About() {
       <Panel className="pad-page border-l-6 border-l-[var(--color-violet)]">
         <h2 className="t-section">DISCLAIMER</h2>
         <p className="t-body font-normal mt-2">
-          If timetables, mess menus, past papers, maps, calendar dates and contact
-          numbers in this app are out of date or wrong please inform me at{' '}
-          <a
-            href="mailto:akshathkumar.work@gmail.com"
-            className="underline underline-offset-2 font-bold hover:text-[var(--color-violet)]"
-          >
-            akshathkumar.work@gmail.com
-          </a>
-          . Always verify anything important on official {INSTITUTE.short} channels
-          before acting on it.
+          This app is an unofficial student project. Timetables, mess menus, PYQs, maps, and contacts
+          may change without notice. Always verify important info on official NITKKR channels.
         </p>
       </Panel>
 
@@ -131,24 +125,56 @@ export default function About() {
       <Panel className="pad-page border-l-6 border-l-[var(--color-violet)]">
         <h2 className="t-section">VERSION</h2>
         <div className="mt-3 board pad-page">
-          <div className="flex items-center justify-between gap-3">
+          <div className="flex flex-wrap items-center justify-between gap-3">
             <div>
               <p className="t-meta muted">CURRENT VERSION</p>
               <p className="t-card-title mt-1.5" style={{ fontSize: 20 }}>{VERSION.number}</p>
             </div>
-            <button
-              type="button"
-              onClick={() => setShowChanges((prev) => !prev)}
-              aria-expanded={showChanges}
-              className="btn !py-1 !px-2.5 text-xs font-normal uppercase cursor-pointer"
-            >
-              WHAT'S NEW
-              {showChanges ? (
-                <ChevronUp className="icon-micro" strokeWidth={2.5} />
-              ) : (
-                <ChevronDown className="icon-micro" strokeWidth={2.5} />
-              )}
-            </button>
+            <div className="flex flex-wrap items-center gap-2">
+              <button
+                type="button"
+                onClick={needRefresh ? updateApp : checkForUpdates}
+                disabled={checkStatus === 'checking'}
+                className="btn !py-1 !px-2.5 text-xs font-normal uppercase cursor-pointer"
+              >
+                {checkStatus === 'checking' ? (
+                  <>
+                    <RefreshCw size={12} strokeWidth={2.5} className="animate-spin" />
+                    CHECKING...
+                  </>
+                ) : checkStatus === 'up-to-date' ? (
+                  <>
+                    <Check size={12} strokeWidth={2.5} className="text-[var(--color-present)]" />
+                    UP TO DATE
+                  </>
+                ) : needRefresh || checkStatus === 'updated' ? (
+                  <>
+                    <RefreshCw size={12} strokeWidth={2.5} className="text-[var(--color-acid)]" />
+                    UPDATE READY (RELOAD)
+                  </>
+                ) : checkStatus === 'offline' ? (
+                  'OFFLINE'
+                ) : (
+                  <>
+                    <RefreshCw size={12} strokeWidth={2.5} />
+                    CHECK FOR UPDATES
+                  </>
+                )}
+              </button>
+              <button
+                type="button"
+                onClick={() => setShowChanges((prev) => !prev)}
+                aria-expanded={showChanges}
+                className="btn !py-1 !px-2.5 text-xs font-normal uppercase cursor-pointer"
+              >
+                WHAT'S NEW
+                {showChanges ? (
+                  <ChevronUp className="icon-micro" strokeWidth={2.5} />
+                ) : (
+                  <ChevronDown className="icon-micro" strokeWidth={2.5} />
+                )}
+              </button>
+            </div>
           </div>
           {showChanges ? (
             <ul className="t-body font-normal mt-4 space-y-1.5 border-t border-[var(--border)] pt-3">

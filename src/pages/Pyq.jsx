@@ -104,6 +104,42 @@ export default function Pyq() {
 
   const examLabel = PYQ_EXAMS.find((e) => e.id === exam)?.label ?? ''
 
+  const hasAnyPapers = useMemo(() => {
+    return Object.values(PYQ_PAPERS).some((list) => Array.isArray(list) && list.length > 0)
+  }, [])
+
+  if (!hasAnyPapers) {
+    return (
+      <Shell>
+        <div className="space-y-4">
+          {/* TOP COMMAND HEADER */}
+          <Panel className="board board-hard bg-[var(--surface)] pad-page">
+            <div className="flex items-center gap-3">
+              <div
+                className="icon-tile shrink-0"
+                style={{
+                  background: 'var(--color-fuchsia)',
+                  color: 'var(--on-accent)',
+                }}
+                aria-hidden
+              >
+                <FileText className="icon-lg" strokeWidth={2.5} />
+              </div>
+              <h1 className="t-masthead text-[var(--text)]">
+                PYQS
+              </h1>
+            </div>
+          </Panel>
+
+          {/* EMPTY STATE */}
+          <Panel className="board board-hard bg-[var(--surface)] pad-page text-center py-12 sm:py-16">
+            <p className="t-section text-[var(--text)]">NO PYQS AVAILABLE RIGHT NOW</p>
+          </Panel>
+        </div>
+      </Shell>
+    )
+  }
+
   return (
     <Shell>
       <div className="space-y-4">
@@ -194,7 +230,7 @@ export default function Pyq() {
         {/* PAPER GRID */}
         {papers.length === 0 ? (
           <Panel className="board board-hard bg-[var(--surface)] pad-page text-center">
-            <p className="t-section">NO PAPERS HERE YET</p>
+            <p className="t-section text-[var(--text)]">NO PYQS AVAILABLE RIGHT NOW</p>
             <p className="t-body muted mt-2 normal-case">
               Nothing filed under {session} · {examLabel}
               {sem === 'ALL' ? '' : ` · ${sem}`}

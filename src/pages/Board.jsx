@@ -24,6 +24,7 @@ import {
   coursesOf,
   filterSessionsByGroup,
   gridBounds,
+  insertAutoBreaks,
   isLiveSession,
   nextSession,
   sessionsForDay,
@@ -562,7 +563,7 @@ function WeekGrid({ sessions, editing, onEdit, onDrop, onAddDay }) {
                   />
                 ))}
 
-                {sessionsForDay(sessions, day).map((s) => {
+                {(editing ? sessionsForDay(sessions, day) : insertAutoBreaks(sessionsForDay(sessions, day))).map((s) => {
                   const theme = getSubjectTheme(s)
                   const isBreak = s.type === 'break'
                   return (
@@ -700,8 +701,12 @@ export default function Board() {
   }, [groupFiltered, hideBreaks, query])
 
   const dayList = useMemo(() => {
-    return sessionsForDay(filtered, day)
-  }, [filtered, day])
+    const list = sessionsForDay(filtered, day)
+    if (!hideBreaks && !query.trim()) {
+      return insertAutoBreaks(list)
+    }
+    return list
+  }, [filtered, day, hideBreaks, query])
 
   // Next upcoming session today
   const nextSess = useMemo(() => {

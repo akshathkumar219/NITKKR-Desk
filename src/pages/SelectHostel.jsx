@@ -30,12 +30,18 @@ export default function SelectHostel() {
   function save() {
     update({ hostel: picked, hostelPicked: true })
     // Last step of setup — finish on the board, not the mess menu.
-    if (onboarding) navigate('/home')
+    if (onboarding) navigate('/home', { replace: true })
     else navigate(from || '/mess')
   }
 
+  const backAction =
+    from ||
+    (onboarding
+      ? () => navigate('/select/branch', { replace: true, state: { onboarding: true } })
+      : '/select/branch')
+
   return (
-    <PlainShell back={from || '/select/branch'}>
+    <PlainShell back={backAction}>
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div className="min-w-0">
           <h1 className="display text-4xl sm:text-5xl">SELECT YOUR HOSTEL</h1>

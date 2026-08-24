@@ -23,6 +23,8 @@ import NotFound from './pages/NotFound'
 import ErrorBoundary from './components/ErrorBoundary'
 import Intro from './components/Intro'
 import ThemeBurst from './components/ThemeBurst'
+import UpdatePrompt from './components/UpdatePrompt'
+import { PwaProvider } from './lib/pwa'
 import { KEYS, read, useTheme } from './lib/storage'
 
 function ScrollToTop() {
@@ -56,50 +58,53 @@ export default function App() {
   useTheme() // keeps the <html> class and theme-color meta in sync
 
   return (
-    <ErrorBoundary>
-      <ScrollToTop />
-      {/* Spider-Punk themed radial transition on theme switch */}
-      <ThemeBurst />
-      {/* Mounted at the root, not per-page: a refresh of any route earns the
-          entrance, while client-side navigation never remounts it. Returns
-          null on the loads it decides to sit out. */}
-      <Intro />
-      <Routes>
-        <Route path="/" element={<RootGate />} />
-        <Route path="/welcome" element={<Welcome />} />
+    <PwaProvider>
+      <ErrorBoundary>
+        <ScrollToTop />
+        {/* Spider-Punk themed radial transition on theme switch */}
+        <ThemeBurst />
+        {/* Mounted at the root, not per-page: a refresh of any route earns the
+            entrance, while client-side navigation never remounts it. Returns
+            null on the loads it decides to sit out. */}
+        <Intro />
+        {/* Floating PWA update toast when a new version is detected */}
+        <UpdatePrompt />
+        <Routes>
+          <Route path="/" element={<RootGate />} />
+          <Route path="/welcome" element={<Welcome />} />
 
-        <Route path="/select/branch" element={<SelectBranch />} />
-        <Route path="/select/hostel" element={<SelectHostel />} />
-        <Route path="/select/info" element={<SelectInfo />} />
+          <Route path="/select/branch" element={<SelectBranch />} />
+          <Route path="/select/hostel" element={<SelectHostel />} />
+          <Route path="/select/info" element={<SelectInfo />} />
 
-        <Route path="/home" element={<RequireWelcome><Board /></RequireWelcome>} />
-        <Route path="/mess" element={<RequireWelcome><Mess /></RequireWelcome>} />
-        <Route path="/attendance" element={<RequireWelcome><Attendance /></RequireWelcome>} />
-        <Route path="/attendance/:tabKey" element={<RequireWelcome><Attendance /></RequireWelcome>} />
-        <Route path="/attendance/*" element={<RequireWelcome><Attendance /></RequireWelcome>} />
-        <Route path="/tools" element={<RequireWelcome><Tools /></RequireWelcome>} />
-        <Route path="/pyq" element={<Pyq />} />
-        <Route path="/map" element={<CampusMap />} />
-        <Route path="/campus" element={<RequireWelcome><CampusInfo /></RequireWelcome>} />
-        <Route path="/info" element={<RequireWelcome><InfoHub /></RequireWelcome>} />
-        <Route path="/subjects" element={<RequireWelcome><Subjects /></RequireWelcome>} />
-        <Route path="/subjects/:subjectKey" element={<RequireWelcome><Subjects /></RequireWelcome>} />
-        <Route path="/subjects/*" element={<RequireWelcome><Subjects /></RequireWelcome>} />
-        <Route path="/subject/:subjectKey" element={<RequireWelcome><Subjects /></RequireWelcome>} />
-        <Route path="/calculator" element={<RequireWelcome><CalculatorPage /></RequireWelcome>} />
-        <Route path="/profile" element={<RequireWelcome><Profile /></RequireWelcome>} />
-        <Route path="/calendar" element={<RequireWelcome><CalendarPage /></RequireWelcome>} />
-        <Route path="/guide" element={<Guide />} />
-        <Route path="/about" element={<About />} />
+          <Route path="/home" element={<RequireWelcome><Board /></RequireWelcome>} />
+          <Route path="/mess" element={<RequireWelcome><Mess /></RequireWelcome>} />
+          <Route path="/attendance" element={<RequireWelcome><Attendance /></RequireWelcome>} />
+          <Route path="/attendance/:tabKey" element={<RequireWelcome><Attendance /></RequireWelcome>} />
+          <Route path="/attendance/*" element={<RequireWelcome><Attendance /></RequireWelcome>} />
+          <Route path="/tools" element={<RequireWelcome><Tools /></RequireWelcome>} />
+          <Route path="/pyq" element={<Pyq />} />
+          <Route path="/map" element={<CampusMap />} />
+          <Route path="/campus" element={<RequireWelcome><CampusInfo /></RequireWelcome>} />
+          <Route path="/info" element={<RequireWelcome><InfoHub /></RequireWelcome>} />
+          <Route path="/subjects" element={<RequireWelcome><Subjects /></RequireWelcome>} />
+          <Route path="/subjects/:subjectKey" element={<RequireWelcome><Subjects /></RequireWelcome>} />
+          <Route path="/subjects/*" element={<RequireWelcome><Subjects /></RequireWelcome>} />
+          <Route path="/subject/:subjectKey" element={<RequireWelcome><Subjects /></RequireWelcome>} />
+          <Route path="/calculator" element={<RequireWelcome><CalculatorPage /></RequireWelcome>} />
+          <Route path="/profile" element={<RequireWelcome><Profile /></RequireWelcome>} />
+          <Route path="/calendar" element={<RequireWelcome><CalendarPage /></RequireWelcome>} />
+          <Route path="/guide" element={<Guide />} />
+          <Route path="/about" element={<About />} />
 
-        {/* Legacy query-tab URLs from the reference app */}
-        <Route path="/rollcall" element={<Navigate to="/attendance" replace />} />
-        <Route path="/rollcall/:tabKey" element={<RequireWelcome><Attendance /></RequireWelcome>} />
-        <Route path="/rollcall/*" element={<RequireWelcome><Attendance /></RequireWelcome>} />
+          {/* Legacy query-tab URLs from the reference app */}
+          <Route path="/rollcall" element={<Navigate to="/attendance" replace />} />
+          <Route path="/rollcall/:tabKey" element={<RequireWelcome><Attendance /></RequireWelcome>} />
+          <Route path="/rollcall/*" element={<RequireWelcome><Attendance /></RequireWelcome>} />
 
-        <Route path="*" element={<NotFound />} />
-      </Routes>
-    </ErrorBoundary>
-
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+      </ErrorBoundary>
+    </PwaProvider>
   )
 }

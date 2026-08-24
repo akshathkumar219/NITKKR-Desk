@@ -27,7 +27,11 @@ export default function PlainShell({ children, back = -1, backLabel = 'BACK', as
         {hasTopRow ? (
           <div className="mb-8 flex flex-wrap items-center justify-between gap-3">
             {back !== null ? (
-              <button type="button" className="btn" onClick={() => navigate(back)}>
+              <button
+                type="button"
+                className="btn"
+                onClick={() => (typeof back === 'function' ? back() : navigate(back))}
+              >
                 <ArrowLeft size={15} strokeWidth={2.5} aria-hidden />
                 {backLabel}
               </button>

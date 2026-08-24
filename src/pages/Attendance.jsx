@@ -1571,8 +1571,8 @@ export default function Attendance() {
 
             {filteredCourses.length === 0 ? (
               <EmptyState
-                title="NO SUBJECTS IN THIS FILTER"
-                hint={subjectFilter === 'ALL' ? 'Add classes to your timetable board first.' : 'No subjects match this status filter.'}
+                title={courses.length === 0 ? "NO PUBLISHED SUBJECTS" : "NO SUBJECTS IN THIS FILTER"}
+                hint={courses.length === 0 ? `No timetable uploaded for ${branchName(profile.branch)} Year ${year}. Add classes to your timetable board first.` : (subjectFilter === 'ALL' ? 'Add classes to your timetable board first.' : 'No subjects match this status filter.')}
               />
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">

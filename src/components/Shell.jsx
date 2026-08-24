@@ -1,6 +1,8 @@
-import { NavLink, useNavigate } from 'react-router-dom'
+import { useState, useEffect } from 'react'
+import { NavLink, useLocation, useNavigate } from 'react-router-dom'
 
 import {
+  ArrowRight,
   Calendar,
   ClipboardCheck,
   Clock,
@@ -9,6 +11,7 @@ import {
   Repeat,
   Sun,
   UtensilsCrossed,
+  X,
 } from 'lucide-react'
 import AppHeader from './AppHeader'
 import { avatarOf, useProfile, useTheme } from '../lib/storage'
@@ -21,6 +24,24 @@ const NAV = [
   { to: '/calendar', label: 'CALENDAR', icon: Calendar },
   { to: '/info', label: 'MORE TOOLS', icon: LayoutGrid },
 ]
+
+// Global session state for mobile guide banner dismissal (persists across navigation, resets on browser reload)
+let isGuideBannerDismissed = false
+const guideBannerListeners = new Set()
+
+function setGlobalGuideBannerDismissed(dismissed) {
+  isGuideBannerDismissed = dismissed
+  guideBannerListeners.forEach((listener) => listener(dismissed))
+}
+
+function useGuideBannerDismissed() {
+  const [dismissed, setDismissed] = useState(isGuideBannerDismissed)
+  useEffect(() => {
+    guideBannerListeners.add(setDismissed)
+    return () => guideBannerListeners.delete(setDismissed)
+  }, [])
+  return [dismissed, setGlobalGuideBannerDismissed]
+}
 
 function NavItem({ to, label, icon: Icon, onNavigate }) {
   return (
@@ -45,9 +66,13 @@ export default function Shell({ children }) {
   const { profile, year } = useProfile()
   const { theme, toggle } = useTheme()
   const navigate = useNavigate()
+  const { pathname } = useLocation()
+  const [isBannerDismissed, setBannerDismissed] = useGuideBannerDismissed()
 
   const identity = `${profile.branch} · Y${year} · ${profile.hostel}`
 
+  // Show guide banner on all pages except Dashboard (/) and Guide page (/guide)
+  const showGuideBanner = !isBannerDismissed && pathname !== '/' && pathname !== '/guide'
 
   return (
     <div className="min-h-dvh lg:flex">
@@ -103,13 +128,25 @@ export default function Shell({ children }) {
 
           {/* 2 Side-by-Side Smaller Buttons: GUIDE & ABOUT */}
           <div className="grid grid-cols-2 gap-2">
-            <button
-              type="button"
-              className="btn font-bold text-xs sm:text-sm tracking-wider uppercase !justify-center cursor-pointer"
-              onClick={() => navigate('/guide')}
-            >
-              GUIDE
-            </button>
+            <div className="relative">
+              <button
+                type="button"
+                className="btn w-full font-bold text-xs sm:text-sm tracking-wider uppercase !justify-center cursor-pointer"
+                onClick={() => navigate('/guide')}
+              >
+                GUIDE
+              </button>
+              <span
+                className="sticker absolute -top-2.5 -right-2 pointer-events-none !px-1.5 !py-0.5 !text-[10.5px] !font-black !tracking-wider !leading-none z-20"
+                style={{
+                  backgroundColor: 'var(--color-lime)',
+                  color: 'var(--color-ink)',
+                  transform: 'rotate(7.5deg)',
+                }}
+              >
+                NEW
+              </span>
+            </div>
             <button
               type="button"
               className="btn font-bold text-xs sm:text-sm tracking-wider uppercase !justify-center cursor-pointer"
@@ -164,6 +201,52 @@ export default function Shell({ children }) {
         {/* Mobile top bar — shared masthead (see AppHeader) */}
         <div className="lg:hidden">
           <AppHeader variant="band" />
+
+          {/* Mobile Guide Banner Notification (Shown on all pages except Dashboard and Guide) */}
+          {showGuideBanner ? (
+            <div className="px-3 pt-3 sm:px-5">
+              <div
+                className="board board-hard flex items-center justify-between p-2 sm:p-2.5 transition-transform active:scale-[0.99] cursor-pointer"
+                style={{
+                  background: 'var(--color-lime)',
+                  color: theme === 'dark' ? '#111111' : '#ffffff',
+                }}
+                onClick={() => navigate('/guide')}
+              >
+                {/* Left: Cross Icon in a Box */}
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    setBannerDismissed(true)
+                  }}
+                  className="grid size-8 shrink-0 place-items-center border-2 border-current rounded-[3px] shadow-sm cursor-pointer transition-transform hover:scale-105 active:scale-95"
+                  style={{ color: 'inherit' }}
+                  aria-label="Dismiss Guide notification"
+                >
+                  <X size={16} strokeWidth={2.5} />
+                </button>
+
+                {/* Center: Text GUIDE (20px) */}
+                <div className="flex items-center flex-1 ml-3">
+                  <span
+                    className="font-black text-[20px] leading-none tracking-wider uppercase"
+                    style={{ color: 'inherit' }}
+                  >
+                    GUIDE
+                  </span>
+                </div>
+
+                {/* Right: Arrow in a Box */}
+                <div
+                  className="grid size-8 shrink-0 place-items-center border-2 border-current rounded-[3px] shadow-sm"
+                  style={{ color: 'inherit' }}
+                >
+                  <ArrowRight size={17} strokeWidth={2.5} />
+                </div>
+              </div>
+            </div>
+          ) : null}
         </div>
 
         <main className="world-grain relative flex-1 space-y-4 p-3 pb-24 sm:p-5 lg:pb-8">{children}</main>
@@ -192,7 +275,6 @@ export default function Shell({ children }) {
               </NavLink>
             )
           })}
-
         </nav>
       </div>
     </div>

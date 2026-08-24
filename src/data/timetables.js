@@ -18,7 +18,7 @@
 // ---------------------------------------------------------------------------
 
 import generated from './generated/timetables.json' with { type: 'json' }
-import { getSubsectionsForBranch } from './campus'
+import { getSubsectionsForBranch } from './campus.js'
 
 export const TIMETABLES = generated
 

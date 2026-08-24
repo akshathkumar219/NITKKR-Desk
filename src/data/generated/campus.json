@@ -54,6 +54,26 @@
       "code": "PIE",
       "name": "Production & Industrial",
       "group": "ENGINEERING"
+    },
+    {
+      "code": "VLSI",
+      "name": "Microelectronics & VLSI",
+      "group": "ENGINEERING"
+    },
+    {
+      "code": "RA",
+      "name": "Robotics & Automation",
+      "group": "ENGINEERING"
+    },
+    {
+      "code": "SE",
+      "name": "Sustainable Energy Technologies",
+      "group": "ENGINEERING"
+    },
+    {
+      "code": "ARCH",
+      "name": "Architecture & Planning",
+      "group": "ARCHITECTURE"
     }
   ],
   "hostels": [

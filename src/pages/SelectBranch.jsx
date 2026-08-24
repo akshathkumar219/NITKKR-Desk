@@ -3,9 +3,9 @@ import { useLocation, useNavigate } from 'react-router-dom'
 import { Check } from 'lucide-react'
 import PlainShell from '../components/PlainShell'
 import { Segmented } from '../ui'
-import { BRANCHES, YEARS, getSubsectionsForBranch } from '../data/campus'
+import { BRANCHES, YEARS } from '../data/campus'
 import { useProfile } from '../lib/storage'
-import { baseTimetable } from '../data/timetables'
+import { baseTimetable, groupsFor } from '../data/timetables'
 
 // Alphabetical by code so a branch is findable without reading the whole grid.
 const SORTED_BRANCHES = [...BRANCHES].sort((a, b) => a.code.localeCompare(b.code))
@@ -16,14 +16,15 @@ export default function SelectBranch() {
   const [pickedBranch, setPickedBranch] = useState(profile.branch)
 
   const availableSubsections = useMemo(() => {
-    return getSubsectionsForBranch(pickedBranch)
-  }, [pickedBranch])
+    const raw = groupsFor(pickedBranch, pickedYear)
+    return raw.length > 0 ? raw : ['G1', 'G2']
+  }, [pickedBranch, pickedYear])
 
   const [pickedGroup, setPickedGroup] = useState(() => {
     const key = `${profile.branch}-${year}`
     const existing = profile.groupByBranch?.[key] || (profile.branch === pickedBranch ? group : '')
-    const valid = getSubsectionsForBranch(profile.branch)
-    return valid.includes(existing) ? existing : valid[0]
+    const valid = groupsFor(profile.branch, year)
+    return valid.includes(existing) ? existing : (valid[0] || '1')
   })
 
   const navigate = useNavigate()
@@ -33,23 +34,25 @@ export default function SelectBranch() {
 
   function handleBranchChange(newBranch) {
     setPickedBranch(newBranch)
-    const valid = getSubsectionsForBranch(newBranch)
+    const valid = groupsFor(newBranch, pickedYear)
     const key = `${newBranch}-${pickedYear}`
     const saved = profile.groupByBranch?.[key]
     if (saved && valid.includes(saved)) {
       setPickedGroup(saved)
-    } else if (!valid.includes(pickedGroup)) {
-      setPickedGroup(valid[0])
+    } else {
+      setPickedGroup(valid[0] || '1')
     }
   }
 
   function handleYearChange(newYear) {
     setPickedYear(newYear)
-    const valid = getSubsectionsForBranch(pickedBranch)
+    const valid = groupsFor(pickedBranch, newYear)
     const key = `${pickedBranch}-${newYear}`
     const saved = profile.groupByBranch?.[key]
     if (saved && valid.includes(saved)) {
       setPickedGroup(saved)
+    } else {
+      setPickedGroup(valid[0] || '1')
     }
   }
 
@@ -57,12 +60,15 @@ export default function SelectBranch() {
     setBranch(pickedBranch, pickedYear, pickedGroup)
     // Mid-setup this is step 2, so hand off to the hostel step rather than the
     // board. Reached any other way (e.g. /profile) it still returns where it came from.
-    if (onboarding) navigate('/select/hostel', { state: { onboarding: true } })
+    if (onboarding) navigate('/select/hostel', { replace: true, state: { onboarding: true } })
     else navigate(from || '/home')
   }
 
+  const backAction =
+    from || (onboarding ? () => navigate('/welcome', { replace: true }) : '/welcome')
+
   return (
-    <PlainShell back={from || '/welcome'}>
+    <PlainShell back={backAction}>
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div className="min-w-0">
           <h1 className="display text-4xl sm:text-5xl">SELECT YOUR YEAR &amp; BRANCH</h1>

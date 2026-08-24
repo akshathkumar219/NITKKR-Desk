@@ -30,10 +30,22 @@ const rel = (p) => relative(ROOT, p)
 function mdFiles(dir) {
   const full = join(CONTENT, dir)
   if (!existsSync(full)) return []
-  return readdirSync(full)
-    .filter((f) => f.endsWith('.md') && !f.startsWith('_'))
-    .sort()
-    .map((f) => ({ path: join(full, f), name: basename(f, '.md') }))
+  // Recurses so files can be organised into subfolders (e.g.
+  // timetables/2nd Year/CSE-2.md) without disappearing from the build.
+  const out = []
+  const walk = (d) => {
+    for (const entry of readdirSync(d, { withFileTypes: true })) {
+      if (entry.name.startsWith('_')) continue
+      const p = join(d, entry.name)
+      if (entry.isDirectory()) walk(p)
+      else if (entry.isFile() && entry.name.endsWith('.md')) {
+        out.push({ path: p, name: basename(entry.name, '.md') })
+      }
+    }
+  }
+  walk(full)
+  out.sort((a, b) => a.path.localeCompare(b.path))
+  return out
 }
 
 function readOne(file) {

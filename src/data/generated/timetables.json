@@ -1274,7 +1274,7 @@
       {
         "day": "MON",
         "start": 695,
-        "end": 750,
+        "end": 805,
         "name": "Software Engineering Lab",
         "code": "ITPC-207 (P)",
         "room": "M 305",
@@ -1282,30 +1282,6 @@
         "instructor": "Dr. Kuldeep Kumar",
         "type": "lab",
         "id": "ljgybl"
-      },
-      {
-        "day": "MON",
-        "start": 695,
-        "end": 935,
-        "name": "Break",
-        "code": "",
-        "room": "",
-        "group": "G2",
-        "instructor": null,
-        "type": "break",
-        "id": "1sb2gkb"
-      },
-      {
-        "day": "MON",
-        "start": 750,
-        "end": 935,
-        "name": "Break",
-        "code": "",
-        "room": "",
-        "group": "G1",
-        "instructor": null,
-        "type": "break",
-        "id": "4am88v"
       },
       {
         "day": "MON",

@@ -122,7 +122,8 @@ export default function Profile() {
     a.click()
     URL.revokeObjectURL(url)
 
-    setBackupStatus({ ok: true, text: 'JSON Backup downloaded.' })
+    const n = data.summary?.modules ?? Object.keys(data.data || {}).length
+    setBackupStatus({ ok: true, text: `Backup downloaded — ${n} data module${n === 1 ? '' : 's'} saved.` })
     setTimeout(() => setBackupStatus(null), 4000)
   }
 

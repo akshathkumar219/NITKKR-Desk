@@ -6,11 +6,17 @@ import { HOSTELS } from '../data/campus'
 import { useProfile } from '../lib/storage'
 import { MESS } from '../data/mess'
 
-// Hostels are numbered, not named — sort H1..H10 numerically so H10 does not
-// land between H1 and H2 the way a plain string sort would put it.
+// The boys' hostels are numbered (H1..H10) — sort those numerically so H10
+// does not land between H1 and H2 the way a plain string sort would put it.
+// The girls' hostels are named, not numbered; they sort alphabetically by
+// name after the numbered ones.
 const SORTED_HOSTELS = [...HOSTELS].sort((a, b) => {
-  const n = (c) => Number(c.replace(/\D/g, '')) || 0
-  return n(a.code) - n(b.code) || a.code.localeCompare(b.code)
+  const digits = (c) => c.replace(/\D/g, '')
+  const aNumbered = digits(a.code).length > 0
+  const bNumbered = digits(b.code).length > 0
+  if (aNumbered && bNumbered) return Number(digits(a.code)) - Number(digits(b.code))
+  if (aNumbered !== bNumbered) return aNumbered ? -1 : 1
+  return a.name.localeCompare(b.name)
 })
 
 export default function SelectHostel() {
@@ -60,7 +66,8 @@ export default function SelectHostel() {
               className="board board-hard p-3.5 sm:p-4 text-left transition-transform hover:-translate-y-0.5"
               style={active ? { borderColor: 'var(--color-brand)', borderWidth: 3 } : undefined}
             >
-              <p className="heading text-2xl">{h.code}</p>
+              <p className="heading text-2xl">{h.name}</p>
+              {h.name !== h.code && <p className="label muted mt-1">{h.code}</p>}
               <hr className="my-3 border-t-2 border-black/10 dark:border-white/10" />
               <span
                 className="chip"

@@ -50,7 +50,7 @@ export default function CalculatorPage() {
   const [courses, setCourses] = useStored(KEYS.grades, [])
 
   // Multi-semester cumulative CGPA records stored in localStorage
-  const [semesters, setSemesters] = useStored('kkr.cgpa.semesters', DEFAULT_SEMESTERS)
+  const [semesters, setSemesters] = useStored(KEYS.cgpaSemesters, DEFAULT_SEMESTERS)
 
   // CGPA Forecaster state
   const [currentCgpaInput, setCurrentCgpaInput] = useState('')

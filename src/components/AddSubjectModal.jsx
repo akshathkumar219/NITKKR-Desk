@@ -28,10 +28,10 @@ const CREDIT_OPTIONS = [
 ]
 
 const CUTOFF_OPTIONS = [
-  { value: '75', label: '75% (Institute Standard)' },
-  { value: '80', label: '80% (Strict Theory)' },
-  { value: '85', label: '85% (Strict Lab)' },
-  { value: '65', label: '65% (Lenient)' },
+  { value: '65', label: '65% (Institute Standard)' },
+  { value: '75', label: '75% (Strict Theory)' },
+  { value: '80', label: '80% (Strict Lab)' },
+  { value: '85', label: '85% (Very Strict)' },
   { value: '0', label: '0% (Exempt / Optional)' },
 ]
 
@@ -43,7 +43,7 @@ export default function AddSubjectModal({ open, onClose, onAdd }) {
   const [instructor, setInstructor] = useState('')
   const [room, setRoom] = useState('')
   const [accent, setAccent] = useState('var(--color-sky)')
-  const [targetCutoff, setTargetCutoff] = useState('75')
+  const [targetCutoff, setTargetCutoff] = useState('65')
   const [error, setError] = useState('')
 
   function handleCategoryChange(val) {
@@ -81,7 +81,7 @@ export default function AddSubjectModal({ open, onClose, onAdd }) {
       instructor: instructor.trim().toUpperCase() || null,
       room: room.trim().toUpperCase() || 'TBD',
       accent: accent || 'var(--color-sky)',
-      targetCutoff: Number(targetCutoff) || 75,
+      targetCutoff: Number(targetCutoff) || 65,
     })
 
     setName('')

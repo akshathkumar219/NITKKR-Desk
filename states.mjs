@@ -114,7 +114,7 @@ async function newPage(theme) {
     )
     localStorage.setItem(
       'kkr.rollcall.settings',
-      JSON.stringify({ required: 75, trackingSince: '2026-08-01' }),
+      JSON.stringify({ required: 65, trackingSince: '2026-08-01' }),
     )
     localStorage.setItem(
       'kkr.grades',

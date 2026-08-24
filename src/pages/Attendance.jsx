@@ -426,7 +426,7 @@ export default function Attendance() {
   // Simulator Scope & Interactive States
   const [simScope, setSimScope] = useState('OVERALL')
   const [simSkipCount, setSimSkipCount] = useState(1)
-  const [simGoalTarget, setSimGoalTarget] = useState(75)
+  const [simGoalTarget, setSimGoalTarget] = useState(65)
   const [simForecastWeeks, setSimForecastWeeks] = useState(4)
 
 
@@ -1193,7 +1193,7 @@ export default function Attendance() {
 
                 {/* Target Goals Selector */}
                 <div className="flex items-center gap-1.5">
-                  {[75, 80, 85, 90].map((t) => (
+                  {[65, 75, 85, 90].map((t) => (
                     <button
                       key={t}
                       type="button"

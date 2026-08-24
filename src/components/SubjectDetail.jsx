@@ -51,7 +51,7 @@ export default function SubjectDetail({
     credits: subject.category === "LAB" ? "2" : "4",
     instructor: subject.instructor || "",
     accent: subject.accent || initialTheme.accent,
-    targetCutoff: String(subject.targetCutoff || "75"),
+    targetCutoff: String(subject.targetCutoff || "65"),
   });
 
 
@@ -77,7 +77,7 @@ export default function SubjectDetail({
 
   // Effective Cutoff
   const requiredCutoff =
-    Number(data.targetCutoff) || Number(rollcallSettings?.required) || 75;
+    Number(data.targetCutoff) || Number(rollcallSettings?.required) || 65;
 
   // Attendance stats calculation for this subject's sessions
   const sessionIds = useMemo(

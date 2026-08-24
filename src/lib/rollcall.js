@@ -13,7 +13,7 @@ export function markKey(iso, sessionId) {
 
 export function useRollcall() {
   const [marks, setMarks] = useStored(KEYS.rollcall, {})
-  const [adjustments, setAdjustments] = useStored('kkr.rollcall.adjustments', {})
+  const [adjustments, setAdjustments] = useStored(KEYS.rollcallAdjustments, {})
 
   const setMark = useCallback(
     (iso, sessionId, mark) =>
@@ -181,7 +181,7 @@ export const classDeficit = mustAttend
 /**
  * Simulate the resulting percentage if user skips next N classes.
  */
-export function simulateSkip(present, held, skipCount, required = 75) {
+export function simulateSkip(present, held, skipCount, required = 65) {
   const nextHeld = held + skipCount
   if (nextHeld <= 0) return { percent: null, status: 'untracked', delta: 0 }
   const nextPercent = (present / nextHeld) * 100
@@ -196,7 +196,7 @@ export function simulateSkip(present, held, skipCount, required = 75) {
 /**
  * Simulate the resulting percentage if user attends next N classes.
  */
-export function simulateAttend(present, held, attendCount, required = 75) {
+export function simulateAttend(present, held, attendCount, required = 65) {
   const nextHeld = held + attendCount
   if (nextHeld <= 0) return { percent: null, status: 'untracked', delta: 0 }
   const nextPresent = present + attendCount

@@ -18,7 +18,14 @@ export const KEYS = {
   pantry: 'kkr.pantry',
   messOverrides: 'kkr.mess.overrides',
   subjectData: 'kkr.subjects.data',
+  rollcallAdjustments: 'kkr.rollcall.adjustments',
+  cgpaSemesters: 'kkr.cgpa.semesters',
 }
+
+// Every key this app owns starts here. The backup walks the prefix rather
+// than the registry above, so a feature that adds a key without updating
+// KEYS still ends up inside the export file.
+export const KEY_PREFIX = 'kkr.'
 
 // Per-tab state. Deliberately outside KEYS: sessionStorage dies with the tab,
 // and none of it belongs in a backup.
@@ -295,7 +302,7 @@ export function useTheme() {
 // ---------------------------------------------------------------------------
 
 export const DEFAULT_ROLLCALL_SETTINGS = {
-  required: 75,
+  required: 65,
   trackingSince: '',
   baseAttendance: { present: 0, held: 0 },
 }
@@ -320,14 +327,58 @@ export function useRollcallSettings() {
 
 export function exportSnapshot() {
   const data = {}
-  for (const key of Object.values(KEYS)) {
-    const raw = localStorage.getItem(key)
-    if (raw !== null) data[key] = JSON.parse(raw)
+  // Walk localStorage by prefix, then union with the registry. The prefix
+  // catches keys added by newer features; the registry keeps the file's shape
+  // stable and legible even for modules the user has never opened.
+  try {
+    for (let i = 0; i < localStorage.length; i += 1) {
+      const key = localStorage.key(i)
+      if (!key || !key.startsWith(KEY_PREFIX)) continue
+      const raw = localStorage.getItem(key)
+      if (raw === null) continue
+      try {
+        data[key] = JSON.parse(raw)
+      } catch {
+        // A value that isn't JSON still belongs in the backup — keep it raw
+        // so a restore can put it back byte-for-byte.
+        data[key] = raw
+      }
+    }
+  } catch {
+    /* storage blocked — fall through to the registry pass below */
   }
+  for (const key of Object.values(KEYS)) {
+    if (key in data) continue
+    const raw = localStorage.getItem?.(key) ?? null
+    if (raw === null) continue
+    try {
+      data[key] = JSON.parse(raw)
+    } catch {
+      data[key] = raw
+    }
+  }
+
+  const profile = data[KEYS.profile] || {}
+  const rollcall = data[KEYS.rollcall] || {}
+
   return {
     app: 'NITKKR DESK',
-    version: 1,
+    version: 2,
     exportedAt: new Date().toISOString(),
+    // Human-readable header so the file says what it holds without being
+    // parsed. Purely descriptive — importSnapshot ignores it entirely.
+    summary: {
+      name: profile.name || '',
+      rollNo: profile.rollNo || '',
+      branch: profile.branch || '',
+      hostel: profile.hostel || '',
+      modules: Object.keys(data).length,
+      subjects: Object.keys(data[KEYS.subjectData] || {}).length,
+      attendanceDays: Object.keys(rollcall).length,
+      todos: (data[KEYS.todos] || []).length,
+      events: (data[KEYS.events] || []).length,
+      gradeRows: (data[KEYS.grades] || []).length,
+    },
     data,
   }
 }
@@ -336,15 +387,23 @@ export function importSnapshot(snapshot) {
   if (!snapshot || typeof snapshot !== 'object' || !snapshot.data) {
     throw new Error('Not a NITKKR DESK backup file.')
   }
-  const known = new Set(Object.values(KEYS))
-  let restored = 0
+  const touched = []
   for (const [key, value] of Object.entries(snapshot.data)) {
-    if (!known.has(key)) continue
-    localStorage.setItem(key, JSON.stringify(value))
-    restored += 1
+    // Prefix check, not a registry check: a backup taken on a newer build
+    // must not silently drop the keys this build doesn't know about yet.
+    if (typeof key !== 'string' || !key.startsWith(KEY_PREFIX)) continue
+    try {
+      localStorage.setItem(key, JSON.stringify(value))
+      touched.push(key)
+    } catch {
+      /* quota or blocked storage — skip this key, keep restoring the rest */
+    }
   }
-  Object.values(KEYS).forEach(emit)
-  return restored
+  if (touched.length === 0) {
+    throw new Error('That backup file had no NITKKR DESK data in it.')
+  }
+  new Set([...touched, ...Object.values(KEYS)]).forEach(emit)
+  return touched.length
 }
 
 // ---------------------------------------------------------------------------
@@ -580,7 +639,7 @@ export function useMessOverrides(hostelCode) {
 
 export const DEFAULT_SUBJECT_DATA = {
   credits: '4',
-  targetCutoff: '75',
+  targetCutoff: '65',
   instructor: '',
   cabin: '',
   email: '',

@@ -11,10 +11,10 @@ const TXT = { fontSize: 14 }
 const COLOR_PRESETS = ACCENTS.map((a) => ({ label: a.label, value: a.value, bg: a.value, text: a.ink }))
 
 const CUTOFF_OPTIONS = [
-  { value: '75', label: '75% (Institute Standard)' },
-  { value: '80', label: '80% (Strict Theory)' },
-  { value: '85', label: '85% (Strict Lab)' },
-  { value: '65', label: '65% (Lenient)' },
+  { value: '65', label: '65% (Institute Standard)' },
+  { value: '75', label: '75% (Strict Theory)' },
+  { value: '80', label: '80% (Strict Lab)' },
+  { value: '85', label: '85% (Very Strict)' },
   { value: '0', label: '0% (Exempt / Optional)' },
 ]
 
@@ -30,7 +30,7 @@ const blank = {
   accent: '',
   instructor: '',
   note: '',
-  targetCutoff: '75',
+  targetCutoff: '65',
 }
 
 function toText(mins) {
@@ -62,7 +62,7 @@ export default function SessionModal({ open, onClose, onSave, onDelete, session,
         accent: session.accent ?? '',
         instructor: session.instructor ?? '',
         note: session.note ?? '',
-        targetCutoff: String(session.targetCutoff ?? '75'),
+        targetCutoff: String(session.targetCutoff ?? '65'),
       })
     } else {
       setForm({
@@ -105,7 +105,7 @@ export default function SessionModal({ open, onClose, onSave, onDelete, session,
       accent: form.accent || '',
       instructor: form.instructor.trim(),
       note: form.note.trim(),
-      targetCutoff: form.targetCutoff ? Number(form.targetCutoff) : 75,
+      targetCutoff: form.targetCutoff ? Number(form.targetCutoff) : 65,
     })
     onClose()
   }

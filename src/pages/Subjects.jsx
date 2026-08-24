@@ -85,7 +85,7 @@ export default function Subjects() {
         const accent =
           customData.accent || firstSession.accent || theme.accent;
         const targetCutoff =
-          customData.targetCutoff || firstSession.targetCutoff || 75;
+          customData.targetCutoff || firstSession.targetCutoff || 65;
         const credits = customData.credits || (category === "LAB" ? "2" : "4");
 
 

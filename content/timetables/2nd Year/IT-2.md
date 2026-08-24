@@ -1,7 +1,7 @@
 ---
 branch: IT
 year: 2
-source: Dept. of Computer Engineering Odd Sem 2026-27 Time Table
+source: Dept. of Computer Engineering Odd Sem 2026-27 Time Table (corrected & simplified, 24 Aug 2026) — G1 = IT-1, G2 = IT-2
 ---
 
 # IT · Year 2
@@ -13,9 +13,7 @@ source: Dept. of Computer Engineering Odd Sem 2026-27 Time Table
 | 08:30 | 09:25 | Design and Analysis of Algorithms      | ITPC-201     | LHC 106 |       | Dr. Santosh Kumar     | lecture |
 | 09:25 | 10:20 | Software Engineering                   | ITPC-207     | LHC 106 |       | Dr. Kuldeep Kumar     | lecture |
 | 10:40 | 11:35 | Computer Organization and Architecture | ITPC-203     | LHC 106 |       | Dr. Priyanka Ahalawat | lecture |
-| 11:35 | 12:30 | Software Engineering Lab               | ITPC-207 (P) | M 305   | G1    | Dr. Kuldeep Kumar     | lab     |
-| 11:35 | 15:35 | Break                                  |              |         | G2    |                       | break   |
-| 12:30 | 15:35 | Break                                  |              |         | G1    |                       | break   |
+| 11:35 | 13:25 | Software Engineering Lab               | ITPC-207 (P) | M 305   | G1    | Dr. Kuldeep Kumar     | lab     |
 | 15:35 | 16:30 | Discrete Mathematics & Statistical Methods | MAIC-201 | LHC 105 |       | Dr. Pragati Sharma    | lecture |
 
 ## TUE

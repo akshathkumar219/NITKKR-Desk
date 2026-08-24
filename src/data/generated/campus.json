@@ -96,6 +96,18 @@
     {
       "code": "H10",
       "name": "H10"
+    },
+    {
+      "code": "ALK",
+      "name": "Alaknanda"
+    },
+    {
+      "code": "BHA",
+      "name": "Bhagirathi"
+    },
+    {
+      "code": "CVR",
+      "name": "Cauvery"
     }
   ]
 }

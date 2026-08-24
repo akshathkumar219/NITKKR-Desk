@@ -10,10 +10,10 @@ const TXT = { fontSize: 14 }
 const COLOR_PRESETS = ACCENTS.map((a) => ({ label: a.label, value: a.value }))
 
 const CUTOFF_OPTIONS = [
-  { value: '75', label: '75% (Institute Standard)' },
-  { value: '80', label: '80% (Strict Theory)' },
-  { value: '85', label: '85% (Strict Lab)' },
-  { value: '65', label: '65% (Lenient)' },
+  { value: '65', label: '65% (Institute Standard)' },
+  { value: '75', label: '75% (Strict Theory)' },
+  { value: '80', label: '80% (Strict Lab)' },
+  { value: '85', label: '85% (Very Strict)' },
   { value: '0', label: '0% (Exempt / Optional)' },
 ]
 
@@ -22,7 +22,7 @@ export default function SubjectModal({ open, onClose, onSave, onDelete, course }
   const [code, setCode] = useState('')
   const [instructor, setInstructor] = useState('')
   const [accent, setAccent] = useState('')
-  const [targetCutoff, setTargetCutoff] = useState('75')
+  const [targetCutoff, setTargetCutoff] = useState('65')
   const [error, setError] = useState('')
 
   useEffect(() => {
@@ -34,7 +34,7 @@ export default function SubjectModal({ open, onClose, onSave, onDelete, course }
       const firstSession = course.sessions?.[0] || {}
       setInstructor(firstSession.instructor ?? '')
       setAccent(firstSession.accent ?? '')
-      setTargetCutoff(String(firstSession.targetCutoff ?? '75'))
+      setTargetCutoff(String(firstSession.targetCutoff ?? '65'))
     }
   }, [open, course])
 

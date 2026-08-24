@@ -164,7 +164,7 @@ function SessionCard({
   session,
   mark,
   tallyData,
-  defaultRequired = 75,
+  defaultRequired = 65,
   onEdit,
   onDelete,
   onMark,
@@ -632,7 +632,7 @@ export default function Board() {
   const [modal, setModal] = useState({ open: false, session: null, day: null })
 
   const [settings] = useRollcallSettings()
-  const required = settings?.required ?? 75
+  const required = settings?.required ?? 65
   const since = settings?.trackingSince
 
   // Computes the ISO calendar date for the selected weekday in the current week

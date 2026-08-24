@@ -67,7 +67,6 @@ export default function SelectHostel() {
               style={active ? { borderColor: 'var(--color-brand)', borderWidth: 3 } : undefined}
             >
               <p className="heading text-2xl">{h.name}</p>
-              {h.name !== h.code && <p className="label muted mt-1">{h.code}</p>}
               <hr className="my-3 border-t-2 border-black/10 dark:border-white/10" />
               <span
                 className="chip"

@@ -38,8 +38,15 @@ function triggerHaptic(duration = 12) {
 const STASH_PRESETS = ['EGGS', 'COFFEE', 'MILK', 'DAHI', 'APPLES', 'POHA', 'MAGGI', 'PEANUT BUTTER']
 
 // Keywords that mark a meal's "special extra" as a highlighted treat day
-// (thicker amber outline on the extra strip in MealCard).
-const SPECIAL_EXTRA_KEYWORDS = ['RASMALAI', 'HALWA', 'JAMUN', 'SWEET', 'ICE', 'CREAM', 'CAKE']
+// (thicker amber outline on the extra strip in MealCard). General rule: any
+// sweet/dessert in the extra column should light this up, not just the
+// handful that happened to show up in the first few hostels' menus.
+const SPECIAL_EXTRA_KEYWORDS = [
+  'SWEET', 'DESSERT', 'MITHAI', 'RASGULLA', 'RASMALAI', 'JAMUN', 'KHEER',
+  'HALWA', 'BARFI', 'LADDU', 'LADOO', 'JALEBI', 'PEDA', 'RABRI', 'BASUNDI',
+  'SHRIKHAND', 'MALPUA', 'FIRNI', 'PAYASAM', 'KALAKAND', 'SANDESH', 'GUJIYA',
+  'SEVAI', 'SEVIYAN', 'SEVYA', 'ICE', 'CREAM', 'CAKE',
+]
 
 /* ----------------------------------------------------------- Meal Icon Helper ---------- */
 

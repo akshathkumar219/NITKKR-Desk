@@ -21,7 +21,7 @@ import {
 import Shell from '../components/Shell'
 import { Field, Modal, Panel } from '../ui'
 import { HOSTELS, hostelName } from '../data/campus'
-import { MEALS, isLiveMeal, menuFor } from '../data/mess'
+import { MEALS, hasHostelMenu, isLiveMeal, menuFor } from '../data/mess'
 import { useMessOverrides, usePantry, useProfile } from '../lib/storage'
 import { DAYS_7, dayCode, minutesNow } from '../lib/time'
 
@@ -445,7 +445,7 @@ function MessWeekMatrix({ hostelCode, overrides, searchQuery }) {
                             mealMatches ? 'text-[var(--text)] font-semibold' : 'text-[var(--muted)] font-normal'
                           }`}
                         >
-                          {itList.join(', ')}
+                          {itList.length > 0 ? itList.join(', ') : <span className="italic opacity-60">No dishes scheduled</span>}
                         </p>
                         {ext ? (
                           <p className="text-xs font-semibold text-[var(--warn-ink)] flex items-center gap-1.5 mt-1">
@@ -793,6 +793,25 @@ export default function Mess() {
             </div>
           </div>
         </Panel>
+
+        {!hasHostelMenu(profile.hostel) && !isCustomised ? (
+          <div className="board board-hard bg-[var(--surface)] p-3.5 sm:p-4 border-l-4 sm:border-l-[6px] border-l-[var(--color-amber)] flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <p className="font-extrabold text-sm uppercase text-[var(--text)]">NO PUBLISHED MENU FOR {hostelName(profile.hostel)}</p>
+              <p className="t-meta muted mt-0.5">The official mess schedule hasn&apos;t been uploaded yet. Click &quot;EDIT MENU&quot; to add your own dishes.</p>
+            </div>
+            <button
+              type="button"
+              onClick={() => {
+                triggerHaptic()
+                setEditing(true)
+              }}
+              className="btn btn-go !py-1.5 !px-3 text-xs font-bold shrink-0 uppercase cursor-pointer"
+            >
+              ADD DISHES
+            </button>
+          </div>
+        ) : null}
 
         {/* NATIVE SEGMENTED 7-DAY & VIEW TOOLBAR */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">

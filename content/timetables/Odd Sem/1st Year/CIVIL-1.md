@@ -30,7 +30,7 @@ source: NIT Kurukshetra 1st Semester Time Table Session 2026-27
 | 11:35 | 12:30 | Engineering Graphics                       | CEIC101      | EHFF            | 1+2+3 |               | lecture |
 | 11:35 | 13:25 | Problem Solving and Programming Using C Lab | CSIC103 (P) |                 | 4+5+6 |               | lab     |
 | 12:30 | 13:25 | Engineering Physics                        | PHIC101      | A210            | 1+2+3 | I N Bhatti    | lecture |
-| 14:40 | 15:35 | Energy and Environmental Science           | CHIC101      | L6              | 1+2+3 | Vandana Meena | lecture |
+| 15:35 | 16:30 | Energy and Environmental Science           | CHIC101      | L6              | 1+2+3 | Vandana Meena | lecture |
 | 14:40 | 15:35 | Differential Calculus and Differential Equations | MAIC101 | L6             | 4+5+6 |               | lecture |
 | 16:30 | 18:20 | NCC / Sports / Yoga / NSS / Clubs          |              |                 |       |               | other   |
 

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import {
   Bus,
   Briefcase,
@@ -13,10 +13,19 @@ import {
   Wrench,
 } from 'lucide-react'
 import Shell from '../components/Shell'
+import RestoreBackupModal from '../components/RestoreBackupModal'
 import { Chip, Field, PageHeader, Panel, Select, StatTile } from '../ui'
-import { KEYS, exportSnapshot, importSnapshot, useProfile, useStored } from '../lib/storage'
+import {
+  KEYS,
+  exportSnapshot,
+  generateExportFilename,
+  parseAndValidateSnapshot,
+  restoreSnapshot,
+  useProfile,
+  useStored,
+} from '../lib/storage'
 import { BRANCHES, HOSTELS, YEARS } from '../data/campus'
-import { currentSession, nextSession, useBoard } from '../lib/board'
+import { coursesOf, currentSession, filterSessionsByGroup, nextSession, useBoard } from '../lib/board'
 import { currentMeal, menuFor } from '../data/mess'
 import { dayCode, fmtRange, minutesNow } from '../lib/time'
 import {
@@ -38,11 +47,10 @@ const SECTIONS = [
 const GRADE_POINTS = [
   { value: '10', label: 'A+ · 10' },
   { value: '9', label: 'A · 9' },
-  { value: '8', label: 'B+ · 8' },
-  { value: '7', label: 'B · 7' },
-  { value: '6', label: 'C+ · 6' },
-  { value: '5', label: 'C · 5' },
+  { value: '8', label: 'B · 8' },
+  { value: '6', label: 'C · 6' },
   { value: '4', label: 'D · 4' },
+  { value: '2', label: 'E · 2' },
   { value: '0', label: 'F · 0' },
 ]
 
@@ -96,7 +104,53 @@ function SkipGuard() {
 /* ------------------------------------------------------------------ CGPA -- */
 
 function Cgpa() {
-  const [rows, setRows] = useStored(KEYS.grades, [])
+  const { profile, year, group } = useProfile()
+  const { sessions } = useBoard(profile.branch, year)
+  const branchKey = `${profile.branch}-${year}`
+  const [allGrades, setAllGrades] = useStored(KEYS.grades, {})
+
+  const defaultCourses = useMemo(() => {
+    const effectiveSessions = filterSessionsByGroup(sessions, group)
+    const rawCourses = coursesOf(effectiveSessions)
+    return rawCourses.map((c, i) => {
+      const isLab = c.category === 'LAB' || c.type === 'lab' || (c.name || '').toUpperCase().includes('LAB')
+      return {
+        id: `g_${c.key || c.name}_${i}`,
+        name: c.name,
+        credits: isLab ? '2' : '4',
+        grade: '9',
+      }
+    })
+  }, [sessions, group])
+
+  const rows = useMemo(() => {
+    if (allGrades && !Array.isArray(allGrades) && Array.isArray(allGrades[branchKey]) && allGrades[branchKey].length > 0) {
+      return allGrades[branchKey]
+    }
+    if (Array.isArray(allGrades) && allGrades.length > 0) {
+      return allGrades
+    }
+    return defaultCourses
+  }, [allGrades, branchKey, defaultCourses])
+
+  const setRows = useCallback(
+    (updater) => {
+      setAllGrades((prev) => {
+        const curList =
+          (!Array.isArray(prev) && Array.isArray(prev?.[branchKey]) && prev[branchKey].length > 0)
+            ? prev[branchKey]
+            : (Array.isArray(prev) && prev.length > 0)
+              ? prev
+              : defaultCourses
+        const nextList = typeof updater === 'function' ? updater(curList) : updater
+        if (Array.isArray(prev)) {
+          return { [branchKey]: nextList }
+        }
+        return { ...prev, [branchKey]: nextList }
+      })
+    },
+    [branchKey, defaultCourses, setAllGrades],
+  )
 
   const { credits, points, sgpa } = useMemo(() => {
     let c = 0
@@ -184,29 +238,47 @@ function Cgpa() {
 /* ---------------------------------------------------------------- Backup -- */
 
 function Backup() {
+  const { profile } = useProfile()
   const fileRef = useRef(null)
   const [msg, setMsg] = useState(null)
+  const [pendingRestore, setPendingRestore] = useState(null)
+  const [restoreModalOpen, setRestoreModalOpen] = useState(false)
 
   function doExport() {
-    const blob = new Blob([JSON.stringify(exportSnapshot(), null, 2)], {
+    const data = exportSnapshot()
+    const fileName = generateExportFilename(profile)
+    const blob = new Blob([JSON.stringify(data, null, 2)], {
       type: 'application/json',
     })
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
     a.href = url
-    a.download = `nitkkr-board-backup-${new Date().toISOString().slice(0, 10)}.json`
+    a.download = fileName
     a.click()
     URL.revokeObjectURL(url)
-    setMsg({ ok: true, text: 'Backup downloaded.' })
+    setMsg({ ok: true, text: `Backup exported as ${fileName}` })
   }
 
-  async function doImport(file) {
+  async function handleFileSelect(file) {
     try {
       const text = await file.text()
-      const n = importSnapshot(JSON.parse(text))
-      setMsg({ ok: true, text: `Restored ${n} section${n === 1 ? '' : 's'}.` })
+      const validated = parseAndValidateSnapshot(text)
+      setPendingRestore(validated)
+      setRestoreModalOpen(true)
     } catch (err) {
-      setMsg({ ok: false, text: err.message || 'Could not read that file.' })
+      setMsg({ ok: false, text: err.message || 'Could not parse that backup file.' })
+    }
+  }
+
+  async function handleConfirmRestore(snapshot) {
+    try {
+      restoreSnapshot(snapshot, { cleanBeforeRestore: true })
+      setRestoreModalOpen(false)
+      setPendingRestore(null)
+      window.location.reload()
+    } catch (err) {
+      setMsg({ ok: false, text: err.message || 'Could not restore backup.' })
+      setRestoreModalOpen(false)
     }
   }
 
@@ -215,25 +287,25 @@ function Backup() {
       <p className="t-meta muted">BACKUP / RESTORE</p>
       <p className="t-section mt-1">OFFLINE JSON SNAPSHOT</p>
       <p className="t-body mt-2">
-        Your board, roll call, grades and profile as one file. This is the only way to
-        recover if you clear your browser data — do it every few weeks.
+        Your entire board, subjects, roll call, grades, CGPA, to-dos and profile as one file.
+        This is the only way to recover if you clear your browser data or switch devices.
       </p>
 
       <div className="mt-4 flex flex-wrap gap-2">
-        <button type="button" className="btn btn-primary flex items-center gap-1.5" onClick={doExport}>
-          <Download className="icon-micro shrink-0" strokeWidth={2.5} /> <span>EXPORT JSON</span>
+        <button type="button" className="btn btn-primary flex items-center gap-1.5 cursor-pointer" onClick={doExport}>
+          <Download className="icon-micro shrink-0" strokeWidth={2.5} /> <span>EXPORT BACKUP</span>
         </button>
-        <button type="button" className="btn flex items-center gap-1.5" onClick={() => fileRef.current?.click()}>
-          <Upload className="icon-micro shrink-0" strokeWidth={2.5} /> <span>IMPORT JSON</span>
+        <button type="button" className="btn flex items-center gap-1.5 cursor-pointer" onClick={() => fileRef.current?.click()}>
+          <Upload className="icon-micro shrink-0" strokeWidth={2.5} /> <span>IMPORT BACKUP</span>
         </button>
         <input
           ref={fileRef}
           type="file"
-          accept="application/json,.json"
+          accept="application/json,.json,.md"
           className="hidden"
           onChange={(e) => {
             const f = e.target.files?.[0]
-            if (f) doImport(f)
+            if (f) handleFileSelect(f)
             e.target.value = ''
           }}
         />
@@ -248,6 +320,16 @@ function Backup() {
           {msg.text}
         </p>
       ) : null}
+
+      <RestoreBackupModal
+        open={restoreModalOpen}
+        onClose={() => {
+          setRestoreModalOpen(false)
+          setPendingRestore(null)
+        }}
+        backupData={pendingRestore}
+        onConfirmRestore={handleConfirmRestore}
+      />
     </Panel>
   )
 }

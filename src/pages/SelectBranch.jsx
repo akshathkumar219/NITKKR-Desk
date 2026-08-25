@@ -3,12 +3,9 @@ import { useLocation, useNavigate } from 'react-router-dom'
 import { Check } from 'lucide-react'
 import PlainShell from '../components/PlainShell'
 import { Segmented } from '../ui'
-import { BRANCHES, YEARS } from '../data/campus'
+import { BRANCHES, SORTED_BRANCHES, YEARS } from '../data/campus'
 import { useProfile } from '../lib/storage'
 import { baseTimetable, groupsFor } from '../data/timetables'
-
-// Alphabetical by code so a branch is findable without reading the whole grid.
-const SORTED_BRANCHES = [...BRANCHES].sort((a, b) => a.code.localeCompare(b.code))
 
 export default function SelectBranch() {
   const { profile, year, group, setBranch } = useProfile()
@@ -31,7 +28,6 @@ export default function SelectBranch() {
   const location = useLocation()
   const from = location.state?.from
   const onboarding = location.state?.onboarding === true
-
   function handleBranchChange(newBranch) {
     setPickedBranch(newBranch)
     const valid = groupsFor(newBranch, pickedYear)
@@ -39,6 +35,8 @@ export default function SelectBranch() {
     const saved = profile.groupByBranch?.[key]
     if (saved && valid.includes(saved)) {
       setPickedGroup(saved)
+    } else if (pickedGroup && valid.includes(pickedGroup)) {
+      setPickedGroup(pickedGroup)
     } else {
       setPickedGroup(valid[0] || '1')
     }
@@ -51,6 +49,8 @@ export default function SelectBranch() {
     const saved = profile.groupByBranch?.[key]
     if (saved && valid.includes(saved)) {
       setPickedGroup(saved)
+    } else if (pickedGroup && valid.includes(pickedGroup)) {
+      setPickedGroup(pickedGroup)
     } else {
       setPickedGroup(valid[0] || '1')
     }

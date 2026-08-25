@@ -18,11 +18,11 @@ import { avatarOf, useProfile, useTheme } from '../lib/storage'
 import { inkFor } from '../lib/palette'
 
 const NAV = [
-  { to: '/home', label: 'TIMETABLE', icon: Clock },
-  { to: '/attendance', label: 'ATTENDANCE', icon: ClipboardCheck },
-  { to: '/mess', label: 'MESS MENU', icon: UtensilsCrossed },
-  { to: '/calendar', label: 'CALENDAR', icon: Calendar },
-  { to: '/info', label: 'MORE TOOLS', icon: LayoutGrid },
+  { to: '/home', label: 'TIMETABLE', icon: Clock, color: 'var(--color-violet)' },
+  { to: '/attendance', label: 'ATTENDANCE', icon: ClipboardCheck, color: 'var(--color-coral)' },
+  { to: '/mess', label: 'MESS MENU', icon: UtensilsCrossed, color: 'var(--color-amber)' },
+  { to: '/calendar', label: 'CALENDAR', icon: Calendar, color: 'var(--color-acid)' },
+  { to: '/info', label: 'MORE TOOLS', icon: LayoutGrid, color: 'var(--color-sky)' },
 ]
 
 // Global session state for mobile guide banner dismissal (persists across navigation, resets on browser reload)
@@ -256,25 +256,23 @@ export default function Shell({ children }) {
           className="fixed inset-x-0 bottom-0 z-30 grid grid-cols-5 gap-1.5 border-t-2 border-[var(--border)] bg-[var(--bg)] p-1.5 lg:hidden"
           aria-label="Primary"
         >
-          {NAV.map(({ to, label, icon: Icon }) => {
-            const shortLabel = label.split(' ')[0]
-            return (
-              <NavLink
-                key={to}
-                to={to}
-                className={({ isActive }) =>
-                  `btn !flex-col !gap-1.5 !px-0.5 !py-1.5 !text-[0.6rem] sm:!text-xs font-black uppercase tracking-widest transition-all ${
-                    isActive
-                      ? '!bg-[var(--text)] !border-[var(--text)] !text-[var(--bg)] shadow-hard-sm'
-                      : 'hover:border-[var(--text)]'
-                  }`
-                }
-              >
-                <Icon size={16} strokeWidth={2.5} aria-hidden />
-                <span className="truncate max-w-[56px]">{shortLabel}</span>
-              </NavLink>
-            )
-          })}
+          {NAV.map(({ to, label, icon: Icon, color }) => (
+            <NavLink
+              key={to}
+              to={to}
+              aria-label={label}
+              title={label}
+              className={({ isActive }) =>
+                `btn !p-2 transition-all ${
+                  isActive
+                    ? '!bg-[var(--surface-2)] !border-[var(--text)] shadow-hard-sm'
+                    : 'hover:border-[var(--text)] opacity-75 hover:opacity-100'
+                }`
+              }
+            >
+              <Icon size={25} strokeWidth={2.5} style={{ color }} aria-hidden />
+            </NavLink>
+          ))}
         </nav>
       </div>
     </div>

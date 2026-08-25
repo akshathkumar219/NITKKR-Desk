@@ -14,18 +14,20 @@ import {
   User,
 } from 'lucide-react'
 import Shell from '../components/Shell'
+import RestoreBackupModal from '../components/RestoreBackupModal'
 import { PageHeader } from '../ui'
 import {
   initialsOf,
   exportSnapshot,
-  importSnapshot,
+  generateExportFilename,
+  parseAndValidateSnapshot,
+  restoreSnapshot,
   useCustomStatus,
   useEvents,
   useProfile,
   useTodos,
 } from '../lib/storage'
 import { branchName, hostelName } from '../data/campus'
-import { todayISO } from '../lib/time'
 import { ACCENTS, inkFor } from '../lib/palette'
 
 const EMOJI_PRESETS = ['⚡', '🚀', '🎸', '🕷️', '💀', '🔥']
@@ -36,7 +38,10 @@ const COLOR_PRESETS = [
 ]
 
 export default function Profile() {
-  const { profile, year, group, update } = useProfile()
+  const { profile, year, group, bioBranch, bioYear, bioGroup, update } = useProfile()
+  const displayBranch = bioBranch || profile.branch
+  const displayYear = bioYear || year
+  const displayGroup = bioGroup || group
   const { todos } = useTodos()
   const { events } = useEvents()
   const [customStatus] = useCustomStatus()
@@ -64,6 +69,8 @@ export default function Profile() {
   const [customEmojiInput, setCustomEmojiInput] = useState('')
   const [saved, setSaved] = useState(false)
   const [backupStatus, setBackupStatus] = useState(null)
+  const [pendingRestore, setPendingRestore] = useState(null)
+  const [restoreModalOpen, setRestoreModalOpen] = useState(false)
   const fileInputRef = useRef(null)
   const navigate = useNavigate()
 
@@ -110,43 +117,50 @@ export default function Profile() {
 
   function exportJsonBackup() {
     const data = exportSnapshot()
-    const activeName = (name.trim() || profile.name || 'STUDENT').toUpperCase().replace(/\s+/g, '_')
-    const dateStr = todayISO()
+    const effectiveProfile = {
+      ...profile,
+      name: name.trim() || profile.name,
+      rollNo: rollNo.trim() || profile.rollNo,
+    }
+    const fileName = generateExportFilename(effectiveProfile)
     const blob = new Blob([JSON.stringify(data, null, 2)], {
       type: 'application/json',
     })
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
     a.href = url
-    a.download = `NITKKR_DESK_${activeName}_BACKUP_${dateStr}.json`
+    a.download = fileName
     a.click()
     URL.revokeObjectURL(url)
 
     const n = data.summary?.modules ?? Object.keys(data.data || {}).length
-    setBackupStatus({ ok: true, text: `Backup downloaded — ${n} data module${n === 1 ? '' : 's'} saved.` })
-    setTimeout(() => setBackupStatus(null), 4000)
+    setBackupStatus({ ok: true, text: `Backup downloaded: ${fileName} (${n} modules saved).` })
+    setTimeout(() => setBackupStatus(null), 5000)
   }
 
-  async function importJsonBackup(file) {
+  async function handleFileSelect(file) {
     try {
       const text = await file.text()
-      let parsed = null
-      try {
-        parsed = JSON.parse(text)
-      } catch {
-        const jsonMatch = text.match(/```json\s*([\s\S]*?)\s*```/)
-        if (jsonMatch && jsonMatch[1]) {
-          parsed = JSON.parse(jsonMatch[1])
-        } else {
-          throw new Error('Invalid JSON file format.')
-        }
-      }
-      const count = importSnapshot(parsed)
-      setBackupStatus({ ok: true, text: `Successfully restored ${count} data modules!` })
-      setTimeout(() => setBackupStatus(null), 5000)
+      const validated = parseAndValidateSnapshot(text)
+      setPendingRestore(validated)
+      setRestoreModalOpen(true)
     } catch (err) {
-      setBackupStatus({ ok: false, text: err.message || 'Could not import that backup file.' })
-      setTimeout(() => setBackupStatus(null), 5000)
+      setBackupStatus({ ok: false, text: err.message || 'Could not parse that backup file.' })
+      setTimeout(() => setBackupStatus(null), 6000)
+    }
+  }
+
+  async function handleConfirmRestore(snapshot) {
+    try {
+      restoreSnapshot(snapshot, { cleanBeforeRestore: true })
+      setRestoreModalOpen(false)
+      setPendingRestore(null)
+      // Reload the page to cleanly reinitialize all components and hooks
+      window.location.reload()
+    } catch (err) {
+      setBackupStatus({ ok: false, text: err.message || 'Could not restore backup.' })
+      setRestoreModalOpen(false)
+      setTimeout(() => setBackupStatus(null), 6000)
     }
   }
 
@@ -262,7 +276,7 @@ export default function Profile() {
                         }}
                       >
                         <span>
-                          {branchName(profile.branch)} · YEAR {year}{group ? ` (${group})` : ''}
+                          {branchName(displayBranch)} · YEAR {displayYear}{displayGroup ? ` (${displayGroup})` : ''}
                         </span>
                       </div>
 
@@ -457,10 +471,10 @@ export default function Profile() {
                 <BookOpen className="icon-sm text-[var(--color-sky)]" />
               </div>
               <h3 className="t-card-title mt-3">
-                {branchName(profile.branch)}
+                {branchName(displayBranch)}
               </h3>
               <p className="t-meta muted mt-1">
-                ACADEMIC YEAR {year}{group ? ` · SUBSECTION ${group}` : ''}
+                ACADEMIC YEAR {displayYear}{displayGroup ? ` · SUBSECTION ${displayGroup}` : ''}
               </p>
             </div>
 
@@ -558,7 +572,7 @@ export default function Profile() {
                 className="hidden"
                 onChange={(e) => {
                   const f = e.target.files?.[0]
-                  if (f) importJsonBackup(f)
+                  if (f) handleFileSelect(f)
                   e.target.value = ''
                 }}
               />
@@ -586,6 +600,17 @@ export default function Profile() {
             </button>
           </div>
         </section>
+
+        {/* RESTORE PREVIEW & CONFIRMATION MODAL */}
+        <RestoreBackupModal
+          open={restoreModalOpen}
+          onClose={() => {
+            setRestoreModalOpen(false)
+            setPendingRestore(null)
+          }}
+          backupData={pendingRestore}
+          onConfirmRestore={handleConfirmRestore}
+        />
 
         <footer className="pt-2 text-center">
           <p className="t-meta muted">

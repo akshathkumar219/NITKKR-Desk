@@ -14,6 +14,7 @@
 import campus from './generated/campus.json' with { type: 'json' }
 
 export const BRANCHES = campus.branches
+export const SORTED_BRANCHES = [...BRANCHES].sort((a, b) => a.code.localeCompare(b.code))
 export const HOSTELS = campus.hostels
 export const YEARS = ['1', '2', '3', '4']
 

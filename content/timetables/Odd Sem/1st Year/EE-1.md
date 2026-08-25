@@ -25,10 +25,10 @@ source: NIT Kurukshetra 1st Semester Time Table Session 2026-27
 | Start | End   | Course                                     | Code         | Room            | Group | Instructor        | Type    |
 |-------|-------|--------------------------------------------|--------------|-----------------|-------|-------------------|---------|
 | 08:30 | 10:20 | Engineering Physics Lab                    | PHIC101 (P)  | Physics Dept    | 1+2+3 |                   | lab     |
-| 08:30 | 10:20 | Energy and Environmental Science Lab       | CHIC101 (P)  | Chemistry Dept  | 4+5   | Ghule Vikas       | lab     |
+| 08:30 | 10:20 | Energy and Environmental Science Lab       | CHIC101 (P)  | Chemistry Dept  | 4+5+6 | Ghule Vikas       | lab     |
 | 10:40 | 12:30 | Energy and Environmental Science Lab       | CHIC101 (P)  | Chemistry Dept  | 1+2+3 | C Prabhakar       | lab     |
 | 10:40 | 12:30 | Engineering Physics Lab                    | PHIC101 (P)  | Physics Dept    | 4+5+6 |                   | lab     |
-| 13:45 | 14:40 | Differential Calculus and Differential Equations | MAIC101 | L5             | 4+5+6 |                   | lecture |
+| 12:30 | 13:25 | Differential Calculus and Differential Equations | MAIC101 | L5             | 4+5+6 |                   | lecture |
 | 14:40 | 15:35 | Engineering Physics                        | PHIC101      | A210            | 1+2+3 |                   | lecture |
 | 14:40 | 16:30 | Problem Solving and Programming Using C Lab | CSIC103 (P) |                 | 4+5+6 | Y Srinivasa Rao   | lab     |
 | 15:35 | 16:30 | Problem Solving and Programming Using C    | CSIC103      | A321            | 1+2+3 | V V S Murty       | lecture |

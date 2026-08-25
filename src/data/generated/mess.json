@@ -746,5 +746,230 @@
         "extra": "Milk, Butter"
       }
     }
+  },
+  "H7": {
+    "MON": {
+      "breakfast": {
+        "items": [
+          "Aloo-Pyaz-Paratha (Max. 2)",
+          "Chutney",
+          "Dahi / Butter",
+          "Tea"
+        ],
+        "extra": "Milk"
+      },
+      "lunch": {
+        "items": [
+          "Aloo-Soyabean",
+          "Chana Dal",
+          "Rice",
+          "Roti",
+          "Dahi",
+          "Salad"
+        ],
+        "extra": "Ice-Cream"
+      },
+      "dinner": {
+        "items": [
+          "Kadai-Paneer",
+          "Masoor-Dal (less)",
+          "Rice",
+          "Butter",
+          "Tandoori-Naan / Missi Roti",
+          "Salad"
+        ],
+        "extra": "Milk, Butter"
+      }
+    },
+    "TUE": {
+      "breakfast": {
+        "items": [
+          "Masala-Dosa (Max. 2)",
+          "Sambhar",
+          "Coconut-Chutney",
+          "Coffee"
+        ],
+        "extra": "Milk"
+      },
+      "lunch": {
+        "items": [
+          "Kadhi-Pakoda",
+          "Aloo-Jeera",
+          "Sambhar (less)",
+          "Rice",
+          "Roti",
+          "Salad"
+        ],
+        "extra": "Ice-Cream"
+      },
+      "dinner": {
+        "items": [
+          "Lauki",
+          "Chana-Dal",
+          "Rice",
+          "Roti",
+          "Salad",
+          "Sevai"
+        ],
+        "extra": "Milk, Butter"
+      }
+    },
+    "WED": {
+      "breakfast": {
+        "items": [
+          "Chole-Kulche",
+          "Chutney",
+          "Tea",
+          "Papaya"
+        ],
+        "extra": "Milk"
+      },
+      "lunch": {
+        "items": [
+          "Aloo-Gobhi",
+          "Moong-Masoor-Dal",
+          "Boondi-Raita",
+          "Rice",
+          "Roti",
+          "Salad"
+        ],
+        "extra": "Ice-Cream"
+      },
+      "dinner": {
+        "items": [
+          "Shahi-Paneer",
+          "Chana-Dal (less)",
+          "Rice",
+          "Tandoori-Roti",
+          "Salad"
+        ],
+        "extra": "Milk, Butter"
+      }
+    },
+    "THU": {
+      "breakfast": {
+        "items": [
+          "Sandwich (Max. 3)",
+          "Tea",
+          "Banana (max. 2)"
+        ],
+        "extra": "Milk"
+      },
+      "lunch": {
+        "items": [
+          "Black-Chana-Aloo",
+          "Sambhar (less)",
+          "Rice",
+          "Roti",
+          "Dahi",
+          "Salad"
+        ],
+        "extra": "Ice-Cream"
+      },
+      "dinner": {
+        "items": [
+          "Kaddu",
+          "Arhar-Dal",
+          "Veg. Biryani",
+          "Roti",
+          "Salad",
+          "Jalebi"
+        ],
+        "extra": "Milk, Butter"
+      }
+    },
+    "FRI": {
+      "breakfast": {
+        "items": [
+          "Paneer-Paratha (Max. 2)",
+          "Chutney",
+          "Dahi / Butter",
+          "Tea"
+        ],
+        "extra": "Milk"
+      },
+      "lunch": {
+        "items": [
+          "Rajma",
+          "Rice",
+          "Lemon Rice (less)",
+          "Roti",
+          "Dahi",
+          "Salad"
+        ],
+        "extra": "Ice-Cream"
+      },
+      "dinner": {
+        "items": [
+          "Malai-Kofta",
+          "Mix-Dal (less)",
+          "Rice",
+          "Roti",
+          "Salad"
+        ],
+        "extra": "Milk, Butter, Gulab-Jamun"
+      }
+    },
+    "SAT": {
+      "breakfast": {
+        "items": [
+          "Pav-Bhaji",
+          "Sprouts",
+          "Tea"
+        ],
+        "extra": "Milk"
+      },
+      "lunch": {
+        "items": [
+          "Chole",
+          "Bhature",
+          "Rice",
+          "Lassi",
+          "Salad"
+        ],
+        "extra": "Ice-Cream"
+      },
+      "dinner": {
+        "items": [
+          "Fried-Mix-Veg.",
+          "Urad-Chana-Dal",
+          "Fried-Rice",
+          "Roti",
+          "Salad"
+        ],
+        "extra": "Milk, Butter, Rasmalai"
+      }
+    },
+    "SUN": {
+      "breakfast": {
+        "items": [
+          "Poha",
+          "Namkeen",
+          "Sprouts",
+          "Tea"
+        ],
+        "extra": "Milk"
+      },
+      "lunch": {
+        "items": [
+          "Aloo-Shimla-Mirch",
+          "Dal-Makhni",
+          "Rice",
+          "Roti",
+          "Dahi",
+          "Salad"
+        ],
+        "extra": "Ice-Cream"
+      },
+      "dinner": {
+        "items": [
+          "Aloo-Sabji",
+          "Puri",
+          "Rice",
+          "Kheer"
+        ],
+        "extra": "Milk, Butter"
+      }
+    }
   }
 }

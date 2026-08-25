@@ -70,15 +70,43 @@ export default function AttendancePanel({
           <div className="flex items-center gap-1.5">
             <button
               type="button"
-              onClick={() => adjustSubject(courseKey, 1)}
-              className="btn btn-go !py-1 !px-2.5 text-xs font-black cursor-pointer"
+              disabled={attendanceStats.held === 0 || attendanceStats.present >= attendanceStats.held}
+              onClick={() => {
+                if (attendanceStats.held === 0 || attendanceStats.present >= attendanceStats.held) return;
+                adjustSubject(courseKey, 1);
+              }}
+              className={`btn btn-go !py-1 !px-2.5 text-xs font-black ${
+                attendanceStats.held === 0 || attendanceStats.present >= attendanceStats.held
+                  ? "opacity-40 cursor-not-allowed"
+                  : "cursor-pointer"
+              }`}
+              title={
+                attendanceStats.held === 0
+                  ? "No classes recorded yet"
+                  : attendanceStats.present >= attendanceStats.held
+                    ? "Cannot exceed total classes held"
+                    : "Add 1 present class"
+              }
             >
               +1 PRESENT
             </button>
             <button
               type="button"
-              onClick={() => adjustSubject(courseKey, -1)}
-              className="btn !py-1 !px-2.5 text-xs font-bold text-red-500 hover:border-red-500 cursor-pointer"
+              disabled={attendanceStats.present <= 0}
+              onClick={() => {
+                if (attendanceStats.present <= 0) return;
+                adjustSubject(courseKey, -1);
+              }}
+              className={`btn !py-1 !px-2.5 text-xs font-bold text-red-500 hover:border-red-500 ${
+                attendanceStats.present <= 0
+                  ? "opacity-40 cursor-not-allowed"
+                  : "cursor-pointer"
+              }`}
+              title={
+                attendanceStats.present <= 0
+                  ? "Cannot subtract below 0 attended classes"
+                  : "Subtract 1 attended class"
+              }
             >
               -1 ATTENDED
             </button>

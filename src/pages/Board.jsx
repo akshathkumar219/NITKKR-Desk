@@ -17,7 +17,7 @@ import {
 import Shell from '../components/Shell'
 import SessionModal from '../components/SessionModal'
 import { Panel } from '../ui'
-import { BRANCHES, YEARS, branchName } from '../data/campus'
+import { BRANCHES, SORTED_BRANCHES, YEARS, branchName } from '../data/campus'
 import { groupsFor } from '../data/timetables'
 import { useProfile, useRollcallSettings } from '../lib/storage'
 import {
@@ -217,7 +217,6 @@ function SessionCard({
     session.code,
     session.room ? `Room ${session.room}` : null,
     session.group ? `Grp ${session.group}` : null,
-    session.instructor,
   ].filter(Boolean)
 
   return (
@@ -317,6 +316,13 @@ function SessionCard({
         {metaParts.length > 0 ? (
           <p className="t-meta muted mt-1">
             {metaParts.join(' · ')}
+          </p>
+        ) : null}
+
+        {/* Professor / Instructor Name */}
+        {session.instructor ? (
+          <p className="t-meta muted mt-0.5">
+            {session.instructor}
           </p>
         ) : null}
 
@@ -746,9 +752,9 @@ export default function Board() {
                   value={profile.branch}
                   onChange={(e) => setBranch(e.target.value)}
                 >
-                  {BRANCHES.map((b) => (
+                  {SORTED_BRANCHES.map((b) => (
                     <option key={b.code} value={b.code} className="bg-[var(--surface)] text-[var(--text)]">
-                      {b.name}
+                      {b.code}
                     </option>
                   ))}
                 </select>
@@ -765,7 +771,7 @@ export default function Board() {
                 >
                   {YEARS.map((y) => (
                     <option key={y} value={y} className="bg-[var(--surface)] text-[var(--text)]">
-                      YEAR {y}
+                      {y}
                     </option>
                   ))}
                 </select>

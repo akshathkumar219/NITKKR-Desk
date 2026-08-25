@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useCallback } from 'react'
 import {
   Calculator,
   Plus,
@@ -16,7 +16,7 @@ import {
 } from 'lucide-react'
 import Shell from '../components/Shell'
 import { KEYS, useProfile, useStored } from '../lib/storage'
-import { useBoard } from '../lib/board'
+import { coursesOf, filterSessionsByGroup, useBoard } from '../lib/board'
 
 // NIT Kurukshetra standard grading scale from CGPA.md
 const GRADE_POINTS = [
@@ -41,13 +41,61 @@ const DEFAULT_SEMESTERS = [
 ]
 
 export default function CalculatorPage() {
-  const { profile, year } = useProfile()
+  const { profile, year, group } = useProfile()
   const { sessions } = useBoard(profile.branch, year)
+  const branchKey = `${profile.branch}-${year}`
 
   const [activeTab, setActiveTab] = useState('SGPA') // 'SGPA' | 'CGPA' | 'FORECAST' | 'RULES'
 
-  // SGPA Course Rows stored in localStorage
-  const [courses, setCourses] = useStored(KEYS.grades, [])
+  // SGPA Course Rows stored in localStorage (supports per branch-year and legacy array)
+  const [allGrades, setAllGrades] = useStored(KEYS.grades, {})
+
+  // Compute default courses for active branch, year, and group
+  const defaultCoursesForBranch = useMemo(() => {
+    const effectiveSessions = filterSessionsByGroup(sessions, group)
+    const rawCourses = coursesOf(effectiveSessions)
+    return rawCourses.map((c, i) => {
+      const isLab = c.category === 'LAB' || c.type === 'lab' || (c.name || '').toUpperCase().includes('LAB')
+      return {
+        id: `c_${c.key || c.name}_${i}`,
+        code: c.code || (isLab ? 'LAB' : 'THEORY'),
+        name: c.name,
+        credits: isLab ? '2' : '4',
+        grade: 'A',
+      }
+    })
+  }, [sessions, group])
+
+  // Active courses for current branch & year
+  const courses = useMemo(() => {
+    if (allGrades && !Array.isArray(allGrades) && Array.isArray(allGrades[branchKey]) && allGrades[branchKey].length > 0) {
+      return allGrades[branchKey]
+    }
+    // Backward compatibility if grades was stored as a flat array
+    if (Array.isArray(allGrades) && allGrades.length > 0) {
+      return allGrades
+    }
+    return defaultCoursesForBranch
+  }, [allGrades, branchKey, defaultCoursesForBranch])
+
+  const setCourses = useCallback(
+    (updater) => {
+      setAllGrades((prev) => {
+        const curList =
+          (!Array.isArray(prev) && Array.isArray(prev?.[branchKey]) && prev[branchKey].length > 0)
+            ? prev[branchKey]
+            : (Array.isArray(prev) && prev.length > 0)
+              ? prev
+              : defaultCoursesForBranch
+        const nextList = typeof updater === 'function' ? updater(curList) : updater
+        if (Array.isArray(prev)) {
+          return { [branchKey]: nextList }
+        }
+        return { ...prev, [branchKey]: nextList }
+      })
+    },
+    [branchKey, defaultCoursesForBranch, setAllGrades],
+  )
 
   // Multi-semester cumulative CGPA records stored in localStorage
   const [semesters, setSemesters] = useStored(KEYS.cgpaSemesters, DEFAULT_SEMESTERS)
@@ -60,24 +108,7 @@ export default function CalculatorPage() {
 
   // Auto-fill SGPA courses from current active timetable
   const importFromTimetable = () => {
-    const map = new Map()
-    sessions.forEach((s) => {
-      if (!s.name) return
-      const key = s.name.toUpperCase().trim()
-      if (!map.has(key)) {
-        const isLab = (s.category || '').toUpperCase().includes('LAB') || s.name.toUpperCase().includes('LAB')
-        map.set(key, {
-          id: `tt_${Date.now()}_${map.size}`,
-          code: isLab ? 'LAB' : 'THEORY',
-          name: key,
-          credits: isLab ? '2' : '4',
-          grade: 'A',
-        })
-      }
-    })
-    if (map.size > 0) {
-      setCourses(Array.from(map.values()))
-    }
+    setCourses(defaultCoursesForBranch)
   }
 
   const addCourse = () => {
@@ -96,7 +127,7 @@ export default function CalculatorPage() {
   }
 
   const resetCourses = () => {
-    setCourses([])
+    setCourses(defaultCoursesForBranch)
   }
 
   // Calculate SGPA (Formula: sum(Ci * Gi) / sum(Ci))

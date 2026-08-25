@@ -19,7 +19,7 @@ source: NIT Kurukshetra 1st Semester Time Table Session 2026-27
 
 | Start | End   | Course                                     | Code         | Room            | Group | Instructor        | Type    |
 |-------|-------|--------------------------------------------|--------------|-----------------|-------|-------------------|---------|
-| 08:30 | 10:20 | Problem Solving and Programming Using C    | CSIC103      | A321            |       | R Verma           | lecture |
+| 09:25 | 10:20 | Problem Solving and Programming Using C    | CSIC103      | A321            |       | R Verma           | lecture |
 | 11:35 | 12:30 | Differential Calculus and Differential Equations | MAIC101 | L3             |       |                   | lecture |
 | 13:45 | 14:40 | Engineering Physics                        | PHIC101      | L1              |       |                   | lecture |
 | 14:40 | 15:35 | Energy and Environmental Science           | CHIC101      | L1              |       | Minati Baral      | lecture |

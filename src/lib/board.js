@@ -91,14 +91,19 @@ export function useBoard(branch, year) {
   return { sessions, addSession, removeSession, moveSession, resetBoard, isCustomised }
 }
 
-/** Filter sessions by group/batch (e.g. G1, G2). Sessions without a group apply to all. */
+/** Filter sessions by group/batch (e.g. G1, G2, A1, 1, 2). Sessions without a group apply to all. */
 export function filterSessionsByGroup(sessions, group) {
   if (!group || group === 'ALL') return sessions
-  const target = group.toUpperCase()
+  const target = group.toUpperCase().trim()
+  const targetDigits = target.replace(/\D/g, '')
   return sessions.filter((s) => {
     if (!s.group) return true
     const parts = s.group.split('+').map((g) => g.trim().toUpperCase())
-    return parts.includes(target) || s.group.toUpperCase().includes(target)
+    if (parts.includes(target) || s.group.toUpperCase().includes(target)) return true
+    if (targetDigits && (parts.includes(targetDigits) || parts.some((p) => p.replace(/\D/g, '') === targetDigits))) {
+      return true
+    }
+    return false
   })
 }
 

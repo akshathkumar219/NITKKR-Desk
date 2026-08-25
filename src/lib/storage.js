@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { DEFAULT_BRANCH, DEFAULT_HOSTEL, DEFAULT_YEAR } from '../data/campus.js'
+import { baseTimetable, groupsFor } from '../data/timetables.js'
 
 // Everything lives in this browser. No account, no server, no sync.
 // Keys are namespaced so a future export/import stays legible.
@@ -138,6 +139,9 @@ export const EMPTY_PROFILE = {
   avatarColor: 'var(--color-amber)', // custom color theme
   yearByBranch: {},
   groupByBranch: {},
+  bioBranch: '',
+  bioYear: '',
+  bioGroup: '',
   branchPicked: false,
   hostelPicked: false,
 }
@@ -154,6 +158,10 @@ export function useProfile() {
   const groupKey = `${merged.branch}-${year}`
   const group = merged.groupByBranch?.[groupKey] ?? ''
 
+  const bioBranch = merged.bioBranch || merged.branch || DEFAULT_BRANCH
+  const bioYear = String(merged.bioYear || merged.yearByBranch?.[bioBranch] || DEFAULT_YEAR)
+  const bioGroup = merged.bioGroup || merged.groupByBranch?.[`${bioBranch}-${bioYear}`] || ''
+
   const update = useCallback(
     (patch) => setProfile((p) => ({ ...EMPTY_PROFILE, ...p, ...patch })),
     [setProfile],
@@ -163,9 +171,27 @@ export function useProfile() {
     (nextYear) =>
       setProfile((p) => {
         const base = { ...EMPTY_PROFILE, ...p }
+        const currentBranch = base.branch || DEFAULT_BRANCH
+        const targetYear = String(nextYear)
+        const yearByBranch = { ...base.yearByBranch, [currentBranch]: targetYear }
+        const groupByBranch = { ...(base.groupByBranch || {}) }
+        const targetKey = `${currentBranch}-${targetYear}`
+
+        const bBranch = base.bioBranch || base.branch || DEFAULT_BRANCH
+        const bYear = String(base.bioYear || base.yearByBranch?.[bBranch] || DEFAULT_YEAR)
+        const bGroup = base.bioGroup || base.groupByBranch?.[`${bBranch}-${bYear}`] || ''
+
+        // Default to ALL ('') except when switching to the student's bio branch & year
+        if (currentBranch === bBranch && targetYear === bYear) {
+          groupByBranch[targetKey] = bGroup === 'ALL' ? '' : bGroup
+        } else {
+          groupByBranch[targetKey] = ''
+        }
+
         return {
           ...base,
-          yearByBranch: { ...base.yearByBranch, [base.branch]: String(nextYear) },
+          yearByBranch,
+          groupByBranch,
         }
       }),
     [setProfile],
@@ -177,9 +203,10 @@ export function useProfile() {
         const base = { ...EMPTY_PROFILE, ...p }
         const currentYear = base.yearByBranch[base.branch] ?? DEFAULT_YEAR
         const key = `${base.branch}-${currentYear}`
+        const cleanGroup = nextGroup === 'ALL' ? '' : (nextGroup ?? '')
         return {
           ...base,
-          groupByBranch: { ...(base.groupByBranch || {}), [key]: nextGroup },
+          groupByBranch: { ...(base.groupByBranch || {}), [key]: cleanGroup },
         }
       }),
     [setProfile],
@@ -189,13 +216,44 @@ export function useProfile() {
     (branch, nextYear, nextGroup) =>
       setProfile((p) => {
         const base = { ...EMPTY_PROFILE, ...p }
+        const prevBranch = base.branch || DEFAULT_BRANCH
+        const prevYear = base.yearByBranch[prevBranch] ?? DEFAULT_YEAR
+
         const yearByBranch = { ...base.yearByBranch }
         const groupByBranch = { ...(base.groupByBranch || {}) }
-        const effectiveYear = nextYear != null ? String(nextYear) : (yearByBranch[branch] ?? DEFAULT_YEAR)
-        if (nextYear != null) yearByBranch[branch] = effectiveYear
+
+        const effectiveYear = nextYear != null ? String(nextYear) : prevYear
+        yearByBranch[branch] = effectiveYear
+
+        const targetKey = `${branch}-${effectiveYear}`
+
+        // When nextGroup is provided (e.g. from SelectBranch/Setup save), update bio
         if (nextGroup != null) {
-          groupByBranch[`${branch}-${effectiveYear}`] = nextGroup
+          const cleanGroup = nextGroup === 'ALL' ? '' : nextGroup
+          groupByBranch[targetKey] = cleanGroup
+          return {
+            ...base,
+            branch,
+            branchPicked: true,
+            yearByBranch,
+            groupByBranch,
+            bioBranch: branch,
+            bioYear: effectiveYear,
+            bioGroup: cleanGroup,
+          }
         }
+
+        const bBranch = base.bioBranch || base.branch || DEFAULT_BRANCH
+        const bYear = String(base.bioYear || base.yearByBranch?.[bBranch] || DEFAULT_YEAR)
+        const bGroup = base.bioGroup || base.groupByBranch?.[`${bBranch}-${bYear}`] || ''
+
+        // Default to ALL ('') except when switching to the student's bio branch & year
+        if (branch === bBranch && String(effectiveYear) === String(bYear)) {
+          groupByBranch[targetKey] = bGroup === 'ALL' ? '' : bGroup
+        } else {
+          groupByBranch[targetKey] = ''
+        }
+
         return { ...base, branch, branchPicked: true, yearByBranch, groupByBranch }
       }),
     [setProfile],
@@ -205,6 +263,9 @@ export function useProfile() {
     profile: merged,
     year,
     group,
+    bioBranch,
+    bioYear,
+    bioGroup,
     initials: initialsOf(merged.name),
     avatar: avatarOf(merged),
     onboarded: merged.branchPicked,
@@ -320,16 +381,172 @@ export function useRollcallSettings() {
   return [merged, setSettings]
 }
 
-// ---------------------------------------------------------------------------
-// Backup — the only recovery path in a local-only app, so it exports
-// everything under the kkr.* namespace rather than a hand-picked list.
-// ---------------------------------------------------------------------------
+export function getCompiledActiveSubjects(
+  branch,
+  year,
+  group,
+  boardData = {},
+  subjectData = {},
+  rollcallData = {},
+  adjustmentsData = {},
+) {
+  const effectiveBranch = branch || DEFAULT_BRANCH
+  const effectiveYear = String(year || DEFAULT_YEAR)
+  const published = baseTimetable(effectiveBranch, effectiveYear)
+  const branchKey = `${effectiveBranch}-${effectiveYear}`
+  const override = boardData[branchKey] || { added: [], removed: [], moved: {} }
+  const removed = new Set(override.removed || [])
+
+  const sessions = []
+  for (const s of published) {
+    if (removed.has(s.id)) continue
+    const mv = override.moved?.[s.id]
+    sessions.push(mv ? { ...s, ...mv } : s)
+  }
+  for (const s of override.added || []) {
+    if (removed.has(s.id)) continue
+    const mv = override.moved?.[s.id]
+    sessions.push(mv ? { ...s, ...mv } : s)
+  }
+
+  const effectiveGroup = (group || '').trim().toUpperCase()
+  const groupDigits = effectiveGroup.replace(/\D/g, '')
+  const filteredSessions =
+    effectiveGroup && effectiveGroup !== 'ALL'
+      ? sessions.filter((s) => {
+          if (!s.group) return true
+          const parts = s.group.split('+').map((g) => g.trim().toUpperCase())
+          if (parts.includes(effectiveGroup) || s.group.toUpperCase().includes(effectiveGroup)) return true
+          if (groupDigits && (parts.includes(groupDigits) || parts.some((p) => p.replace(/\D/g, '') === groupDigits))) {
+            return true
+          }
+          return false
+        })
+      : sessions
+
+  const courseMap = new Map()
+  for (const s of filteredSessions) {
+    if (s.type === 'break') continue
+    const isLab = s.type === 'lab' || (s.name || '').toUpperCase().includes('LAB')
+    const baseCode = s.code || s.name || ''
+    const key = isLab
+      ? (baseCode.toUpperCase().includes('LAB') || baseCode.includes('(P)') ? baseCode : `${baseCode} (Lab)`)
+      : baseCode
+
+    if (!courseMap.has(key)) {
+      courseMap.set(key, {
+        key,
+        name: s.name,
+        code: s.code || '',
+        type: isLab ? 'lab' : (s.type || 'lecture'),
+        category: isLab ? 'LAB' : 'THEORY',
+        sessions: [],
+      })
+    }
+    courseMap.get(key).sessions.push(s)
+  }
+
+  const result = []
+  for (const [key, c] of courseMap.entries()) {
+    const custom = subjectData[key] || subjectData[c.name] || {}
+    const sessionIds = new Set(c.sessions.map((s) => s.id))
+
+    let present = 0
+    let absent = 0
+    let cancelled = 0
+    for (const [markKey, mark] of Object.entries(rollcallData)) {
+      const [, sessId] = markKey.split('|')
+      if (sessionIds.has(sessId)) {
+        if (mark === 'present') present += 1
+        else if (mark === 'absent') absent += 1
+        else if (mark === 'cancelled') cancelled += 1
+      }
+    }
+
+    const manualAdj = Number(adjustmentsData[key] || adjustmentsData[c.name] || 0)
+    const effectiveAttended = Math.max(0, present + manualAdj)
+    const held = present + absent
+    const percentage = held > 0 ? `${Math.round((effectiveAttended / held) * 1000) / 10}%` : '0%'
+
+    result.push({
+      name: c.name,
+      code: c.code || custom.code || '',
+      category: custom.category || c.category,
+      credits: custom.credits || (c.category === 'LAB' ? '2' : '4'),
+      targetCutoff: Number(custom.targetCutoff || 65),
+      instructor: custom.instructor || c.sessions[0]?.instructor || '',
+      room: custom.room || c.sessions[0]?.room || 'TBD',
+      attendance: {
+        attended: effectiveAttended,
+        held,
+        percentage,
+        cancelled,
+        manualAdjustment: manualAdj,
+      },
+      marks: custom.marks || null,
+      notes: custom.notes || '',
+      tasks: custom.tasks || [],
+      units: custom.units || [],
+      resources: custom.resources || [],
+    })
+  }
+
+  return result
+}
+
+export function getConfiguredBranches(profile, boardData = {}) {
+  const branches = []
+  const currentBranch = profile.branch || DEFAULT_BRANCH
+  const currentYear = String(profile.yearByBranch?.[currentBranch] || DEFAULT_YEAR)
+
+  const knownBranchCodes = new Set([
+    currentBranch,
+    ...Object.keys(profile.yearByBranch || {}),
+    ...Object.keys(boardData).map((k) => k.split('-')[0]),
+  ])
+
+  for (const b of knownBranchCodes) {
+    if (!b) continue
+    const yr = String(profile.yearByBranch?.[b] || DEFAULT_YEAR)
+    const grpKey = `${b}-${yr}`
+    const grp = profile.groupByBranch?.[grpKey] || ''
+    const isActive = b === currentBranch && yr === currentYear
+
+    branches.push({
+      branch: b,
+      year: yr,
+      group: grp,
+      active: isActive,
+    })
+  }
+
+  return branches
+}
+
+export function generateExportFilename(profile, date = new Date()) {
+  const cleanName = (profile?.name || '')
+    .trim()
+    .replace(/[^a-zA-Z0-9]/g, '_')
+    .replace(/_+/g, '_')
+    .toUpperCase()
+  const cleanBranch = (profile?.branch || '')
+    .trim()
+    .replace(/[^a-zA-Z0-9]/g, '_')
+    .toUpperCase()
+  const dateStr = typeof date === 'string' ? date : date.toISOString().slice(0, 10)
+
+  const parts = ['NITKKR_DESK']
+  if (cleanName) parts.push(cleanName)
+  if (cleanBranch) parts.push(cleanBranch)
+  if (!cleanName && !cleanBranch) parts.push('BACKUP')
+  parts.push(dateStr)
+
+  return `${parts.join('_')}.json`
+}
 
 export function exportSnapshot() {
   const data = {}
-  // Walk localStorage by prefix, then union with the registry. The prefix
-  // catches keys added by newer features; the registry keeps the file's shape
-  // stable and legible even for modules the user has never opened.
+  // Walk localStorage by prefix, then union with the registry.
   try {
     for (let i = 0; i < localStorage.length; i += 1) {
       const key = localStorage.key(i)
@@ -339,13 +556,11 @@ export function exportSnapshot() {
       try {
         data[key] = JSON.parse(raw)
       } catch {
-        // A value that isn't JSON still belongs in the backup — keep it raw
-        // so a restore can put it back byte-for-byte.
         data[key] = raw
       }
     }
   } catch {
-    /* storage blocked — fall through to the registry pass below */
+    /* storage blocked */
   }
   for (const key of Object.values(KEYS)) {
     if (key in data) continue
@@ -359,51 +574,183 @@ export function exportSnapshot() {
   }
 
   const profile = data[KEYS.profile] || {}
+  const year = profile.yearByBranch?.[profile.branch] ?? DEFAULT_YEAR
+  const groupKey = `${profile.branch}-${year}`
+  const group = profile.groupByBranch?.[groupKey] ?? ''
   const rollcall = data[KEYS.rollcall] || {}
+  const adjustments = data[KEYS.rollcallAdjustments] || {}
+  const cgpaSems = (data[KEYS.cgpaSemesters] || []).filter((s) => s.active || s.sgpa)
+  const subjectsData = data[KEYS.subjectData] || {}
+  const todos = data[KEYS.todos] || []
+  const events = data[KEYS.events] || []
+  const grades = data[KEYS.grades] || []
+  const board = data[KEYS.board] || {}
+  const pantry = data[KEYS.pantry]?.items || []
+
+  // Compile full human-readable subjects for the active branch & year
+  const activeBranchSubjects = getCompiledActiveSubjects(
+    profile.branch,
+    year,
+    group,
+    board,
+    subjectsData,
+    rollcall,
+    adjustments,
+  )
+
+  const configuredBranches = getConfiguredBranches(profile, board)
 
   return {
     app: 'NITKKR DESK',
-    version: 2,
+    version: 3,
     exportedAt: new Date().toISOString(),
-    // Human-readable header so the file says what it holds without being
-    // parsed. Purely descriptive — importSnapshot ignores it entirely.
     summary: {
       name: profile.name || '',
       rollNo: profile.rollNo || '',
       branch: profile.branch || '',
+      year: String(year),
+      group: group || '',
       hostel: profile.hostel || '',
+      avatarEmoji: profile.avatarEmoji || '',
+      avatarColor: profile.avatarColor || '',
       modules: Object.keys(data).length,
-      subjects: Object.keys(data[KEYS.subjectData] || {}).length,
+      activeSubjectsCount: activeBranchSubjects.length,
       attendanceDays: Object.keys(rollcall).length,
-      todos: (data[KEYS.todos] || []).length,
-      events: (data[KEYS.events] || []).length,
-      gradeRows: (data[KEYS.grades] || []).length,
+      cgpaSemesters: cgpaSems.length,
+      todos: todos.length,
+      events: events.length,
+      gradeRows: grades.length,
+      pantryItems: pantry.length,
+      boardOverrides: Object.keys(board).length,
+      configuredBranches,
+      activeSubjects: activeBranchSubjects,
     },
     data,
   }
 }
 
-export function importSnapshot(snapshot) {
-  if (!snapshot || typeof snapshot !== 'object' || !snapshot.data) {
-    throw new Error('Not a NITKKR DESK backup file.')
+export function parseAndValidateSnapshot(rawTextOrObject) {
+  let parsed = rawTextOrObject
+  if (typeof rawTextOrObject === 'string') {
+    try {
+      parsed = JSON.parse(rawTextOrObject)
+    } catch {
+      const jsonMatch = rawTextOrObject.match(/```json\s*([\s\S]*?)\s*```/)
+      if (jsonMatch && jsonMatch[1]) {
+        parsed = JSON.parse(jsonMatch[1])
+      } else {
+        throw new Error('Invalid JSON file format. Could not parse file.')
+      }
+    }
   }
+
+  if (!parsed || typeof parsed !== 'object' || !parsed.data || typeof parsed.data !== 'object') {
+    throw new Error('Not a valid NITKKR DESK backup file. Missing data payload.')
+  }
+
+  if (parsed.app !== 'NITKKR DESK') {
+    throw new Error('Invalid backup: App signature does not match NITKKR DESK.')
+  }
+
+  const data = parsed.data
+  const profile = data[KEYS.profile] || {}
+  const year = profile.yearByBranch?.[profile.branch] ?? DEFAULT_YEAR
+  const groupKey = `${profile.branch}-${year}`
+  const group = profile.groupByBranch?.[groupKey] ?? ''
+
+  const subjectsData = data[KEYS.subjectData] || {}
+  const rollcall = data[KEYS.rollcall] || {}
+  const adjustments = data[KEYS.rollcallAdjustments] || {}
+  const cgpaSems = (data[KEYS.cgpaSemesters] || []).filter((s) => s.active || s.sgpa)
+  const grades = data[KEYS.grades] || []
+  const todos = data[KEYS.todos] || []
+  const events = data[KEYS.events] || []
+  const board = data[KEYS.board] || {}
+
+  const activeSubjects =
+    parsed.summary?.activeSubjects ||
+    getCompiledActiveSubjects(
+      profile.branch,
+      year,
+      group,
+      board,
+      subjectsData,
+      rollcall,
+      adjustments,
+    )
+
+  const configuredBranches =
+    parsed.summary?.configuredBranches || getConfiguredBranches(profile, board)
+
+  const summary = {
+    name: profile.name || 'STUDENT',
+    rollNo: profile.rollNo || '',
+    branch: profile.branch || DEFAULT_BRANCH,
+    year: String(year),
+    group: group || '',
+    hostel: profile.hostel || DEFAULT_HOSTEL,
+    avatarEmoji: profile.avatarEmoji || '',
+    avatarColor: profile.avatarColor || '',
+    subjectsCount: activeSubjects.length,
+    activeSubjects,
+    configuredBranches,
+    attendanceDays: Object.keys(rollcall).length,
+    cgpaSemestersCount: cgpaSems.length,
+    gradesCount: grades.length,
+    todosCount: todos.length,
+    eventsCount: events.length,
+    boardOverridesCount: Object.keys(board).length,
+    totalKeys: Object.keys(data).filter((k) => typeof k === 'string' && k.startsWith(KEY_PREFIX)).length,
+    exportedAt: parsed.exportedAt || null,
+    version: parsed.version || 3,
+  }
+
+  return {
+    raw: parsed,
+    summary,
+  }
+}
+
+export function restoreSnapshot(snapshot, { cleanBeforeRestore = true } = {}) {
+  const { raw } = parseAndValidateSnapshot(snapshot)
+  const data = raw.data
+
+  if (cleanBeforeRestore) {
+    try {
+      const keysToRemove = []
+      for (let i = 0; i < localStorage.length; i += 1) {
+        const key = localStorage.key(i)
+        if (key && key.startsWith(KEY_PREFIX)) {
+          keysToRemove.push(key)
+        }
+      }
+      keysToRemove.forEach((k) => localStorage.removeItem(k))
+    } catch {
+      /* ignore */
+    }
+  }
+
   const touched = []
-  for (const [key, value] of Object.entries(snapshot.data)) {
-    // Prefix check, not a registry check: a backup taken on a newer build
-    // must not silently drop the keys this build doesn't know about yet.
+  for (const [key, value] of Object.entries(data)) {
     if (typeof key !== 'string' || !key.startsWith(KEY_PREFIX)) continue
     try {
       localStorage.setItem(key, JSON.stringify(value))
       touched.push(key)
     } catch {
-      /* quota or blocked storage — skip this key, keep restoring the rest */
+      /* quota or storage blocked */
     }
   }
+
   if (touched.length === 0) {
-    throw new Error('That backup file had no NITKKR DESK data in it.')
+    throw new Error('No NITKKR DESK data could be restored from that backup.')
   }
+
   new Set([...touched, ...Object.values(KEYS)]).forEach(emit)
   return touched.length
+}
+
+export function importSnapshot(snapshot) {
+  return restoreSnapshot(snapshot, { cleanBeforeRestore: true })
 }
 
 // ---------------------------------------------------------------------------

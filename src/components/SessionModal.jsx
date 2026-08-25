@@ -1,9 +1,11 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Check } from 'lucide-react'
 import { Field, Modal, Select } from '../ui'
 import { DAYS, fmtRange, parseTime } from '../lib/time'
 import { SESSION_TYPES } from '../data/campus'
 import { ACCENTS } from '../lib/palette'
+import { useProfile } from '../lib/storage'
+import { coursesOf, useBoard } from '../lib/board'
 
 // Body text in this modal is fixed at 14px (everything except the title).
 const TXT = { fontSize: 14 }
@@ -42,14 +44,47 @@ function toText(mins) {
   return `${h}:${String(m).padStart(2, '0')} ${suffix}`
 }
 
-export default function SessionModal({ open, onClose, onSave, onDelete, session, defaultDay, prefill }) {
+export default function SessionModal({ open, onClose, onSave, onDelete, session, defaultDay, prefill, courses: propCourses }) {
+  const { profile, year } = useProfile()
+  const { sessions } = useBoard(profile.branch, year)
+
+  const availableCourses = useMemo(() => {
+    if (propCourses && propCourses.length > 0) return propCourses
+    return coursesOf(sessions)
+  }, [propCourses, sessions])
+
+  const courseOptions = useMemo(() => {
+    const list = [
+      { value: '__CUSTOM__', label: '✨ CUSTOM / OTHER SUBJECT' },
+    ]
+    for (const c of availableCourses) {
+      const isLab = c.type === 'lab' || c.category === 'LAB' || (c.name || '').toUpperCase().includes('LAB')
+      const codeTag = c.code ? `<${c.code}>` : ''
+      const typeTag = isLab ? '[LAB]' : ''
+      const label = [c.name, codeTag, typeTag].filter(Boolean).join(' · ')
+      list.push({
+        value: c.key,
+        label,
+      })
+    }
+    return list
+  }, [availableCourses])
+
   const [form, setForm] = useState(blank)
+  const [selectedCourseKey, setSelectedCourseKey] = useState('__CUSTOM__')
   const [error, setError] = useState('')
 
   useEffect(() => {
     if (!open) return
     setError('')
     if (session) {
+      const matched = availableCourses.find(
+        (c) =>
+          c.key === (session.code || session.name) ||
+          (session.code && c.code === session.code) ||
+          c.name.toUpperCase() === (session.name || '').toUpperCase(),
+      )
+      setSelectedCourseKey(matched ? matched.key : '__CUSTOM__')
       setForm({
         day: session.day,
         startText: toText(session.start),
@@ -65,15 +100,41 @@ export default function SessionModal({ open, onClose, onSave, onDelete, session,
         targetCutoff: String(session.targetCutoff ?? '65'),
       })
     } else {
+      const initialPrefill = prefill || {}
+      const matched = availableCourses.find(
+        (c) =>
+          (initialPrefill.code && c.code === initialPrefill.code) ||
+          (initialPrefill.name && c.name.toUpperCase() === initialPrefill.name.toUpperCase()),
+      )
+      setSelectedCourseKey(matched ? matched.key : '__CUSTOM__')
       setForm({
         ...blank,
         day: defaultDay ?? 'MON',
-        ...(prefill || {}),
+        ...initialPrefill,
       })
     }
-  }, [open, session, defaultDay, prefill])
+  }, [open, session, defaultDay, prefill, availableCourses])
 
   const set = (patch) => setForm((f) => ({ ...f, ...patch }))
+
+  function handleSelectCourse(key) {
+    setSelectedCourseKey(key)
+    if (key === '__CUSTOM__') return
+
+    const target = availableCourses.find((c) => c.key === key)
+    if (!target) return
+    const s0 = target.sessions?.[0] || {}
+    setForm((prev) => ({
+      ...prev,
+      name: target.name,
+      code: target.code || '',
+      type: target.type || (target.category === 'LAB' ? 'lab' : 'lecture'),
+      instructor: s0.instructor || prev.instructor || '',
+      room: s0.room || prev.room || '',
+      accent: s0.accent || prev.accent || '',
+      targetCutoff: s0.targetCutoff != null ? String(s0.targetCutoff) : prev.targetCutoff || '65',
+    }))
+  }
 
   const start = parseTime(form.startText)
   const end = parseTime(form.endText)
@@ -188,13 +249,41 @@ export default function SessionModal({ open, onClose, onSave, onDelete, session,
           </p>
         ) : null}
 
+        {/* REGISTERED SUBJECT SELECTION DROPDOWN */}
+        <Field
+          label="SELECT REGISTERED SUBJECT"
+          id="s-course-preset"
+          labelStyle={TXT}
+          hint={
+            selectedCourseKey !== '__CUSTOM__'
+              ? '✓ Attendance & cutoff will automatically sync with this subject'
+              : 'Choose an enrolled subject to sync attendance, or enter custom details below.'
+          }
+          hintStyle={{ fontSize: 12 }}
+        >
+          <Select
+            id="s-course-preset"
+            options={courseOptions}
+            value={selectedCourseKey}
+            onChange={handleSelectCourse}
+            style={TXT}
+          />
+        </Field>
+
         <Field label="COURSE NAME" id="s-name" labelStyle={TXT}>
           <input
             id="s-name"
             className="field uppercase !py-2 text-xs"
             style={TXT}
             value={form.name}
-            onChange={(e) => set({ name: e.target.value.toUpperCase() })}
+            onChange={(e) => {
+              const val = e.target.value.toUpperCase()
+              set({ name: val })
+              const matched = availableCourses.find(
+                (c) => c.name.toUpperCase() === val && (form.code ? c.code === form.code : true),
+              )
+              setSelectedCourseKey(matched ? matched.key : '__CUSTOM__')
+            }}
             placeholder="DATA STRUCTURES"
           />
         </Field>
@@ -206,7 +295,14 @@ export default function SessionModal({ open, onClose, onSave, onDelete, session,
               className="field uppercase !py-2 text-xs"
               style={TXT}
               value={form.code}
-              onChange={(e) => set({ code: e.target.value.toUpperCase() })}
+              onChange={(e) => {
+                const val = e.target.value.toUpperCase()
+                set({ code: val })
+                const matched = availableCourses.find(
+                  (c) => (c.code && c.code === val) || c.name.toUpperCase() === form.name,
+                )
+                setSelectedCourseKey(matched ? matched.key : '__CUSTOM__')
+              }}
               placeholder="CSPC-201"
             />
           </Field>

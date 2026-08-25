@@ -43,13 +43,15 @@ export const MEALS = [
 export const MESS = generated
 
 /**
- * The stand-in week for hostels with no menu of their own.
+ * Check if an official menu exists for a hostel.
  */
-export const DEFAULT_WEEK = Object.values(generated)[0] ?? {}
+export function hasHostelMenu(hostel) {
+  return Boolean(MESS[hostel])
+}
 
 export function menuFor(hostel, dayKey, overrides = null) {
-  const host = MESS[hostel] ?? DEFAULT_WEEK
-  const baseDay = host[dayKey] ?? DEFAULT_WEEK.MON ?? {}
+  const host = MESS[hostel] ?? {}
+  const baseDay = host[dayKey] ?? {}
   if (!overrides || !overrides[dayKey]) return baseDay
   return {
     ...baseDay,

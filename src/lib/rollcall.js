@@ -115,14 +115,14 @@ export function tally(marks, sessionIds, since, manualAdjustment = 0, baseAttend
 
   const baseP = Number(baseAttendance?.present) || 0
   const baseH = Math.max(baseP, Number(baseAttendance?.held) || 0)
-  const baseAbsent = Math.max(0, baseH - baseP)
 
   const adj = Number(manualAdjustment) || 0
   const rawPresent = present + baseP
-  const totalPresent = Math.max(0, rawPresent + adj)
-  const extraMissed = Math.max(0, -(rawPresent + adj))
-  const totalAbsent = absent + baseAbsent + (adj < 0 && rawPresent + adj >= 0 ? -adj : extraMissed)
-  const totalHeld = Math.max(totalPresent + totalAbsent, (present + absent + baseH) + (adj > 0 ? adj : 0))
+  const rawHeld = present + absent + baseH
+
+  const totalHeld = rawHeld
+  const totalPresent = totalHeld === 0 ? 0 : Math.max(0, Math.min(totalHeld, rawPresent + adj))
+  const totalAbsent = totalHeld - totalPresent
 
   return {
     present: totalPresent,

@@ -111,7 +111,6 @@ function AttendanceRow({ session, mark, tallyData, required, onMark, onReset, on
   const metaParts = [
     session.room ? `Room ${session.room}` : null,
     session.group ? `Grp ${session.group}` : null,
-    session.instructor,
   ].filter(Boolean)
 
   return (
@@ -186,6 +185,13 @@ function AttendanceRow({ session, mark, tallyData, required, onMark, onReset, on
               </button>
             ) : null}
           </div>
+
+          {/* Professor / Instructor Name */}
+          {session.instructor ? (
+            <p className="t-meta muted mt-0.5">
+              {session.instructor}
+            </p>
+          ) : null}
 
           {/* Custom Note Reminder */}
           {session.note ? (
@@ -1686,13 +1692,19 @@ export default function Attendance() {
                             <div className="inline-flex items-center rounded border-2 border-[var(--border)] bg-[var(--surface-2)] p-0.5" title="Manual attendance adjustment (+/- classes)">
                               <button
                                 type="button"
+                                disabled={t.present <= 0}
                                 onClick={() => {
+                                  if (t.present <= 0) return
                                   triggerHaptic(10)
                                   adjustSubject(c.key, -1)
                                 }}
-                                className="h-6 w-6 sm:h-7 sm:w-7 grid place-items-center hover:bg-[var(--surface)] rounded cursor-pointer text-[var(--muted)] hover:text-[var(--text)] transition-colors font-bold"
-                                title="Subtract 1 class adjustment"
-                                aria-label="Subtract 1 class adjustment"
+                                className={`h-6 w-6 sm:h-7 sm:w-7 grid place-items-center rounded transition-colors font-bold ${
+                                  t.present <= 0
+                                    ? 'opacity-30 cursor-not-allowed text-[var(--muted)]'
+                                    : 'hover:bg-[var(--surface)] cursor-pointer text-[var(--muted)] hover:text-[var(--text)]'
+                                }`}
+                                title={t.present <= 0 ? 'Cannot subtract below 0 attended classes' : 'Subtract 1 class attended'}
+                                aria-label="Subtract 1 class attended"
                               >
                                 <Minus className="icon-micro shrink-0" strokeWidth={2.5} />
                               </button>
@@ -1701,13 +1713,25 @@ export default function Attendance() {
                               </span>
                               <button
                                 type="button"
+                                disabled={t.held === 0 || t.present >= t.held}
                                 onClick={() => {
+                                  if (t.held === 0 || t.present >= t.held) return
                                   triggerHaptic(10)
                                   adjustSubject(c.key, 1)
                                 }}
-                                className="h-6 w-6 sm:h-7 sm:w-7 grid place-items-center hover:bg-[var(--surface)] rounded cursor-pointer text-[var(--muted)] hover:text-[var(--text)] transition-colors font-bold"
-                                title="Add 1 class adjustment"
-                                aria-label="Add 1 class adjustment"
+                                className={`h-6 w-6 sm:h-7 sm:w-7 grid place-items-center rounded transition-colors font-bold ${
+                                  t.held === 0 || t.present >= t.held
+                                    ? 'opacity-30 cursor-not-allowed text-[var(--muted)]'
+                                    : 'hover:bg-[var(--surface)] cursor-pointer text-[var(--muted)] hover:text-[var(--text)]'
+                                }`}
+                                title={
+                                  t.held === 0
+                                    ? 'No classes recorded yet'
+                                    : t.present >= t.held
+                                      ? 'Cannot exceed total classes that happened'
+                                      : 'Add 1 class attended'
+                                }
+                                aria-label="Add 1 class attended"
                               >
                                 <Plus className="icon-micro shrink-0" strokeWidth={2.5} />
                               </button>

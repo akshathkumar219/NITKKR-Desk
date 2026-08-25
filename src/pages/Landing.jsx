@@ -521,11 +521,11 @@ export default function Landing() {
 
   const attendanceWord =
     attendance.percent === null
-      ? 'NOTHING LOGGED'
+      ? 'EMPTY'
       : st === 'short'
         ? 'BELOW TARGET'
         : st === 'edge'
-          ? 'CUTTING IT FINE'
+          ? 'ALMOST'
           : 'ON TRACK'
 
   const classNote = useMemo(() => {

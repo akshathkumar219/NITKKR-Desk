@@ -86,7 +86,7 @@ export default function SelectHostel() {
       </div>
 
       <p className="label muted mt-10">
-        HOSTELS WITHOUT THEIR OWN MENU FALL BACK TO A SHARED PLACEHOLDER WEEK.
+        HOSTELS WITHOUT A PUBLISHED MENU START EMPTY UNTIL YOU ADD DISHES OR AN OFFICIAL SCHEDULE IS UPLOADED.
       </p>
     </PlainShell>
   )

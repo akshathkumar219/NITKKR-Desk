@@ -34,7 +34,7 @@ export default function UpdatePrompt() {
               <p className="t-card-title text-sm uppercase tracking-wide leading-none">
                 UPDATE READY
               </p>
-              <p className="t-meta muted text-[0.6875rem] mt-1 normal-case">
+              <p className="t-meta muted text-[0.6875rem] mt-1">
                 A new version of NITKKR DESK is ready to install.
               </p>
             </div>

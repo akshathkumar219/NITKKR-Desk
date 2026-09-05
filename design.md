@@ -225,6 +225,10 @@ All typographic hierarchy and texture across the UI are achieved solely through 
 | **`.body`** | `Spartan` | `500–600` (Medium / SemiBold) | Readable session descriptions, event details, timetable items, and prose text. |
 | **`.label`** | `Spartan` | `700` (Bold + Tracking) | Timestamps, micro badges, room numbers, chip indicators, attendance percentages. |
 
+### Universal Small-Text Capitalization Rule
+> **Rule**: All text that is of size 12px or lower (`<= 12px` / `<= 0.75rem`) across the entire application **MUST ALWAYS BE UPPERCASE / CAPITAL EVERYWHERE**.
+> This includes all `text-xs`, `.t-micro`, `.t-meta` at mobile, micro badges, tags, chips, sub-labels, timestamps, and tiny hints.
+
 ### Font Scale & Sizing Rules
 
 | Typographic Level | Mobile Size (`< sm`) | Desktop Size (`lg+`) | Tailwind Class | Font Weight | Letter Spacing & Transform |
@@ -233,8 +237,8 @@ All typographic hierarchy and texture across the UI are achieved solely through 
 | **Card / Widget Title** | `13px` (`0.8125rem`) | `16px` (`1rem`) | `text-xs sm:text-base` | `800` (ExtraBold) | `tracking-normal uppercase` |
 | **Stat Figures** | `20px` (`1.25rem`) | `24px` (`1.5rem`) | `text-xl sm:text-2xl` | `800` (ExtraBold) | `tracking-tight` |
 | **Live Status Text** | `12px` (`0.75rem`) | `14px` (`0.875rem`) | `text-xs sm:text-sm` | `900` (Black) | `tracking-wide uppercase` |
-| **Body & Session Names**| `12px` (`0.75rem`) | `14px` (`0.875rem`) | `text-xs sm:text-sm` | `700` (Bold) | Normal case |
-| **Timestamps & Sub-labels** | `11px` (`0.6875rem`)| `13px` (`0.8125rem`) | `text-[0.6875rem] sm:text-xs` | `600` (SemiBold) | `tracking-wider` |
+| **Body & Session Names**| `12px` (`0.75rem`) | `14px` (`0.875rem`) | `text-xs sm:text-sm` | `700` (Bold) | `uppercase` when $\le 12$px, normal case above |
+| **Timestamps & Sub-labels** | `11px` (`0.6875rem`)| `13px` (`0.8125rem`) | `text-[0.6875rem] sm:text-xs` | `600` (SemiBold) | `tracking-wider uppercase` |
 | **Micro Badges & Chips**| `9.6px` (`0.6rem`) | `11px` (`0.7rem`) | `text-[0.6rem] sm:text-xs` | `900` (Black) | `tracking-widest uppercase` |
 
 ---
@@ -256,20 +260,19 @@ The UI is decoupled into dedicated, optimized layouts for desktop and mobile dev
 ---
 
 ## 6.2 Mobile Edition (`< lg:`)
+* **Starting Page**:
+  * On phone devices (`< 768px`), the starting page is the **Timetable** page (`/home`) rather than the dashboard.
 * **Editorial Masthead Plate**:
   ```
    [🔄] NITKKR DESK                             [AK ●] [ 🌙 ]
    ═════════════════════════════════════════════════════════════
-    ● IN SESSION NOW ✎                            FRI · 4:21 PM 
-   ─────────────────────────────────────────────────────────────
   ```
-  * Distinct from content cards: No bulky card box enclosure or offset shadow; anchored with clean editorial double rules.
+  * Clean editorial rule anchoring the top masthead.
   * Minimized profile avatar icon (`AK` with live pulsing status dot `●`).
 * **Priority Card Flow (Top to Bottom)**:
-  1. **Today's Timetable** *(Immediate class awareness above the fold)*
+  1. **Today's Timetable** *(Immediate class awareness directly below the masthead)*
   2. **Student To-Dos** *(Assignments and daily checklists)*
-  3. **2×2 Grid of Glance Cards** *(Attendance gauge, Next Meal, Classes Left, Info)*
-  4. **Calendar & Upcoming Events Board** *(Mini Month Calendar + Events list)*
+  3. **Calendar & Upcoming Events Board** *(Mini Month Calendar + Events list)*
 
 ---
 
@@ -295,3 +298,4 @@ Active states (live timetable session, on-campus status, live breaks) use two-la
 2. **Universal Contrast Rule**: Solid accent fills always use white text in Light mode and black text in Dark mode (`--on-accent`).
 3. **Universal Green Rule**: Emerald (`#16A34A`) in Light mode, Acid Green (`#36DA45`) in Dark mode.
 4. **Permanent Neobrutalist Identity**: Tactile paper cutouts, crisp 2px ink borders, solid hard shadows, and disciplined information hierarchy.
+5. **Universal Small-Text Rule**: All text of size 12px or lower (`<= 12px` / `<= 0.75rem`) is always capital (uppercase) everywhere.

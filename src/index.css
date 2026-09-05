@@ -596,6 +596,34 @@
    CSS and SVG only — §14 rules out continuously running canvas work. */
 
 @layer utilities {
+  /* ---- Universal Small-Text Capitalization Rule (design.md §5) --------
+     All text which is of size 12px or lower (<= 12px / <= 0.75rem)
+     will always be capital everywhere. */
+  .text-xs,
+  [class*="text-[0.5"],
+  [class*="text-[0.6"],
+  [class*="text-[0.7rem]"],
+  [class*="text-[0.75rem]"],
+  [class*="text-[8px]"],
+  [class*="text-[9px]"],
+  [class*="text-[10px]"],
+  [class*="text-[10.5px]"],
+  [class*="text-[11px]"],
+  [class*="text-[12px]"],
+  [class*=":text-xs"],
+  [class*=":text-[0.5"],
+  [class*=":text-[0.6"],
+  [class*=":text-[0.7rem]"],
+  [class*=":text-[0.75rem]"],
+  [class*=":text-[8px]"],
+  [class*=":text-[9px]"],
+  [class*=":text-[10px]"],
+  [class*=":text-[10.5px]"],
+  [class*=":text-[11px]"],
+  [class*=":text-[12px]"] {
+    text-transform: uppercase;
+  }
+
   .world {
     position: absolute;
     inset: 0;

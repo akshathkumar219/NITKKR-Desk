@@ -81,6 +81,16 @@ export function useBoard(branch, year) {
     [mutate],
   )
 
+  const clearBoard = useCallback(() => {
+    const published = baseTimetable(branch, year)
+    mutate((cur) => ({
+      ...cur,
+      added: [],
+      removed: [...new Set([...(cur.removed || []), ...published.map((s) => s.id)])],
+      moved: {},
+    }))
+  }, [branch, year, mutate])
+
   const resetBoard = useCallback(() => mutate(() => ({ ...emptyOverride })), [mutate])
 
   const isCustomised =
@@ -88,7 +98,7 @@ export function useBoard(branch, year) {
     override.removed.length > 0 ||
     Object.keys(override.moved).length > 0
 
-  return { sessions, addSession, removeSession, moveSession, resetBoard, isCustomised }
+  return { sessions, addSession, removeSession, moveSession, resetBoard, clearBoard, isCustomised }
 }
 
 /** Filter sessions by group/batch (e.g. G1, G2, A1, 1, 2). Sessions without a group apply to all. */

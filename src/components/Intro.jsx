@@ -13,9 +13,9 @@ const MAX_PLAYS = 5
 //   850-900   SNAP into register, overlay impact, halftone strobe flash
 //   850-1080  the wordmark card + sticker backing stamp on with chromatic jitter
 //   950-1350  "NITKKR DESK" wordmark prints in with CMYK staccato vibration
-//   1350-1800 clean hold
-//   1800      smooth fade-out
-const HOLD_MS = 1800
+//   1350-2100 clean hold
+//   2100      smooth fade-out
+const HOLD_MS = 2100
 const FADE_MS = 220
 
 function prefersReducedMotion() {

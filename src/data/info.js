@@ -303,13 +303,9 @@ export const INSPIRED_BY = {
 // --------------------------------------------------------------- version --
 
 export const VERSION = {
-  number: '1.3',
+  number: '1.4',
   changes: [
-    'Fixed timetable for 1st Year Civil, PIE, EE, Mechanical',
-    'Timetable updated for All 2nd year branches',
-    'Timetable updated for All 3rd year except Civil and VLSI',
-    'Timetable updated for 4th year - AIML, CSE, ECE, IT, Mech, MNC, PIE',
-    'Added menu of H7',
-    'Fixed Export/Import and other small bugs',
+    'Cleaned mobile layout',
+    'Fixed minor bugs',
   ],
 }

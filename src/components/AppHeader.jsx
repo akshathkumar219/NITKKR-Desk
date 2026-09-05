@@ -1,6 +1,6 @@
-import { Link, useNavigate } from 'react-router-dom'
-import { Moon, Repeat, Sun } from 'lucide-react'
-import { avatarOf, useProfile, useTheme } from '../lib/storage'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
+import { Bell, Moon, Repeat, Sun } from 'lucide-react'
+import { avatarOf, useNotifications, useProfile, useTheme } from '../lib/storage'
 import { inkFor } from '../lib/palette'
 
 /**
@@ -10,7 +10,7 @@ import { inkFor } from '../lib/palette'
  * Geometry is fixed here and identical across variants:
  *   - every control is a 34px (size-8.5) square
  *   - gap-3 between logo and wordmark, gap-2 inside the right cluster
- *   - order is always: [swap] WORDMARK ......... [theme] [avatar]
+ *   - order is always: [swap] WORDMARK ......... [theme] [avatar] [notifications]
  *   - the control row sits 16px from the top of its shell, 8px above whatever
  *     follows it, so the two headers line up when you swap between them
  *   - never sticky; it scrolls with the page
@@ -25,13 +25,16 @@ const CONTROL =
 export default function AppHeader({ variant = 'paper' }) {
   const { profile } = useProfile()
   const { theme, toggle } = useTheme()
+  const { unreadCount } = useNotifications()
   const navigate = useNavigate()
+  const { pathname } = useLocation()
 
   const band = variant === 'band'
+  const isNotifications = pathname === '/notifications'
 
   // Swap target: the band (inner pages) goes back to the dashboard, the
   // dashboard goes into the workspace.
-  const swapTo = band ? '/' : '/home'
+  const swapTo = band ? '/dashboard' : '/home'
   const swapLabel = band ? 'Go to Dashboard' : 'Open Workspace / Timetable'
   const swapBg = band ? 'var(--color-acid)' : 'var(--color-present)'
 
@@ -66,7 +69,7 @@ export default function AppHeader({ variant = 'paper' }) {
         </span>
       </div>
 
-      {/* Right: theme toggle, then avatar */}
+      {/* Right: theme toggle, avatar, then notifications */}
       <div className="flex shrink-0 items-center gap-2">
         <button
           type="button"
@@ -93,6 +96,29 @@ export default function AppHeader({ variant = 'paper' }) {
             <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[var(--color-present)] opacity-75" />
             <span className="relative inline-flex size-2.5 rounded-full border border-[var(--surface)] bg-[var(--color-present)]" />
           </span>
+        </Link>
+
+        {/* 3rd button at rightmost side: Notifications */}
+        <Link
+          to="/notifications"
+          className={`${CONTROL} relative shadow-hard-sm ${
+            isNotifications ? '!bg-[var(--text)] !text-[var(--bg)]' : ''
+          }`}
+          style={
+            !isNotifications
+              ? { background: 'var(--surface)', color: 'var(--text)' }
+              : undefined
+          }
+          title="Notifications & Updates"
+          aria-label="Notifications & Updates"
+        >
+          <Bell size={15} strokeWidth={2.5} />
+          {unreadCount > 0 && (
+            <span className="absolute -top-1 -right-1 flex size-2.5" aria-hidden>
+              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[var(--color-coral)] opacity-75" />
+              <span className="relative inline-flex size-2.5 rounded-full border border-[var(--surface)] bg-[var(--color-coral)]" />
+            </span>
+          )}
         </Link>
       </div>
     </div>

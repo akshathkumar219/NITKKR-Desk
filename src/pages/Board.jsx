@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import {
   CalendarDays,
   Check,
@@ -17,8 +17,8 @@ import {
 import Shell from '../components/Shell'
 import SessionModal from '../components/SessionModal'
 import { Panel } from '../ui'
-import { BRANCHES, SORTED_BRANCHES, YEARS, branchName } from '../data/campus'
-import { groupsFor } from '../data/timetables'
+import { SORTED_BRANCHES, YEARS, branchName } from '../data/campus'
+import { baseTimetable, groupsFor } from '../data/timetables'
 import { useProfile, useRollcallSettings } from '../lib/storage'
 import {
   coursesOf,
@@ -394,8 +394,8 @@ function SessionCard({
             type="button"
             className={`flex-1 py-1.5 text-[0.6875rem] sm:text-xs font-bold tracking-wider uppercase rounded flex items-center justify-center gap-1.5 transition-all active:scale-95 cursor-pointer ${
               mark === 'present'
-                ? '!bg-[var(--color-present)] !text-[var(--on-accent)] shadow-xs font-extrabold'
-                : 'text-[var(--text)] hover:bg-[var(--surface)]'
+                ? '!bg-[var(--color-present)] !text-[var(--on-accent)] shadow-xs font-extrabold border border-transparent'
+                : 'text-[var(--present-ink)] bg-[var(--color-present)]/10 border border-[var(--color-present)]/30 hover:bg-[var(--color-present)]/20 hover:border-[var(--color-present)]/50'
             }`}
             onMouseEnter={() => setHoverSim('present')}
             onMouseLeave={() => setHoverSim(null)}
@@ -415,8 +415,8 @@ function SessionCard({
             type="button"
             className={`flex-1 py-1.5 text-[0.6875rem] sm:text-xs font-bold tracking-wider uppercase rounded flex items-center justify-center gap-1.5 transition-all active:scale-95 cursor-pointer ${
               mark === 'absent'
-                ? '!bg-[var(--color-absent)] !text-[var(--on-accent)] shadow-xs font-extrabold'
-                : 'text-[var(--text)] hover:bg-[var(--surface)]'
+                ? '!bg-[var(--color-absent)] !text-[var(--on-accent)] shadow-xs font-extrabold border border-transparent'
+                : 'text-[var(--absent-ink)] bg-[var(--color-absent)]/10 border border-[var(--color-absent)]/30 hover:bg-[var(--color-absent)]/20 hover:border-[var(--color-absent)]/50'
             }`}
             onMouseEnter={() => setHoverSim('absent')}
             onMouseLeave={() => setHoverSim(null)}
@@ -436,8 +436,8 @@ function SessionCard({
             type="button"
             className={`py-1.5 px-2 text-[0.6875rem] sm:text-xs font-bold tracking-wider uppercase rounded flex items-center justify-center transition-all active:scale-95 cursor-pointer ${
               mark === 'cancelled'
-                ? '!bg-[var(--color-cancelled)] !text-[var(--on-accent)] shadow-xs font-extrabold'
-                : 'text-[var(--muted)] hover:text-[var(--text)] hover:bg-[var(--surface)]'
+                ? '!bg-[var(--color-cancelled)] !text-[var(--on-accent)] shadow-xs font-extrabold border border-transparent'
+                : 'text-[var(--muted)] hover:text-[var(--text)] hover:bg-[var(--surface)] border border-transparent'
             }`}
             onClick={(e) => {
               e.stopPropagation()
@@ -626,7 +626,7 @@ function WeekGrid({ sessions, editing, onEdit, onDrop, onAddDay }) {
 
 export default function Board() {
   const { profile, year, group, setBranch, setYear, setGroup } = useProfile()
-  const { sessions, addSession, removeSession, moveSession, resetBoard, isCustomised } =
+  const { sessions, addSession, removeSession, moveSession, resetBoard, clearBoard, isCustomised } =
     useBoard(profile.branch, year)
   const { marks, getMark, setMark } = useRollcall()
 
@@ -637,6 +637,16 @@ export default function Board() {
   const [editing, setEditing] = useState(false)
   const [hideBreaks, setHideBreaks] = useState(false)
   const [modal, setModal] = useState({ open: false, session: null, day: null })
+  const [resetModalOpen, setResetModalOpen] = useState(false)
+
+  useEffect(() => {
+    if (!resetModalOpen) return
+    const onKey = (e) => {
+      if (e.key === 'Escape') setResetModalOpen(false)
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [resetModalOpen])
 
   const [settings] = useRollcallSettings()
   const required = settings?.required ?? 65
@@ -828,8 +838,8 @@ export default function Board() {
               })}
             </div>
 
-            {/* View Switcher: List vs Week Grid */}
-            <div className="flex items-center gap-1.5">
+            {/* View Switcher: List vs Week Grid (DESKTOP ONLY) */}
+            <div className="hidden sm:flex items-center gap-1.5">
               <button
                 type="button"
                 className={`btn !px-2.5 !py-1.5 cursor-pointer transition-all border-2 border-[var(--border)] ${
@@ -879,66 +889,104 @@ export default function Board() {
               />
             </div>
 
-            {/* Edit & Preference Action Buttons */}
-            <div className="flex flex-wrap items-center gap-2">
-              {/* Hide Breaks Toggle */}
-              <button
-                type="button"
-                className={`btn !py-2 !px-2.5 sm:!px-3 text-xs sm:text-sm font-bold tracking-wider uppercase flex items-center gap-1.5 cursor-pointer transition-all border-2 border-[var(--border)] ${
-                  hideBreaks
-                    ? '!bg-[var(--text)] !text-[var(--bg)] !border-[var(--text)] shadow-hard-sm'
-                    : 'bg-[var(--surface-2)] text-[var(--text)] hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-hard-sm'
-                }`}
-                onClick={() => setHideBreaks(!hideBreaks)}
-                title={hideBreaks ? 'Showing teaching classes only' : 'Showing all sessions'}
-              >
-                <Coffee className="icon-micro" />
-                <span>{hideBreaks ? 'NO BREAKS' : 'ALL'}</span>
-              </button>
-
-              {editing ? (
-                <>
-                  <button
-                    type="button"
-                    className="btn !py-2 !px-3 text-xs sm:text-sm font-bold tracking-wider uppercase cursor-pointer hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-hard-sm"
-                    style={{ background: 'var(--color-sky)', color: 'var(--on-accent)' }}
-                    onClick={() => setModal({ open: true, session: null, day })}
-                  >
-                    <Plus className="icon-micro" strokeWidth={2.5} /> ADD SESSION
-                  </button>
-                  <button
-                    type="button"
-                    className="btn !py-2 !px-3 text-xs sm:text-sm font-bold tracking-wider uppercase cursor-pointer hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-hard-sm"
-                    disabled={!isCustomised}
-                    onClick={() => {
-                      if (
-                        confirm(
-                          'Reset this board to the published timetable? Your edits for this branch and year will be lost.',
-                        )
-                      ) {
-                        resetBoard()
-                      }
-                    }}
-                  >
-                    RESET BOARD
-                  </button>
-                  <button
-                    type="button"
-                    className="btn btn-go !py-2 !px-3 text-xs sm:text-sm font-bold tracking-wider uppercase cursor-pointer hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-hard-sm"
-                    onClick={() => setEditing(false)}
-                  >
-                    DONE EDITING
-                  </button>
-                </>
-              ) : (
+            {/* Edit & Preference Action Buttons + Mobile View Switcher */}
+            <div className="flex items-center justify-between sm:justify-start gap-2">
+              <div className="flex items-center gap-1.5 sm:gap-2">
+                {/* Hide Breaks Toggle */}
                 <button
                   type="button"
-                  className="btn !py-2 !px-3.5 text-xs sm:text-sm font-bold tracking-wider uppercase cursor-pointer hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-hard-sm"
-                  onClick={() => setEditing(true)}
+                  className={`btn !py-1.5 sm:!py-2 !px-2.5 sm:!px-3 text-xs sm:text-sm font-bold tracking-wider uppercase flex items-center gap-1.5 cursor-pointer transition-all border-2 border-[var(--border)] ${
+                    hideBreaks
+                      ? '!bg-[var(--text)] !text-[var(--bg)] !border-[var(--text)] shadow-hard-sm'
+                      : 'bg-[var(--surface-2)] text-[var(--text)] hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-hard-sm'
+                  }`}
+                  onClick={() => setHideBreaks(!hideBreaks)}
+                  title={hideBreaks ? 'Showing teaching classes only' : 'Showing all sessions'}
                 >
-                  EDIT TIMETABLE
+                  <Coffee className="icon-micro" />
+                  <span>{hideBreaks ? 'NO BREAKS' : 'ALL'}</span>
                 </button>
-              )}
+
+                {editing ? (
+                  <>
+                    {/* Sequence: tick, +, reset */}
+                    {/* 1. Tick for done */}
+                    <button
+                      type="button"
+                      className="btn btn-go !py-1.5 sm:!py-2 !px-2.5 sm:!px-3 text-xs sm:text-sm font-bold tracking-wider uppercase flex items-center justify-center gap-1.5 cursor-pointer hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-hard-sm"
+                      onClick={() => setEditing(false)}
+                      aria-label="Done editing"
+                      title="Done editing"
+                    >
+                      <Check className="icon-sm" strokeWidth={2.5} />
+                      <span className="hidden sm:inline">DONE</span>
+                    </button>
+
+                    {/* 2. + for add */}
+                    <button
+                      type="button"
+                      className="btn !py-1.5 sm:!py-2 !px-2.5 sm:!px-3 text-xs sm:text-sm font-bold tracking-wider uppercase flex items-center justify-center gap-1.5 cursor-pointer hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-hard-sm"
+                      style={{ background: 'var(--color-sky)', color: 'var(--on-accent)' }}
+                      onClick={() => setModal({ open: true, session: null, day })}
+                      aria-label="Add session"
+                      title="Add session"
+                    >
+                      <Plus className="icon-sm" strokeWidth={2.5} />
+                      <span className="hidden sm:inline">ADD</span>
+                    </button>
+
+                    {/* 3. Reset icon */}
+                    <button
+                      type="button"
+                      className="btn !py-1.5 sm:!py-2 !px-2.5 sm:!px-3 text-xs sm:text-sm font-bold tracking-wider uppercase flex items-center justify-center gap-1.5 cursor-pointer hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-hard-sm bg-[var(--surface-2)] text-[var(--text)] border-2 border-[var(--border)]"
+                      onClick={() => setResetModalOpen(true)}
+                      aria-label="Reset timetable"
+                      title="Reset timetable"
+                    >
+                      <RotateCcw className="icon-sm" strokeWidth={2.5} />
+                      <span className="hidden sm:inline">RESET</span>
+                    </button>
+                  </>
+                ) : (
+                  <button
+                    type="button"
+                    className="btn !py-1.5 sm:!py-2 !px-2.5 sm:!px-3.5 text-xs sm:text-sm font-bold tracking-wider uppercase cursor-pointer hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-hard-sm"
+                    onClick={() => setEditing(true)}
+                  >
+                    EDIT TIMETABLE
+                  </button>
+                )}
+              </div>
+
+              {/* View Switcher: List vs Week Grid (MOBILE ONLY - in space on right side of ALL, EDIT TIMETABLE buttons) */}
+              <div className="flex sm:hidden items-center gap-1.5">
+                <button
+                  type="button"
+                  className={`btn !px-2.5 !py-1.5 cursor-pointer transition-all border-2 border-[var(--border)] ${
+                    view === 'day'
+                      ? '!bg-[var(--text)] !text-[var(--bg)] !border-[var(--text)] shadow-hard-sm'
+                      : 'bg-[var(--surface-2)] text-[var(--text)] hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-hard-sm'
+                  }`}
+                  onClick={() => setView('day')}
+                  aria-label="Day view"
+                  title="Day List View"
+                >
+                  <List className="icon-sm" strokeWidth={2.5} />
+                </button>
+                <button
+                  type="button"
+                  className={`btn !px-2.5 !py-1.5 cursor-pointer transition-all border-2 border-[var(--border)] ${
+                    view === 'week'
+                      ? '!bg-[var(--text)] !text-[var(--bg)] !border-[var(--text)] shadow-hard-sm'
+                      : 'bg-[var(--surface-2)] text-[var(--text)] hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-hard-sm'
+                  }`}
+                  onClick={() => setView('week')}
+                  aria-label="Week view"
+                  title="Week Matrix Grid"
+                >
+                  <LayoutGrid className="icon-sm" strokeWidth={2.5} />
+                </button>
+              </div>
             </div>
           </div>
         </Panel>
@@ -949,19 +997,31 @@ export default function Board() {
             <CalendarDays size={36} className="text-[var(--muted)] mb-3" />
             <h3 className="t-section">NOTHING PINNED YET</h3>
             <p className="t-meta muted max-w-md mt-2">
-              No published timetable for {branchName(profile.branch)} Year {year}. Add your sessions
-              in edit mode — they save directly to this device.
+              {baseTimetable(profile.branch, year).length > 0
+                ? `Timetable cleared for ${branchName(profile.branch)} Year ${year}. Add your sessions in edit mode, or restore the published timetable.`
+                : `No published timetable for ${branchName(profile.branch)} Year ${year}. Add your sessions in edit mode — they save directly to this device.`}
             </p>
-            <button
-              type="button"
-              className="btn btn-go mt-5 !py-2 !px-4 text-xs cursor-pointer"
-              onClick={() => {
-                setEditing(true)
-                setModal({ open: true, session: null, day })
-              }}
-            >
-              <Plus className="icon-micro" strokeWidth={2.5} /> ADD FIRST SESSION
-            </button>
+            <div className="flex flex-wrap items-center justify-center gap-2.5 mt-5">
+              <button
+                type="button"
+                className="btn btn-go !py-2 !px-4 text-xs font-bold uppercase cursor-pointer"
+                onClick={() => {
+                  setEditing(true)
+                  setModal({ open: true, session: null, day })
+                }}
+              >
+                <Plus className="icon-micro" strokeWidth={2.5} /> ADD FIRST SESSION
+              </button>
+              {baseTimetable(profile.branch, year).length > 0 && (
+                <button
+                  type="button"
+                  className="btn bg-[var(--surface-2)] text-[var(--text)] border-2 border-[var(--border)] !py-2 !px-4 text-xs font-bold uppercase cursor-pointer hover:shadow-hard-sm"
+                  onClick={() => resetBoard()}
+                >
+                  <RotateCcw className="icon-micro" strokeWidth={2.5} /> RESTORE PUBLISHED TIMETABLE
+                </button>
+              )}
+            </div>
           </div>
         ) : view === 'week' ? (
           <WeekGrid
@@ -1054,6 +1114,98 @@ export default function Board() {
             else addSession(data)
           }}
         />
+
+        {/* RESET TIMETABLE CONFIRMATION MODAL */}
+        {resetModalOpen && (
+          <div
+            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs"
+            onClick={() => setResetModalOpen(false)}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="reset-modal-title"
+          >
+            <div
+              className="board board-hard bg-[var(--surface)] p-5 sm:p-6 max-w-md w-full rounded shadow-hard-lg space-y-4 animate-in fade-in zoom-in-95"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="flex items-start justify-between gap-3 border-b-2 border-[var(--border)] pb-3">
+                <div className="flex items-center gap-2.5">
+                  <div
+                    className="size-9 rounded border-2 border-[var(--border)] flex items-center justify-center shrink-0"
+                    style={{ background: 'var(--color-absent)', color: 'var(--on-accent)' }}
+                  >
+                    <RotateCcw className="icon-sm" strokeWidth={2.5} />
+                  </div>
+                  <div>
+                    <h2 id="reset-modal-title" className="t-section font-black leading-tight uppercase">
+                      RESET TIMETABLE
+                    </h2>
+                    <p className="t-micro muted uppercase font-bold mt-0.5">
+                      CONFIRM TIMETABLE ACTION
+                    </p>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setResetModalOpen(false)}
+                  className="p-1 rounded border-2 border-[var(--border)] bg-[var(--surface-2)] text-[var(--text)] hover:shadow-hard-sm cursor-pointer"
+                  aria-label="Close"
+                >
+                  <X className="icon-sm" />
+                </button>
+              </div>
+
+              <div className="space-y-3">
+                <p className="text-xs sm:text-sm text-[var(--text)] leading-relaxed">
+                  Are you sure you want to reset this timetable? This will remove the classes from your schedule.
+                </p>
+
+                <div className="p-3 rounded bg-[var(--color-present)]/10 border-2 border-[var(--color-present)]/30 space-y-1">
+                  <div className="flex items-center gap-1.5 text-xs font-black uppercase text-[var(--present-ink)]">
+                    <Check className="icon-micro" strokeWidth={2.5} />
+                    <span>ATTENDANCE IS PRESERVED</span>
+                  </div>
+                  <p className="t-meta muted leading-normal">
+                    Your attendance records are safely preserved. If you get the timetable back or restore default classes, all past attendance will still be there.
+                  </p>
+                </div>
+              </div>
+
+              <div className="pt-2 flex flex-col sm:flex-row items-stretch sm:items-center justify-end gap-2">
+                <button
+                  type="button"
+                  onClick={() => setResetModalOpen(false)}
+                  className="btn !py-2 !px-4 text-xs font-bold uppercase cursor-pointer bg-[var(--surface-2)] text-[var(--text)] border-2 border-[var(--border)] hover:shadow-hard-sm"
+                >
+                  CANCEL
+                </button>
+                {isCustomised && baseTimetable(profile.branch, year).length > 0 && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      resetBoard()
+                      setResetModalOpen(false)
+                    }}
+                    className="btn !py-2 !px-3 text-xs font-bold uppercase cursor-pointer bg-[var(--surface-2)] text-[var(--text)] border-2 border-[var(--border)] hover:shadow-hard-sm"
+                  >
+                    RESTORE DEFAULT
+                  </button>
+                )}
+                <button
+                  type="button"
+                  onClick={() => {
+                    clearBoard()
+                    setResetModalOpen(false)
+                  }}
+                  className="btn !py-2 !px-4 text-xs font-bold uppercase cursor-pointer shadow-hard-sm"
+                  style={{ background: 'var(--color-absent)', color: 'var(--on-accent)' }}
+                >
+                  REMOVE TIMETABLE
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </Shell>
   )

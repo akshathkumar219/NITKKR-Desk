@@ -71,8 +71,8 @@ export default function Shell({ children }) {
 
   const identity = `${profile.branch} · Y${year} · ${profile.hostel}`
 
-  // Show guide banner on all pages except Dashboard (/) and Guide page (/guide)
-  const showGuideBanner = !isBannerDismissed && pathname !== '/' && pathname !== '/guide'
+  // Show guide banner on all pages except Dashboard (/ or /dashboard) and Guide page (/guide)
+  const showGuideBanner = !isBannerDismissed && pathname !== '/' && pathname !== '/dashboard' && pathname !== '/guide'
 
   return (
     <div className="min-h-dvh lg:flex">

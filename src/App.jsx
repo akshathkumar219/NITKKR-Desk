@@ -19,6 +19,7 @@ import Profile from './pages/Profile'
 import CalendarPage from './pages/Calendar'
 import Guide from './pages/Guide'
 import About from './pages/About'
+import Notifications from './pages/Notifications'
 import NotFound from './pages/NotFound'
 import ErrorBoundary from './components/ErrorBoundary'
 import Intro from './components/Intro'
@@ -35,10 +36,17 @@ function ScrollToTop() {
   return null
 }
 
-/** First run sends you to /welcome once, then never again. */
+/** First run sends you to /welcome once, then never again.
+ * For phones (< 768px), the starting page is the timetable page (/home) instead of the dashboard.
+ */
 function RootGate() {
   const seen = read(KEYS.welcomed, false)
-  return seen ? <Landing /> : <Navigate to="/welcome" replace />
+  if (!seen) return <Navigate to="/welcome" replace />
+  const isPhone = typeof window !== 'undefined' && window.matchMedia?.('(max-width: 767px)').matches
+  if (isPhone) {
+    return <Navigate to="/home" replace />
+  }
+  return <Landing />
 }
 
 /**
@@ -71,6 +79,7 @@ export default function App() {
         <UpdatePrompt />
         <Routes>
           <Route path="/" element={<RootGate />} />
+          <Route path="/dashboard" element={<RequireWelcome><Landing /></RequireWelcome>} />
           <Route path="/welcome" element={<Welcome />} />
 
           <Route path="/select/branch" element={<SelectBranch />} />
@@ -96,6 +105,7 @@ export default function App() {
           <Route path="/calendar" element={<RequireWelcome><CalendarPage /></RequireWelcome>} />
           <Route path="/guide" element={<Guide />} />
           <Route path="/about" element={<About />} />
+          <Route path="/notifications" element={<RequireWelcome><Notifications /></RequireWelcome>} />
 
           {/* Legacy query-tab URLs from the reference app */}
           <Route path="/rollcall" element={<Navigate to="/attendance" replace />} />

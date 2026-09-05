@@ -7,8 +7,6 @@ import {
   CalendarClock,
   Check,
   CheckCheck,
-  ChevronDown,
-  ChevronUp,
   ClipboardCheck,
   Clock,
   Copy,
@@ -108,46 +106,49 @@ function AttendanceRow({ session, mark, tallyData, required, onMark, onReset, on
   const skipsLeft = canSkip(presentCount, heldCount, effectiveCutoff)
   const recoverNeeded = mustAttend(presentCount, heldCount, effectiveCutoff)
 
+  // Clean typographic metadata line (matching timetable page)
   const metaParts = [
+    session.code,
     session.room ? `Room ${session.room}` : null,
     session.group ? `Grp ${session.group}` : null,
   ].filter(Boolean)
 
   return (
-    <div
-      className={`board board-hard bg-[var(--surface)] pad-card rounded border-2 border-l-4 sm:border-l-[6px] transition-all hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-hard-lg ${
+    <Panel
+      className={`board board-hard bg-[var(--surface)] pad-card flex flex-col justify-between transition-all hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-hard-lg border-l-4 sm:border-l-[6px] ${
         isLive
-          ? '!border-[var(--color-present)] shadow-[0_0_18px_color-mix(in_srgb,var(--color-present)_35%,transparent)] ring-1 ring-[var(--color-present)]/60'
+          ? '!border-[var(--color-present)] shadow-[0_0_18px_rgba(143,254,9,0.35)] ring-1 ring-[var(--color-present)]/60'
           : isNext
             ? '!border-[var(--color-amber)]/70 ring-1 ring-[var(--color-amber)]/30'
-            : 'border-[var(--border)]'
+            : ''
       }`}
       style={{
         borderLeftColor: isLive ? 'var(--color-present)' : isNext ? 'var(--color-amber)' : theme.accent,
         backgroundColor: isNext ? 'color-mix(in srgb, var(--color-amber) 10%, var(--surface))' : undefined,
+        minHeight: 200,
       }}
     >
-      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3 sm:gap-4">
-        {/* Left Column: Time, Course & Metadata Details */}
-        <div className="min-w-0 flex-1">
-          {/* Top Row: Time/Type Pill + Live Pulse + Cutoff Badge */}
+      <div>
+        {/* Unified Top Header Row */}
+        <div className="flex items-center justify-between gap-2">
+          {/* Time & Type in a single sleek unified badge */}
           <div className="flex items-center gap-1.5 flex-wrap">
             <span
-              className="chip !py-0.5 !px-2 text-[0.6rem] sm:text-xs font-bold rounded border-2 uppercase tracking-wider flex items-center gap-1.5 shadow-2xs"
+              className="px-2.5 py-1 text-[0.6rem] sm:text-xs font-bold rounded border-2 uppercase tracking-wider flex items-center gap-1.5 shadow-2xs"
               style={{
                 background: theme.bgPill,
                 color: theme.ink,
                 borderColor: 'var(--border)',
               }}
             >
-              <Clock className="icon-micro shrink-0" strokeWidth={2.5} />
+              <Clock className="icon-micro" strokeWidth={2.5} />
               <span>{fmtRange(session.start, session.end)}</span>
               <span className="opacity-40">·</span>
               <span>{theme.label}</span>
             </span>
 
             {isLive ? (
-              <span className="chip !py-0.5 !px-2 text-[0.6rem] sm:text-xs text-[var(--color-present)] flex items-center gap-1.5 border-2 border-[var(--color-present)] bg-[var(--color-present)]/10 font-black uppercase tracking-widest">
+              <span className="chip !py-0.5 !px-2 text-[0.6rem] sm:text-xs text-[var(--color-present)] flex items-center gap-1.5 border-2 border-[var(--color-present)] bg-[var(--color-present)]/10 font-black tracking-widest uppercase">
                 <span className="relative flex size-1.5 shrink-0">
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[var(--color-present)] opacity-75" />
                   <span className="relative inline-flex rounded-full size-1.5 bg-[var(--color-present)]" />
@@ -155,94 +156,12 @@ function AttendanceRow({ session, mark, tallyData, required, onMark, onReset, on
                 <span>LIVE · {minsLeft}M</span>
               </span>
             ) : null}
-
-            {effectiveCutoff !== required ? (
-              <span className="chip !py-0.5 !px-2 text-[0.6rem] sm:text-xs font-black uppercase tracking-widest bg-[var(--surface-2)] border-2 border-[var(--border)]">
-                CUTOFF {effectiveCutoff}%
-              </span>
-            ) : null}
           </div>
 
-          {/* Title */}
-          <h3 className="t-card-title mt-2 sm:mt-2.5 text-[var(--text)] truncate" style={{ fontSize: 20 }}>
-            {session.name}
-          </h3>
-
-          {/* Clean inline typographic metadata row */}
-          <div className="t-meta muted mt-1 flex items-center gap-1.5 flex-wrap">
-            {session.code ? <span className="font-mono font-semibold">&lt;{session.code}&gt;</span> : null}
-            {session.code && metaParts.length > 0 ? <span>·</span> : null}
-            {metaParts.length > 0 ? <span>{metaParts.join(' · ')}</span> : null}
-            {onEditSession ? (
-              <button
-                type="button"
-                onClick={onEditSession}
-                className="text-[var(--muted)] hover:text-[var(--text)] cursor-pointer p-0.5 ml-0.5 transition-colors"
-                title="Edit this slot"
-                aria-label="Edit this slot"
-              >
-                <Pencil className="icon-micro shrink-0" strokeWidth={2.5} />
-              </button>
-            ) : null}
-          </div>
-
-          {/* Professor / Instructor Name */}
-          {session.instructor ? (
-            <p className="t-meta muted mt-0.5">
-              {session.instructor}
-            </p>
-          ) : null}
-
-          {/* Custom Note Reminder */}
-          {session.note ? (
-            <p className="t-meta mt-1 text-[var(--color-sky)]">
-              📌 {session.note}
-            </p>
-          ) : null}
-
-          {/* Dynamic Status Advice Context Line */}
-          <div className="mt-2 t-meta">
-            {mark === 'present' ? (
-              <span className="inline-flex items-center gap-1.5 text-[var(--present-ink)] font-bold">
-                <span className="size-1.5 rounded-full bg-[var(--color-present)]" />
-                ATTENDED · {effectiveCutoff === 0 ? 'COURSE EXEMPT' : `${skipsLeft} SAFE SKIP${skipsLeft === 1 ? '' : 'S'} LEFT`}
-              </span>
-            ) : mark === 'absent' ? (
-              <span className="inline-flex items-center gap-1.5 text-[var(--absent-ink)] font-bold">
-                <span className="size-1.5 rounded-full bg-[var(--color-absent)]" />
-                BUNKED ·{' '}
-                {effectiveCutoff === 0
-                  ? 'COURSE EXEMPT'
-                  : actualPercent != null && actualPercent < effectiveCutoff
-                    ? `ATTEND ${recoverNeeded} IN A ROW`
-                    : `${skipsLeft} SAFE SKIP${skipsLeft === 1 ? '' : 'S'} LEFT`}
-              </span>
-            ) : mark === 'cancelled' ? (
-              <span className="inline-flex items-center gap-1.5 text-[var(--warn-ink)] font-bold">
-                <span className="size-1.5 rounded-full bg-[var(--color-amber)]" />
-                CLASS CANCELLED · FREE SLOT
-              </span>
-            ) : (
-              <span className="inline-flex items-center gap-1.5 text-[var(--muted)] font-semibold">
-                <span className="size-1.5 rounded-full bg-[var(--border)]" />
-                {effectiveCutoff === 0
-                  ? 'OPTIONAL COURSE (EXEMPT)'
-                  : actualPercent === null
-                    ? `TARGET CUTOFF: ${effectiveCutoff}%`
-                    : actualPercent >= effectiveCutoff
-                      ? `${skipsLeft === 0 ? 'ON THE CUTOFF' : `${skipsLeft} SAFE SKIP${skipsLeft === 1 ? '' : 'S'} AVAILABLE`}`
-                      : `ATTEND ${recoverNeeded} IN A ROW TO REACH ${effectiveCutoff}%`}
-              </span>
-            )}
-          </div>
-        </div>
-
-        {/* Right Column: Attendance % Pill Badge & Segmented Action Strip */}
-        <div className="flex items-center gap-2 pt-2.5 lg:pt-0 border-t-2 lg:border-t-0 border-[var(--border)] w-full lg:w-auto">
-          {/* Overall Subject % Pill Badge */}
+          {/* Sleek Attendance Gauge Pill / Badge */}
           <div className="relative group/circle shrink-0">
             <span
-              className={`inline-flex items-center gap-1.5 px-2.5 py-1 sm:py-0.5 rounded-full border-2 text-xs sm:text-sm font-extrabold tracking-tight transition-all shadow-xs ${
+              className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full border-2 text-xs sm:text-sm font-extrabold tracking-tight transition-all shadow-xs ${
                 isSimulating ? 'scale-105 ring-2 ring-[var(--border)] animate-pulse' : ''
               }`}
               style={{
@@ -257,7 +176,10 @@ function AttendanceRow({ session, mark, tallyData, required, onMark, onReset, on
                         : simStatus === 'edge'
                           ? 'var(--color-amber)'
                           : 'var(--color-absent)',
-                color: displayPercent === null ? 'var(--muted)' : 'var(--on-accent)',
+                color:
+                  displayPercent === null
+                    ? 'var(--muted)'
+                    : 'var(--on-accent)',
               }}
               title={
                 effectiveCutoff === 0
@@ -266,104 +188,169 @@ function AttendanceRow({ session, mark, tallyData, required, onMark, onReset, on
                     ? `Simulated Preview: ${displayPercent}% (${simDelta >= 0 ? `+${simDelta}%` : `${simDelta}%`}) [Target: ${effectiveCutoff}%]`
                     : actualPercent === null
                       ? `Target Cutoff: ${effectiveCutoff}%`
-                      : `Subject Total: ${presentCount}/${heldCount} attended (${actualPercent}%) · Target: ${effectiveCutoff}%`
+                      : `${presentCount}/${heldCount} attended (${actualPercent}%) · Target: ${effectiveCutoff}%`
               }
             >
-              <span className="t-live font-black leading-none">{displayPercent === null ? '—' : `${displayPercent}%`}</span>
+              <span>{displayPercent === null ? '—' : `${displayPercent}%`}</span>
               {isSimulating && simDelta !== 0 ? (
-                <span className="text-[0.6rem] font-bold opacity-85">
+                <span className="text-[0.6rem] opacity-85">
                   ({simDelta > 0 ? `+${simDelta}%` : `${simDelta}%`})
                 </span>
               ) : null}
             </span>
           </div>
+        </div>
 
-          {/* Segmented Action Controls Bar */}
-          <div className="flex-1 lg:flex-initial flex items-center rounded border-2 border-[var(--border-strong)] bg-[var(--surface-2)] p-0.5 shadow-xs overflow-hidden min-w-0">
-            {/* PRESENT Button */}
-            <button
-              type="button"
-              className={`flex-1 lg:flex-initial min-w-0 px-2.5 sm:px-3.5 py-1.5 sm:py-2 rounded text-[0.6875rem] sm:text-xs font-bold tracking-wider uppercase flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
-                mark === 'present'
-                  ? '!bg-[var(--color-present)] !text-[var(--on-accent)] shadow-xs font-extrabold'
-                  : 'text-[var(--text)] hover:bg-[var(--surface)]'
-              }`}
-              onMouseEnter={() => setHoverSim('present')}
-              onMouseLeave={() => setHoverSim(null)}
-              onClick={() => {
-                triggerHaptic(12)
-                onMark('present')
-              }}
-              title="Mark Present Today (Hover to simulate)"
-            >
-              <Check className="icon-micro shrink-0" strokeWidth={2.5} />
-              <span className="truncate">PRESENT</span>
-            </button>
+        {/* Course Title */}
+        <h3 className="t-card-title mt-2.5 text-[var(--text)]" style={{ fontSize: 20 }}>
+          {session.name}
+        </h3>
 
-            <div className="w-[1.5px] h-4 bg-[var(--border)] shrink-0 mx-0.5" />
+        {/* Clean Typographic Metadata */}
+        {metaParts.length > 0 ? (
+          <p className="t-meta muted mt-1">
+            {metaParts.join(' · ')}
+          </p>
+        ) : null}
 
-            {/* ABSENT Button */}
-            <button
-              type="button"
-              className={`flex-1 lg:flex-initial min-w-0 px-2.5 sm:px-3.5 py-1.5 sm:py-2 rounded text-[0.6875rem] sm:text-xs font-bold tracking-wider uppercase flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
-                mark === 'absent'
-                  ? '!bg-[var(--color-absent)] !text-[var(--on-accent)] shadow-xs font-extrabold'
-                  : 'text-[var(--text)] hover:bg-[var(--surface)]'
-              }`}
-              onMouseEnter={() => setHoverSim('absent')}
-              onMouseLeave={() => setHoverSim(null)}
-              onClick={() => {
-                triggerHaptic(14)
-                onMark('absent')
-              }}
-              title="Mark Absent Today (Hover to simulate)"
-            >
-              <X className="icon-micro shrink-0" strokeWidth={2.5} />
-              <span className="truncate">ABSENT</span>
-            </button>
+        {/* Professor / Instructor Name */}
+        {session.instructor ? (
+          <p className="t-meta muted mt-0.5">
+            {session.instructor}
+          </p>
+        ) : null}
 
-            <div className="w-[1.5px] h-4 bg-[var(--border)] shrink-0 mx-0.5" />
+        {/* Custom Note Reminder */}
+        {session.note ? (
+          <p className="t-meta mt-1.5 text-[var(--color-sky)]">
+            📌 {session.note}
+          </p>
+        ) : null}
 
-            {/* CANCELLED Button */}
-            <button
-              type="button"
-              className={`py-1.5 sm:py-2 px-2 sm:px-2.5 text-[0.6875rem] sm:text-xs font-bold tracking-wider uppercase rounded flex items-center justify-center transition-all cursor-pointer ${
-                mark === 'cancelled'
-                  ? '!bg-[var(--color-cancelled)] !text-[var(--on-accent)] shadow-xs font-extrabold'
-                  : 'text-[var(--muted)] hover:text-[var(--text)] hover:bg-[var(--surface)]'
-              }`}
-              onClick={() => {
-                triggerHaptic(10)
-                onMark('cancelled')
-              }}
-              title="Mark Class Cancelled"
-            >
-              <span className="truncate">CANCELLED</span>
-            </button>
-
-            <div className="w-[1.5px] h-4 bg-[var(--border)] shrink-0 mx-0.5" />
-
-            {/* Reset Button */}
-            <button
-              type="button"
-              className={`p-1.5 sm:p-2 rounded flex items-center justify-center transition-all cursor-pointer shrink-0 ${
-                mark
-                  ? 'text-[var(--text)] hover:bg-[var(--surface)]'
-                  : 'text-[var(--muted)] opacity-40 hover:opacity-100 hover:bg-[var(--surface)]'
-              }`}
-              onClick={() => {
-                triggerHaptic(8)
-                onReset()
-              }}
-              title={mark ? 'Reset attendance mark' : 'No mark recorded'}
-              aria-label="Reset attendance mark"
-            >
-              <RotateCcw className="icon-micro shrink-0" strokeWidth={2.5} />
-            </button>
-          </div>
+        {/* Clean 1-Line Status Context Line */}
+        <div className="t-meta mt-2">
+          {mark === 'present' ? (
+            <span className="inline-flex items-center gap-1.5 text-[var(--present-ink)] font-bold">
+              <span className="size-1.5 rounded-full bg-[var(--color-present)]" />
+              ATTENDED · {effectiveCutoff === 0 ? 'COURSE EXEMPT' : `${skipsLeft} SAFE SKIP${skipsLeft === 1 ? '' : 'S'} LEFT`}
+            </span>
+          ) : mark === 'absent' ? (
+            <span className="inline-flex items-center gap-1.5 text-[var(--absent-ink)] font-bold">
+              <span className="size-1.5 rounded-full bg-[var(--color-absent)]" />
+              BUNKED ·{' '}
+              {effectiveCutoff === 0
+                ? 'COURSE EXEMPT'
+                : actualPercent != null && actualPercent < effectiveCutoff
+                  ? `ATTEND ${recoverNeeded} IN A ROW`
+                  : `${skipsLeft} SAFE SKIP${skipsLeft === 1 ? '' : 'S'} LEFT`}
+            </span>
+          ) : mark === 'cancelled' ? (
+            <span className="inline-flex items-center gap-1.5 text-[var(--warn-ink)] font-bold">
+              <span className="size-1.5 rounded-full bg-[var(--color-amber)]" />
+              CLASS CANCELLED · FREE SLOT
+            </span>
+          ) : (
+            <span className="inline-flex items-center gap-1.5 text-[var(--muted)] font-semibold">
+              <span className="size-1.5 rounded-full bg-[var(--border)]" />
+              {effectiveCutoff === 0
+                ? 'OPTIONAL COURSE (EXEMPT)'
+                : actualPercent === null
+                  ? `TARGET CUTOFF: ${effectiveCutoff}%`
+                  : actualPercent >= effectiveCutoff
+                    ? `${skipsLeft === 0 ? 'ON THE CUTOFF' : `${skipsLeft} SAFE SKIP${skipsLeft === 1 ? '' : 'S'} AVAILABLE`}`
+                    : `ATTEND ${recoverNeeded} IN A ROW TO REACH ${effectiveCutoff}%`}
+            </span>
+          )}
         </div>
       </div>
-    </div>
+
+      {/* Bottom Segmented Action Strip */}
+      <div className="mt-3 flex items-center rounded border-2 border-[var(--border-strong)] bg-[var(--surface-2)] p-0.5 shadow-xs overflow-hidden">
+        <button
+          type="button"
+          className={`flex-1 py-1.5 text-[0.6875rem] sm:text-xs font-bold tracking-wider uppercase rounded flex items-center justify-center gap-1.5 transition-all active:scale-95 cursor-pointer ${
+            mark === 'present'
+              ? '!bg-[var(--color-present)] !text-[var(--on-accent)] shadow-xs font-extrabold border border-transparent'
+              : 'text-[var(--present-ink)] bg-[var(--color-present)]/10 border border-[var(--color-present)]/30 hover:bg-[var(--color-present)]/20 hover:border-[var(--color-present)]/50'
+          }`}
+          onMouseEnter={() => setHoverSim('present')}
+          onMouseLeave={() => setHoverSim(null)}
+          onClick={(e) => {
+            e.stopPropagation()
+            setHoverSim(null)
+            triggerHaptic(12)
+            onMark(mark === 'present' ? null : 'present')
+          }}
+          title="Mark Present"
+        >
+          <Check className="icon-micro shrink-0" strokeWidth={2.5} /> <span className="truncate">PRESENT</span>
+        </button>
+
+        <div className="w-[1.5px] h-4 bg-[var(--border)] shrink-0 mx-0.5" />
+
+        <button
+          type="button"
+          className={`flex-1 py-1.5 text-[0.6875rem] sm:text-xs font-bold tracking-wider uppercase rounded flex items-center justify-center gap-1.5 transition-all active:scale-95 cursor-pointer ${
+            mark === 'absent'
+              ? '!bg-[var(--color-absent)] !text-[var(--on-accent)] shadow-xs font-extrabold border border-transparent'
+              : 'text-[var(--absent-ink)] bg-[var(--color-absent)]/10 border border-[var(--color-absent)]/30 hover:bg-[var(--color-absent)]/20 hover:border-[var(--color-absent)]/50'
+          }`}
+          onMouseEnter={() => setHoverSim('absent')}
+          onMouseLeave={() => setHoverSim(null)}
+          onClick={(e) => {
+            e.stopPropagation()
+            setHoverSim(null)
+            triggerHaptic(14)
+            onMark(mark === 'absent' ? null : 'absent')
+          }}
+          title="Mark Absent / Bunk"
+        >
+          <X className="icon-micro shrink-0" strokeWidth={2.5} /> <span className="truncate">ABSENT</span>
+        </button>
+
+        <div className="w-[1.5px] h-4 bg-[var(--border)] shrink-0 mx-0.5" />
+
+        <button
+          type="button"
+          className={`py-1.5 px-2 text-[0.6875rem] sm:text-xs font-bold tracking-wider uppercase rounded flex items-center justify-center transition-all active:scale-95 cursor-pointer ${
+            mark === 'cancelled'
+              ? '!bg-[var(--color-cancelled)] !text-[var(--on-accent)] shadow-xs font-extrabold border border-transparent'
+              : 'text-[var(--muted)] hover:text-[var(--text)] hover:bg-[var(--surface)] border border-transparent'
+          }`}
+          onClick={(e) => {
+            e.stopPropagation()
+            setHoverSim(null)
+            triggerHaptic(10)
+            onMark(mark === 'cancelled' ? null : 'cancelled')
+          }}
+          title="Mark Class Cancelled"
+        >
+          <span className="truncate">CANCELLED</span>
+        </button>
+
+        <div className="w-[1.5px] h-4 bg-[var(--border)] shrink-0 mx-0.5" />
+
+        <button
+          type="button"
+          disabled={!mark}
+          className={`p-1.5 rounded flex items-center justify-center transition-all ${
+            mark
+              ? 'text-[var(--muted)] hover:text-[var(--text)] hover:bg-[var(--surface)] cursor-pointer active:scale-95'
+              : 'text-[var(--muted)]/40 opacity-40 cursor-not-allowed'
+          }`}
+          onClick={(e) => {
+            e.stopPropagation()
+            setHoverSim(null)
+            triggerHaptic(8)
+            if (mark) onReset()
+          }}
+          title={mark ? 'Reset attendance mark' : 'No mark recorded yet'}
+          aria-label="Reset attendance mark"
+        >
+          <RotateCcw className="icon-micro shrink-0" strokeWidth={2.5} />
+        </button>
+      </div>
+    </Panel>
   )
 }
 
@@ -870,7 +857,6 @@ export default function Attendance() {
               >
                 <Settings2 className="icon-micro shrink-0" strokeWidth={2.5} />
                 <span className="truncate">SETTINGS</span>
-                {showSettings ? <ChevronUp className="icon-micro shrink-0" strokeWidth={2.5} /> : <ChevronDown className="icon-micro shrink-0" strokeWidth={2.5} />}
               </button>
             </div>
           </div>
@@ -1519,28 +1505,31 @@ export default function Attendance() {
                 }
               />
             ) : (
-              todaySessions.map((s) => {
-                const courseKey = s.code || s.name
-                const tallyData = tally(
-                  marks,
-                  courses.find((c) => c.key === courseKey)?.sessions.map((sess) => sess.id) || [s.id],
-                  since,
-                  adjustments[courseKey] || 0,
-                )
-                return (
-                  <AttendanceRow
-                    key={s.id}
-                    session={s}
-                    mark={getMark(iso, s.id)}
-                    tallyData={tallyData}
-                    required={required}
-                    currentMins={currentMins}
-                    onMark={(m) => setMark(iso, s.id, m)}
-                    onReset={() => setMark(iso, s.id, null)}
-                    onEditSession={() => setSessionModal({ open: true, session: s, defaultDay: s.day, prefill: null })}
-                  />
-                )
-              })
+              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
+                {todaySessions.map((s) => {
+                  const courseKey = s.code || s.name
+                  const tallyData = tally(
+                    marks,
+                    courses.find((c) => c.key === courseKey)?.sessions.map((sess) => sess.id) || [s.id],
+                    since,
+                    adjustments[courseKey] || 0,
+                  )
+                  return (
+                    <AttendanceRow
+                      key={s.id}
+                      session={s}
+                      mark={getMark(iso, s.id)}
+                      tallyData={tallyData}
+                      required={required}
+                      currentMins={currentMins}
+                      isToday={true}
+                      onMark={(m) => setMark(iso, s.id, m)}
+                      onReset={() => setMark(iso, s.id, null)}
+                      onEditSession={() => setSessionModal({ open: true, session: s, defaultDay: s.day, prefill: null })}
+                    />
+                  )
+                })}
+              </div>
             )}
           </div>
         ) : null}
@@ -1553,8 +1542,8 @@ export default function Attendance() {
               {[
                 { key: 'ALL', label: `ALL (${courses.length})` },
                 { key: 'SAFE', label: `🟢 SAFE (${subjectStats.safe})` },
-                { key: 'EDGE', label: `⚠️ ON THE LINE (${subjectStats.edge})` },
-                { key: 'AT_RISK', label: `🔴 AT RISK (${subjectStats.atRisk})` },
+                { key: 'EDGE', label: `⚠️ FINE (${subjectStats.edge})` },
+                { key: 'AT_RISK', label: `🔴 RISK (${subjectStats.atRisk})` },
               ].map((f) => {
                 const active = subjectFilter === f.key
                 return (
@@ -1876,28 +1865,31 @@ export default function Attendance() {
                   </p>
                 </div>
               ) : (
-                fixSessions.map((s) => {
-                  const courseKey = s.code || s.name
-                  const tallyData = tally(
-                    marks,
-                    courses.find((c) => c.key === courseKey)?.sessions.map((sess) => sess.id) || [s.id],
-                    since,
-                    adjustments[courseKey] || 0,
-                  )
-                  return (
-                    <AttendanceRow
-                      key={s.id}
-                      session={s}
-                      mark={getMark(fixDate, s.id)}
-                      tallyData={tallyData}
-                      required={required}
-                      currentMins={currentMins}
-                      onMark={(m) => setMark(fixDate, s.id, m)}
-                      onReset={() => setMark(fixDate, s.id, null)}
-                      onEditSession={() => setSessionModal({ open: true, session: s, defaultDay: s.day, prefill: null })}
-                    />
-                  )
-                })
+                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
+                  {fixSessions.map((s) => {
+                    const courseKey = s.code || s.name
+                    const tallyData = tally(
+                      marks,
+                      courses.find((c) => c.key === courseKey)?.sessions.map((sess) => sess.id) || [s.id],
+                      since,
+                      adjustments[courseKey] || 0,
+                    )
+                    return (
+                      <AttendanceRow
+                        key={s.id}
+                        session={s}
+                        mark={getMark(fixDate, s.id)}
+                        tallyData={tallyData}
+                        required={required}
+                        currentMins={currentMins}
+                        isToday={fixDate === iso}
+                        onMark={(m) => setMark(fixDate, s.id, m)}
+                        onReset={() => setMark(fixDate, s.id, null)}
+                        onEditSession={() => setSessionModal({ open: true, session: s, defaultDay: s.day, prefill: null })}
+                      />
+                    )
+                  })}
+                </div>
               )}
             </div>
 

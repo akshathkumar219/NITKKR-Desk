@@ -182,11 +182,11 @@ export default function SessionModal({ open, onClose, onSave, onDelete, session,
       closeOnBackdrop={false}
       closeOnEscape={false}
       footer={
-        <>
+        <div className="flex items-center justify-between w-full gap-2">
           {session && onDelete ? (
             <button
               type="button"
-              className="btn mr-auto cursor-pointer font-black uppercase tracking-wider shadow-hard-sm"
+              className="btn cursor-pointer font-black uppercase tracking-wider shadow-hard-sm"
               style={{ background: 'var(--color-coral)', color: 'var(--on-accent)', ...TXT }}
               onClick={() => {
                 onDelete(session.id)
@@ -195,24 +195,26 @@ export default function SessionModal({ open, onClose, onSave, onDelete, session,
             >
               DELETE
             </button>
-          ) : null}
-          <button
-            type="button"
-            className="btn cursor-pointer font-bold uppercase tracking-wider"
-            style={TXT}
-            onClick={onClose}
-          >
-            CANCEL
-          </button>
-          <button
-            type="submit"
-            form="session-form"
-            className="btn btn-go cursor-pointer font-black uppercase tracking-wider shadow-hard-sm"
-            style={TXT}
-          >
-            SAVE SESSION
-          </button>
-        </>
+          ) : <span />}
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              className="btn cursor-pointer font-bold uppercase tracking-wider"
+              style={TXT}
+              onClick={onClose}
+            >
+              CANCEL
+            </button>
+            <button
+              type="submit"
+              form="session-form"
+              className="btn btn-go cursor-pointer font-black uppercase tracking-wider shadow-hard-sm"
+              style={TXT}
+            >
+              SAVE
+            </button>
+          </div>
+        </div>
       }
     >
       <form id="session-form" className="space-y-3 max-h-[65vh] overflow-y-auto pr-1 no-scrollbar" onSubmit={submit}>
@@ -259,7 +261,7 @@ export default function SessionModal({ open, onClose, onSave, onDelete, session,
               ? '✓ Attendance & cutoff will automatically sync with this subject'
               : 'Choose an enrolled subject to sync attendance, or enter custom details below.'
           }
-          hintStyle={{ fontSize: 12 }}
+          hintStyle={{ fontSize: 12, textTransform: 'uppercase' }}
         >
           <Select
             id="s-course-preset"

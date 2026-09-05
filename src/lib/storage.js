@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { DEFAULT_BRANCH, DEFAULT_HOSTEL, DEFAULT_YEAR } from '../data/campus.js'
 import { baseTimetable, groupsFor } from '../data/timetables.js'
+import { NOTIFICATIONS } from '../data/notifications.js'
 
 // Everything lives in this browser. No account, no server, no sync.
 // Keys are namespaced so a future export/import stays legible.
@@ -21,6 +22,7 @@ export const KEYS = {
   subjectData: 'kkr.subjects.data',
   rollcallAdjustments: 'kkr.rollcall.adjustments',
   cgpaSemesters: 'kkr.cgpa.semesters',
+  notificationsRead: 'kkr.notifications.read',
 }
 
 // Every key this app owns starts here. The backup walks the prefix rather
@@ -1320,4 +1322,47 @@ function migrateAttendanceRequirement() {
 }
 
 migrateAttendanceRequirement()
+
+// ---------------------------------------------------------------------------
+// Notifications
+// ---------------------------------------------------------------------------
+
+export function useNotifications() {
+  const [readIds, setReadIds] = useStored(KEYS.notificationsRead, [])
+
+  const markAsRead = useCallback(
+    (id) => {
+      setReadIds((prev) => {
+        const list = Array.isArray(prev) ? prev : []
+        if (list.includes(id)) return list
+        return [...list, id]
+      })
+    },
+    [setReadIds],
+  )
+
+  const markAllAsRead = useCallback(() => {
+    const allIds = NOTIFICATIONS.map((n) => n.id)
+    setReadIds(allIds)
+  }, [setReadIds])
+
+  const notifications = useMemo(() => {
+    const list = Array.isArray(readIds) ? readIds : []
+    return NOTIFICATIONS.map((n) => ({
+      ...n,
+      isRead: list.includes(n.id),
+    }))
+  }, [readIds])
+
+  const unreadCount = useMemo(() => {
+    return notifications.filter((n) => !n.isRead).length
+  }, [notifications])
+
+  return {
+    notifications,
+    unreadCount,
+    markAsRead,
+    markAllAsRead,
+  }
+}
 

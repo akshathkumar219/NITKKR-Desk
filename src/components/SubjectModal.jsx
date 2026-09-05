@@ -68,11 +68,11 @@ export default function SubjectModal({ open, onClose, onSave, onDelete, course }
       closeOnBackdrop={false}
       closeOnEscape={false}
       footer={
-        <>
+        <div className="flex items-center justify-between w-full gap-2">
           {onDelete ? (
             <button
               type="button"
-              className="btn mr-auto cursor-pointer font-black uppercase tracking-wider shadow-hard-sm"
+              className="btn cursor-pointer font-black uppercase tracking-wider shadow-hard-sm"
               style={{ background: 'var(--color-coral)', color: 'var(--on-accent)', ...TXT }}
               onClick={() => {
                 if (
@@ -85,26 +85,28 @@ export default function SubjectModal({ open, onClose, onSave, onDelete, course }
                 }
               }}
             >
-              DELETE COURSE
+              DELETE
             </button>
-          ) : null}
-          <button
-            type="button"
-            className="btn cursor-pointer font-bold uppercase tracking-wider"
-            style={TXT}
-            onClick={onClose}
-          >
-            CANCEL
-          </button>
-          <button
-            type="submit"
-            form="subject-edit-form"
-            className="btn btn-go cursor-pointer font-black uppercase tracking-wider shadow-hard-sm"
-            style={TXT}
-          >
-            SAVE CHANGES
-          </button>
-        </>
+          ) : <span />}
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              className="btn cursor-pointer font-bold uppercase tracking-wider"
+              style={TXT}
+              onClick={onClose}
+            >
+              CANCEL
+            </button>
+            <button
+              type="submit"
+              form="subject-edit-form"
+              className="btn btn-go cursor-pointer font-black uppercase tracking-wider shadow-hard-sm"
+              style={TXT}
+            >
+              SAVE
+            </button>
+          </div>
+        </div>
       }
     >
       <form id="subject-edit-form" className="space-y-4" onSubmit={handleSubmit}>

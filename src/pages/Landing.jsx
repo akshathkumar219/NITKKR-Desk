@@ -583,77 +583,13 @@ export default function Landing() {
       <DotGrid />
 
       <div className="relative z-10 w-full flex-1 flex flex-col justify-between p-4 sm:p-5 lg:p-6 gap-3 lg:gap-4 min-h-0">
-        {/* ---- MOBILE HEADER: Editorial Masthead & Status Plate (< lg screens) ---- */}
+        {/* ---- MOBILE HEADER: Editorial Masthead (< lg screens) ---- */}
         <header className="lg:hidden flex flex-col shrink-0">
           {/* Top Plate — shared masthead (see components/AppHeader) */}
           <AppHeader variant="paper" />
 
           {/* Heavy Editorial Masthead Rule */}
           <hr className="rule-ink" />
-
-          {/* Sub-Plate: Terminal Status Ticker */}
-          <div className="flex items-center justify-between py-1.5 px-0.5 text-xs">
-            {/* Left: Live Pulse Dot + Status Text */}
-            <div className="flex items-center gap-2 min-w-0 pr-2">
-              <span className="relative flex size-2 shrink-0">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[var(--color-present)] opacity-75" />
-                <span className="relative inline-flex rounded-full size-2 bg-[var(--color-present)]" />
-              </span>
-
-              {editingStatus ? (
-                <form onSubmit={handleSaveStatus} className="flex items-center gap-1.5">
-                  <input
-                    type="text"
-                    className="field !py-0.5 !px-2 text-xs font-bold w-36"
-                    placeholder="e.g. Done for the day!"
-                    value={statusInput}
-                    onChange={(e) => setStatusInput(e.target.value)}
-                    autoFocus
-                  />
-                  <button
-                    type="submit"
-                    className="btn !p-1 text-xs cursor-pointer bg-[var(--color-present)] text-[var(--on-accent)] border-[var(--color-present)]"
-                    title="Save custom message"
-                  >
-                    <Check size={12} />
-                  </button>
-                  <button
-                    type="button"
-                    className="btn !p-1 text-xs cursor-pointer"
-                    onClick={() => setEditingStatus(false)}
-                    title="Cancel"
-                  >
-                    <X size={12} />
-                  </button>
-                </form>
-              ) : (
-                <div className="flex items-center gap-1.5 min-w-0">
-                  <h1 className="heading text-xs font-black tracking-wide uppercase truncate" title={activeStatusText}>
-                    {activeStatusText}
-                  </h1>
-                  <button
-                    type="button"
-                    className="p-0.5 muted hover:text-[var(--primary)] transition-colors cursor-pointer shrink-0"
-                    onClick={() => {
-                      setStatusInput(customStatus)
-                      setEditingStatus(true)
-                    }}
-                    title="Edit custom message"
-                  >
-                    <Pencil size={11} />
-                  </button>
-                </div>
-              )}
-            </div>
-
-            {/* Right: Date & Real-time Clock */}
-            <span className="label muted text-[0.6875rem] font-bold shrink-0 tracking-wider">
-              {weekday} · {clock}
-            </span>
-          </div>
-
-          {/* Bottom Hairline Rule */}
-          <div className="w-full h-px bg-[var(--border)]" aria-hidden="true" />
         </header>
 
         {/* ---- DESKTOP HEADER (lg+ screens) ---- */}
@@ -868,8 +804,8 @@ export default function Landing() {
               </div>
             </section>
 
-            {/* READINGS TILES - 4 EQUAL CARDS (order-1 on mobile, order-2 on desktop) */}
-            <section className="order-1 lg:order-2 grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-3 shrink-0">
+            {/* READINGS TILES - 4 EQUAL CARDS (hidden on mobile, visible on desktop) */}
+            <section className="hidden lg:grid lg:order-2 sm:grid-cols-4 gap-3 sm:gap-3 shrink-0">
               {/* 1. ATTENDANCE (CIRCULAR PROGRESS GAUGE + MARGIN) */}
               <Link
                 to="/attendance"

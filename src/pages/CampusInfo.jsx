@@ -79,7 +79,7 @@ export default function CampusInfo() {
             <div className="min-w-0">
               <p className="t-meta muted">ACADEMIC CALENDAR</p>
               <p className="t-section mt-1">{CALENDAR.title}</p>
-              <p className="t-meta muted mt-1.5 normal-case">{CALENDAR.audience}</p>
+              <p className="t-meta muted mt-1.5">{CALENDAR.audience}</p>
             </div>
           </div>
           <Chip tone={CALENDAR.verified ? 'var(--color-acid)' : 'var(--color-amber)'}>

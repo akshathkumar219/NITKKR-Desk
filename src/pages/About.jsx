@@ -84,7 +84,7 @@ export default function About() {
           <div className="board pad-page">
             <p className="t-meta muted">{credit.role}</p>
             <p className="t-card-title mt-1.5" style={{ fontSize: 20 }}>{credit.name}</p>
-            <p className="t-meta muted mt-1 normal-case">{credit.detail}</p>
+            <p className="t-meta muted mt-1">{credit.detail}</p>
             <div className="mt-4 flex items-center gap-2">
               <a
                 href={credit.linkedin}
@@ -114,7 +114,7 @@ export default function About() {
               href={INSPIRED_BY.url}
               target="_blank"
               rel="noreferrer"
-              className="t-meta muted mt-1 inline-block normal-case underline underline-offset-2 hover:text-[var(--color-violet)]"
+              className="t-meta muted mt-1 inline-block underline underline-offset-2 hover:text-[var(--color-violet)]"
             >
               {INSPIRED_BY.url}
             </a>

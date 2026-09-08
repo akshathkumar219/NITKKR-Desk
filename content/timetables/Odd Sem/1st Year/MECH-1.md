@@ -17,7 +17,7 @@ source: NIT Kurukshetra 1st Semester Time Table Session 2026-27
 | 11:35 | 12:30 | Engineering Physics                        | PHIC101      | L3              | 1+2+3 | Tanmay Maji       | lecture |
 | 12:30 | 13:25 | Differential Calculus and Differential Equations | MAIC101 | L3             | 1+2+3 |                   | lecture |
 | 12:30 | 13:25 | Energy and Environmental Science           | CHIC101      | L6              | 4+5+6 | J K Kapoor        | lecture |
-| 14:40 | 15:35 | Energy and Environmental Science           | CHIC101      | L6              | 1+2+3 | R Tittal          | lecture |
+| 15:35 | 16:30 | Energy and Environmental Science           | CHIC101      | L6              | 1+2+3 | R Tittal          | lecture |
 | 14:40 | 16:30 | Problem Solving and Programming Using C Lab | CSIC103 (P) |                 | 6     |                   | lab     |
 | 16:30 | 18:20 | NCC / Sports / Yoga / NSS / Clubs          |              |                 |       |                   | other   |
 

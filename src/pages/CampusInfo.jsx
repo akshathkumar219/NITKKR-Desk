@@ -1,17 +1,16 @@
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { CalendarDays, ExternalLink, Info, Phone } from 'lucide-react'
 import Shell from '../components/Shell'
 import { Chip, PageHeader, Panel, Segmented, StatTile } from '../ui'
 import {
-  CALENDAR,
-  CALENDAR_CATEGORIES,
-  CALENDAR_NEXT,
   HELPLINE,
   INSTITUTE,
   QUICK_LINKS,
   byDate,
   eventState,
   gapFor,
+  getCalendarByTerm,
+  getCalendarNext,
   relativeLabel,
 } from '../data/info'
 
@@ -19,18 +18,44 @@ import {
 const CATEGORY_ACCENT = {
   REGISTRATION: 'var(--color-violet)',
   CLASSES: 'var(--color-acid)',
+  ACADEMIC: 'var(--color-acid)',
   EXAMS: 'var(--color-sky)',
   GRADES: 'var(--color-teal)',
   BREAKS: 'var(--color-amber)',
   HOLIDAYS: 'var(--color-coral)',
+  EVENTS: 'var(--color-coral)',
 }
 
+const SEMESTERS = [
+  { value: 'odd', label: 'ODD SEM (2026-27)' },
+  { value: 'even', label: 'EVEN SEM (2026-27)' },
+]
+
 export default function CampusInfo() {
+  const [termKey, setTermKey] = useState('odd')
   const [cat, setCat] = useState('ALL')
-  const events = byDate(
-    cat === 'ALL' ? CALENDAR.events : CALENDAR.events.filter((e) => e.category === cat),
+
+  const activeCalendar = useMemo(() => getCalendarByTerm(termKey), [termKey])
+
+  const semesterCategories = useMemo(() => {
+    return ['ALL', ...[...new Set((activeCalendar.events || []).map((e) => e.category))].sort()]
+  }, [activeCalendar])
+
+  const activeCat = semesterCategories.includes(cat) ? cat : 'ALL'
+
+  const events = useMemo(() => {
+    return byDate(
+      activeCat === 'ALL'
+        ? activeCalendar.events
+        : activeCalendar.events.filter((e) => e.category === activeCat),
+    )
+  }, [activeCalendar, activeCat])
+
+  const activeNext = useMemo(
+    () => getCalendarNext(activeCalendar.events),
+    [activeCalendar],
   )
-  const nextLabel = CALENDAR_NEXT?.label ?? null
+  const nextLabel = activeNext?.label ?? null
 
   return (
     <Shell>
@@ -78,28 +103,39 @@ export default function CampusInfo() {
             </div>
             <div className="min-w-0">
               <p className="t-meta muted">ACADEMIC CALENDAR</p>
-              <p className="t-section mt-1">{CALENDAR.title}</p>
-              <p className="t-meta muted mt-1.5">{CALENDAR.audience}</p>
+              <p className="t-section mt-1">{activeCalendar.title}</p>
+              <p className="t-meta muted mt-1.5">{activeCalendar.audience}</p>
             </div>
           </div>
-          <Chip tone={CALENDAR.verified ? 'var(--color-acid)' : 'var(--color-amber)'}>
-            {CALENDAR.verified ? 'OFFICIAL' : 'PLACEHOLDER'}
-          </Chip>
+          <div className="flex flex-wrap items-center gap-2">
+            <Segmented
+              options={SEMESTERS}
+              value={termKey}
+              onChange={(val) => {
+                setTermKey(val)
+                setCat('ALL')
+              }}
+              size="sm"
+            />
+            <Chip tone={activeCalendar.verified ? 'var(--color-acid)' : 'var(--color-amber)'}>
+              {activeCalendar.verified ? 'OFFICIAL' : 'PLACEHOLDER'}
+            </Chip>
+          </div>
         </div>
 
         {/* The countdown only. The spine below carries the elapsed-time and
             progress information the old horizontal rail used to duplicate. */}
-        {CALENDAR_NEXT ? (
+        {activeNext ? (
           <div className="board mt-4 pad-card">
             <div className="flex flex-wrap items-end justify-between gap-3">
               <div className="min-w-0">
                 <p className="t-meta muted">NEXT UP</p>
-                <p className="t-section mt-1">{CALENDAR_NEXT.label}</p>
-                <p className="mt-1.5 t-body font-bold tabular-nums">{CALENDAR_NEXT.value}</p>
+                <p className="t-section mt-1">{activeNext.label}</p>
+                <p className="mt-1.5 t-body font-bold tabular-nums">{activeNext.value}</p>
               </div>
-              {relativeLabel(CALENDAR_NEXT) ? (
+              {relativeLabel(activeNext) ? (
                 <p className="t-stat tabular-nums shrink-0">
-                  {relativeLabel(CALENDAR_NEXT)}
+                  {relativeLabel(activeNext)}
                 </p>
               ) : null}
             </div>
@@ -107,11 +143,11 @@ export default function CampusInfo() {
         ) : null}
 
         <div className="mt-5">
-          <Segmented options={CALENDAR_CATEGORIES} value={cat} onChange={setCat} size="sm" />
+          <Segmented options={semesterCategories} value={activeCat} onChange={setCat} size="sm" />
         </div>
 
         <div className="mt-4 flex flex-wrap items-center justify-between gap-2 border-t-2 border-black/10 pt-3 dark:border-white/10">
-          <p className="t-meta">{cat}</p>
+          <p className="t-meta">{activeCat}</p>
           <p className="t-meta muted">
             {events.length} {events.length === 1 ? 'ITEM' : 'ITEMS'}
           </p>
@@ -233,11 +269,11 @@ export default function CampusInfo() {
           })}
         </ol>
 
-        {CALENDAR.note ? <p className="t-meta muted mt-4">{CALENDAR.note}</p> : null}
+        {activeCalendar.note ? <p className="t-meta muted mt-4">{activeCalendar.note}</p> : null}
         {/* Only claim a source once the dates actually come from one. */}
-        {CALENDAR.verified ? (
+        {activeCalendar.verified ? (
           <p className="t-meta muted mt-2">
-            SOURCE · OFFICIAL ACADEMIC CALENDAR NOTICE OF NIT KURUKSHETRA
+            SOURCE · {activeCalendar.source ? activeCalendar.source.toUpperCase() : 'OFFICIAL ACADEMIC CALENDAR NOTICE OF NIT KURUKSHETRA'}
           </p>
         ) : null}
       </Panel>

@@ -87,6 +87,8 @@ export default function App() {
           <Route path="/select/info" element={<SelectInfo />} />
 
           <Route path="/home" element={<RequireWelcome><Board /></RequireWelcome>} />
+          <Route path="/timetable" element={<RequireWelcome><Board /></RequireWelcome>} />
+          <Route path="/board" element={<RequireWelcome><Board /></RequireWelcome>} />
           <Route path="/mess" element={<RequireWelcome><Mess /></RequireWelcome>} />
           <Route path="/attendance" element={<RequireWelcome><Attendance /></RequireWelcome>} />
           <Route path="/attendance/:tabKey" element={<RequireWelcome><Attendance /></RequireWelcome>} />

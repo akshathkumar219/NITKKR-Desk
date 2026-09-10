@@ -42,7 +42,7 @@ source: NIT Kurukshetra 1st Semester Time Table Session 2026-27
 | 08:30 | 10:20 | Energy and Environmental Science Lab       | CHIC101 (P)  | Chemistry Dept  | 4+5+6 |                   | lab     |
 | 10:40 | 12:30 | Energy and Environmental Science Lab       | CHIC101 (P)  | Chemistry Dept  | 1+2+3 |                   | lab     |
 | 10:40 | 12:30 | Engineering Physics Lab                    | PHIC101 (P)  | Physics Dept    | 4+5+6 |                   | lab     |
-| 12:30 | 13:25 | Audit Course (AU-II)                       | AU-II        |                 |       | Humanities Dept   | other   |
+| 12:30 | 13:25 | Thought Lab                                |              |                 | 1+2+3 |                   | other   |
 | 14:40 | 15:35 | Economics for Engineers / Business Studies | HSIC102/HSIC104 | L3/L6        |       |                   | lecture |
 | 15:35 | 16:30 | Engineering Physics                        | PHIC101      | L6              | 4+5+6 | T S Saini         | lecture |
 
@@ -67,6 +67,6 @@ source: NIT Kurukshetra 1st Semester Time Table Session 2026-27
 | 10:40 | 11:35 | Engineering Physics                        | PHIC101      | A321            | 4+5+6 | T S Saini         | lecture |
 | 10:40 | 12:30 | Problem Solving and Programming Using C Lab | CSIC103 (P) |                 | 3     |                   | lab     |
 | 11:35 | 12:30 | Differential Calculus and Differential Equations | MAIC101 | A321           | 4+5+6 |                   | lecture |
-| 12:30 | 13:25 | Audit Course (AU-II)                       | AU-II        |                 |       | Humanities Dept   | other   |
+| 12:30 | 13:25 | Thought Lab                                |              |                 | 4+5+6 |                   | other   |
 | 14:40 | 16:30 | Problem Solving and Programming Using C Lab | CSIC103 (P) |                 | 4     |                   | lab     |
 | 15:35 | 16:30 | Differential Calculus and Differential Equations | MAIC101 | L3             | 1+2+3 |                   | lecture |

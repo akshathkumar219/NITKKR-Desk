@@ -1,6 +1,8 @@
 import { useCallback } from 'react'
 import { KEYS, useStored } from './storage.js'
 import { DAYS, isoToDate, todayISO } from './time.js'
+import { getSessionById } from '../data/timetables.js'
+import { isNoClassDay } from '../data/info.js'
 
 // Attendance ("roll call") marks are keyed by `${isoDate}|${sessionId}` so a
 // session can be marked independently on each date it occurs.
@@ -96,21 +98,60 @@ function inWindow(iso, since) {
  *   held    = present + absent      (cancelled classes never count)
  *   percent = attended / held
  */
-export function tally(marks, sessionIds, since, manualAdjustment = 0, baseAttendance = { present: 0, held: 0 }) {
-  const ids = new Set(sessionIds)
+export function tally(
+  marks,
+  sessionIds,
+  since,
+  manualAdjustment = 0,
+  baseAttendance = { present: 0, held: 0 },
+  sessionWeights = {},
+) {
+  const ids = new Set()
+  const weights = { ...(sessionWeights || {}) }
+
+  if (Array.isArray(sessionIds) || sessionIds instanceof Set) {
+    for (const item of sessionIds) {
+      if (item && typeof item === 'object') {
+        ids.add(item.id)
+        if (weights[item.id] == null) {
+          weights[item.id] =
+            item.attendanceCredits != null
+              ? Number(item.attendanceCredits)
+              : item.type === 'lab'
+                ? 2
+                : 1
+        }
+      } else if (item != null) {
+        ids.add(item)
+        if (weights[item] == null) {
+          const sess = getSessionById(item)
+          if (sess) {
+            weights[item] = sess.attendanceCredits || 1
+          }
+        }
+      }
+    }
+  }
+
   let present = 0
   let absent = 0
   let cancelled = 0
 
-  for (const [key, mark] of Object.entries(marks)) {
+  for (const [key, mark] of Object.entries(marks || {})) {
     const sep = key.indexOf('|')
     const iso = key.slice(0, sep)
     const sid = key.slice(sep + 1)
     if (!ids.has(sid)) continue
     if (!inWindow(iso, since)) continue
-    if (mark === 'present') present += 1
-    else if (mark === 'absent') absent += 1
-    else if (mark === 'cancelled') cancelled += 1
+    let weight = weights[sid]
+    if (weight == null || isNaN(weight)) {
+      const sess = getSessionById(sid)
+      weight = sess?.attendanceCredits || 1
+      weights[sid] = weight
+    }
+    if (mark === 'present') present += weight
+    else if (mark === 'absent') absent += weight
+    else if (mark === 'cancelled') cancelled += weight
   }
 
   const baseP = Number(baseAttendance?.present) || 0
@@ -254,9 +295,11 @@ export function unmarkedSince(sessions, marks, since, upto = todayISO()) {
     const day = DAYS[(cursor.getDay() + 6) % 7]
     if (DAYS.includes(day)) {
       const iso = `${cursor.getFullYear()}-${String(cursor.getMonth() + 1).padStart(2, '0')}-${String(cursor.getDate()).padStart(2, '0')}`
-      for (const s of sessions) {
-        if (s.day !== day || s.type === 'break') continue
-        if (!marks[markKey(iso, s.id)]) out.push({ iso, session: s })
+      if (!isNoClassDay(iso)) {
+        for (const s of sessions) {
+          if (s.day !== day || s.type === 'break') continue
+          if (!marks[markKey(iso, s.id)]) out.push({ iso, session: s })
+        }
       }
     }
     cursor.setDate(cursor.getDate() + 1)

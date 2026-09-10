@@ -269,6 +269,7 @@ export function parseLandmarks(text, file) {
           )
         }
         out.push({
+          id: row.get('id') || null,
           name,
           tag: (row.get('tag') || 'OTHER').toUpperCase(),
           lat: hasCoords ? Number(lat) : null,
@@ -364,6 +365,7 @@ export function parsePyq(text, file) {
         papers.push({
           code: row.get('code'),
           title: row.get('title'),
+          branch: row.get('branch') || '',
           sem: row.get('semester') || row.get('sem') || '',
           exam,
           url: url || null,

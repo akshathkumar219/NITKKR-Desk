@@ -1,23 +1,2306 @@
 [
   {
-    "session": "2023-24",
-    "sub": "SEMESTER I & II · B.TECH",
+    "session": "2024",
+    "sub": "B.TECH · NIT KURUKSHETRA",
     "available": true,
-    "papers": [],
+    "papers": [
+      {
+        "code": "CHIC-101",
+        "title": "Environmental Chemistry",
+        "branch": "ALL",
+        "sem": "1",
+        "exam": "END",
+        "url": "https://pdf.nitkkrpyqs.in/papers/65870728-db56-4345-85d9-8f8ce8496646.pdf"
+      },
+      {
+        "code": "CHIC-101",
+        "title": "Enviormental Chemistry",
+        "branch": "ALL",
+        "sem": "1",
+        "exam": "MID1",
+        "url": "https://pdf.nitkkrpyqs.in/papers/399588c2-09cb-400b-9128-34a0bf8b86b5.pdf"
+      },
+      {
+        "code": "CHIC-101",
+        "title": "Environmental Chemistry",
+        "branch": "ALL",
+        "sem": "1",
+        "exam": "MID1",
+        "url": "https://pdf.nitkkrpyqs.in/papers/912a4790-a4a3-4866-9e0b-af7b7ccb0bfc.pdf"
+      },
+      {
+        "code": "CHIC-101",
+        "title": "Environmental Chemistry",
+        "branch": "ALL",
+        "sem": "1",
+        "exam": "MID2",
+        "url": "https://pdf.nitkkrpyqs.in/papers/4771aa0c-53f1-4eee-81b2-dd9a2ab71ef7.pdf"
+      },
+      {
+        "code": "CHIC-101",
+        "title": "Enviromental Studies",
+        "branch": "ALL",
+        "sem": "1",
+        "exam": "MID2",
+        "url": "https://pdf.nitkkrpyqs.in/papers/af2e59aa-8d6b-42b8-8b11-7ebee2027391.pdf"
+      },
+      {
+        "code": "CSIC-101",
+        "title": "C Programming",
+        "branch": "ALL",
+        "sem": "1",
+        "exam": "END",
+        "url": "https://pdf.nitkkrpyqs.in/papers/5cfb2dd1-d5f4-4393-84fc-c117c1311c41.pdf"
+      },
+      {
+        "code": "CSIC-101",
+        "title": "C Programming",
+        "branch": "ALL",
+        "sem": "1",
+        "exam": "MID1",
+        "url": "https://pdf.nitkkrpyqs.in/papers/ab7cb4af-f400-46c9-a349-d29be2922085.pdf"
+      },
+      {
+        "code": "CSIC-101",
+        "title": "C Programming",
+        "branch": "ALL",
+        "sem": "1",
+        "exam": "MID2",
+        "url": "https://pdf.nitkkrpyqs.in/papers/7d4d8dd5-0f05-4e3c-82a4-e2e4b21e419d.pdf"
+      },
+      {
+        "code": "CSIC-103",
+        "title": "C Programming",
+        "branch": "ALL",
+        "sem": "1",
+        "exam": "END",
+        "url": "https://pdf.nitkkrpyqs.in/papers/5f805284-b1ea-467e-adb4-d70519aaf5ca.pdf"
+      },
+      {
+        "code": "CSIC-103",
+        "title": "C Programming",
+        "branch": "ALL",
+        "sem": "1",
+        "exam": "MID2",
+        "url": "https://pdf.nitkkrpyqs.in/papers/c9d436b2-0083-441e-ba52-4cf834511fc1.pdf"
+      },
+      {
+        "code": "HSIC-101",
+        "title": "Communication skills in English",
+        "branch": "ALL",
+        "sem": "1",
+        "exam": "END",
+        "url": "https://pdf.nitkkrpyqs.in/papers/405ff537-4fb4-4e59-a0ac-b055b9c4ace8.pdf"
+      },
+      {
+        "code": "HSIC-101",
+        "title": "Communication skills in English",
+        "branch": "ALL",
+        "sem": "1",
+        "exam": "MID1",
+        "url": "https://pdf.nitkkrpyqs.in/papers/434a0638-5eb8-44f5-a1fd-69c8c86de698.pdf"
+      },
+      {
+        "code": "HSIC-101",
+        "title": "Communication Skills in English",
+        "branch": "ALL",
+        "sem": "1",
+        "exam": "MID2",
+        "url": "https://pdf.nitkkrpyqs.in/papers/2cadb6e2-1d29-4690-912c-def8964df30e.pdf"
+      },
+      {
+        "code": "HSIC-102",
+        "title": "Economics",
+        "branch": "ALL",
+        "sem": "1",
+        "exam": "END",
+        "url": "https://pdf.nitkkrpyqs.in/papers/449083a0-f567-452b-9dad-6baa574f8e1a.pdf"
+      },
+      {
+        "code": "HSIC-102",
+        "title": "Economics",
+        "branch": "ALL",
+        "sem": "1",
+        "exam": "MID1",
+        "url": "https://pdf.nitkkrpyqs.in/papers/12dbbe6d-9c98-4238-a565-ae2a0922f049.pdf"
+      },
+      {
+        "code": "HSIC-103",
+        "title": "Finance",
+        "branch": "ALL",
+        "sem": "1",
+        "exam": "MID1",
+        "url": "https://pdf.nitkkrpyqs.in/papers/fa84710c-c569-4f73-9ebb-9c573cf445e0.pdf"
+      },
+      {
+        "code": "HSIC-104",
+        "title": "Business Studies",
+        "branch": "ALL",
+        "sem": "1",
+        "exam": "MID1",
+        "url": "https://pdf.nitkkrpyqs.in/papers/a9340924-ee70-4c22-b339-4a0ef1556afb.pdf"
+      },
+      {
+        "code": "HSIC-104",
+        "title": "Business Studies",
+        "branch": "ALL",
+        "sem": "1",
+        "exam": "MID2",
+        "url": "https://pdf.nitkkrpyqs.in/papers/26b97b10-06d3-4c15-bb4e-6824f235083d.pdf"
+      },
+      {
+        "code": "HSIC-104",
+        "title": "Business Studies",
+        "branch": "ALL",
+        "sem": "1",
+        "exam": "MID2",
+        "url": "https://pdf.nitkkrpyqs.in/papers/403fbd99-cec8-4aee-89f5-936ec832aa24.pdf"
+      },
+      {
+        "code": "MAIC-101",
+        "title": "Maths",
+        "branch": "ALL",
+        "sem": "1",
+        "exam": "END",
+        "url": "https://pdf.nitkkrpyqs.in/papers/d3f60f08-a880-4f41-abd8-c35f6f7f153a.pdf"
+      },
+      {
+        "code": "MAIC-101",
+        "title": "Maths",
+        "branch": "ALL",
+        "sem": "1",
+        "exam": "MID1",
+        "url": "https://pdf.nitkkrpyqs.in/papers/863e6700-9242-4532-8a58-cc1a1b3f53a3.pdf"
+      },
+      {
+        "code": "MAIC-101",
+        "title": "Differential Calculus and Differential equations",
+        "branch": "ALL",
+        "sem": "1",
+        "exam": "MID1",
+        "url": "https://pdf.nitkkrpyqs.in/papers/d76d3b00-75b3-450a-a6fb-1b9f1a1f7d59.pdf"
+      },
+      {
+        "code": "MAIC-101",
+        "title": "Maths",
+        "branch": "ALL",
+        "sem": "1",
+        "exam": "MID2",
+        "url": "https://pdf.nitkkrpyqs.in/papers/9122c255-8ea4-470f-bb64-e5991431afe7.pdf"
+      },
+      {
+        "code": "MAIC-101",
+        "title": "Maths ( Differntial Caluculs )",
+        "branch": "ALL",
+        "sem": "1",
+        "exam": "MID2",
+        "url": "https://pdf.nitkkrpyqs.in/papers/c3e9e54f-5423-4836-b7b3-7e23575dc62d.pdf"
+      },
+      {
+        "code": "MEIC-101",
+        "title": "Engineering Graphics",
+        "branch": "ALL",
+        "sem": "1",
+        "exam": "END",
+        "url": "https://pdf.nitkkrpyqs.in/papers/fc5da06f-5307-4f7d-802a-ecdac7b1e216.pdf"
+      },
+      {
+        "code": "MEIC-102",
+        "title": "Engineering Practice",
+        "branch": "ALL",
+        "sem": "1",
+        "exam": "END",
+        "url": "https://pdf.nitkkrpyqs.in/papers/3f69f753-0cda-41d6-ae86-0d8e5842836c.pdf"
+      },
+      {
+        "code": "MEIC-102",
+        "title": "Engineering Practice",
+        "branch": "ALL",
+        "sem": "1",
+        "exam": "MID1",
+        "url": "https://pdf.nitkkrpyqs.in/papers/0a6e21f5-633a-4322-85d1-fb4352d20ebf.pdf"
+      },
+      {
+        "code": "MEIC-102",
+        "title": "Engineering Practice",
+        "branch": "ALL",
+        "sem": "1",
+        "exam": "MID2",
+        "url": "https://pdf.nitkkrpyqs.in/papers/5adeaff8-7abb-4c89-962d-0ca0fd2ae60e.pdf"
+      },
+      {
+        "code": "PHIC-101",
+        "title": "Engineering Physics",
+        "branch": "ALL",
+        "sem": "1",
+        "exam": "END",
+        "url": "https://pdf.nitkkrpyqs.in/papers/3bac4d4c-fec5-4fed-8463-df9ba120686a.pdf"
+      },
+      {
+        "code": "PHIC-101",
+        "title": "Engineering Physics",
+        "branch": "ALL",
+        "sem": "1",
+        "exam": "MID1",
+        "url": "https://pdf.nitkkrpyqs.in/papers/fe9b5961-ea81-4d9d-9580-fc85a1ebe352.pdf"
+      },
+      {
+        "code": "PHIC-101",
+        "title": "Engineering Physics",
+        "branch": "ALL",
+        "sem": "1",
+        "exam": "MID1",
+        "url": "https://pdf.nitkkrpyqs.in/papers/df4e99db-771b-4051-83dc-9e68665ec1e4.pdf"
+      },
+      {
+        "code": "PHIC-101",
+        "title": "Engineering Physics",
+        "branch": "ALL",
+        "sem": "1",
+        "exam": "MID2",
+        "url": "https://pdf.nitkkrpyqs.in/papers/b756a494-b693-49b9-ae07-aed9e064fb9e.pdf"
+      },
+      {
+        "code": "PHIC-101",
+        "title": "Engineering Physics",
+        "branch": "ALL",
+        "sem": "1",
+        "exam": "MID2",
+        "url": "https://pdf.nitkkrpyqs.in/papers/26dd076a-ba54-400e-89d6-0b8008889fac.pdf"
+      },
+      {
+        "code": "EEPC-204",
+        "title": "Signals and Systems",
+        "branch": "EE",
+        "sem": "3",
+        "exam": "MID1",
+        "url": "https://pdf.nitkkrpyqs.in/papers/9e704e6e-d03e-47bb-acf9-eb82713ab9c4.pdf"
+      },
+      {
+        "code": "EEPC-206",
+        "title": "Linear system theory",
+        "branch": "EE",
+        "sem": "3",
+        "exam": "MID2",
+        "url": "https://pdf.nitkkrpyqs.in/papers/8915ff1b-be49-4713-a432-fd1c99e8c8d6.pdf"
+      }
+    ],
     "warnings": []
   },
   {
-    "session": "2024-25",
-    "sub": "SEMESTER I & II · B.TECH",
+    "session": "2025",
+    "sub": "B.TECH · NIT KURUKSHETRA",
     "available": true,
-    "papers": [],
+    "papers": [
+      {
+        "code": "CHIC-101",
+        "title": "Energy and Enviormental Science",
+        "branch": "ALL",
+        "sem": "1",
+        "exam": "END",
+        "url": "https://pdf.nitkkrpyqs.in/papers/995a46a1-9c43-4943-a1e8-eb9b6889a100.pdf"
+      },
+      {
+        "code": "CSIC-101",
+        "title": "C programming",
+        "branch": "ALL",
+        "sem": "1",
+        "exam": "MID1",
+        "url": "https://pdf.nitkkrpyqs.in/papers/e146a7af-6d0c-43d7-b497-a36a9710978a.pdf"
+      },
+      {
+        "code": "CSIC-103",
+        "title": "C Programming",
+        "branch": "ALL",
+        "sem": "1",
+        "exam": "END",
+        "url": "https://pdf.nitkkrpyqs.in/papers/f7d31284-5bfa-4da8-91c4-a47bafa3cc86.pdf"
+      },
+      {
+        "code": "Csic 101",
+        "title": "Data",
+        "branch": "ALL",
+        "sem": "1",
+        "exam": "END",
+        "url": "https://pdf.nitkkrpyqs.in/papers/684894ff-e89c-4228-83da-97d601d8f9a2.pdf"
+      },
+      {
+        "code": "HSIC-101",
+        "title": "Communication Skills in English",
+        "branch": "ALL",
+        "sem": "1",
+        "exam": "END",
+        "url": "https://pdf.nitkkrpyqs.in/papers/51d41b12-4677-4421-9803-9bfbcfbf6172.pdf"
+      },
+      {
+        "code": "HSIC-103",
+        "title": "Finance Education",
+        "branch": "ALL",
+        "sem": "1",
+        "exam": "END",
+        "url": "https://pdf.nitkkrpyqs.in/papers/f3d9fed4-abf3-4dc5-9a20-d9345057ded5.pdf"
+      },
+      {
+        "code": "MAIC-101",
+        "title": "Maths ( Differential Calculus and Differential Equations)",
+        "branch": "ALL",
+        "sem": "1",
+        "exam": "END",
+        "url": "https://pdf.nitkkrpyqs.in/papers/f74d33bc-a5f8-4ccc-8840-b24fea76886a.pdf"
+      },
+      {
+        "code": "MAIC-101",
+        "title": "Maths ( Differential Calculus and Differential equations)",
+        "branch": "ALL",
+        "sem": "1",
+        "exam": "MID1",
+        "url": "https://pdf.nitkkrpyqs.in/papers/1bed5e15-0a9e-4624-8fbf-357052b4f18f.pdf"
+      },
+      {
+        "code": "MAIC-101",
+        "title": "Maths ( Differential Calculus and Differential equations)",
+        "branch": "ALL",
+        "sem": "1",
+        "exam": "MID1",
+        "url": "https://pdf.nitkkrpyqs.in/papers/208d6e61-8816-4385-933a-d39b5e1bed12.pdf"
+      },
+      {
+        "code": "PHIC 101",
+        "title": "Engineering Physics",
+        "branch": "ALL",
+        "sem": "1",
+        "exam": "MID2",
+        "url": "https://pdf.nitkkrpyqs.in/papers/877f855a-60cb-4ff1-a7a1-9c42b48c83a5.pdf"
+      },
+      {
+        "code": "PHIC-101",
+        "title": "Engineering Physics",
+        "branch": "ALL",
+        "sem": "1",
+        "exam": "END",
+        "url": "https://pdf.nitkkrpyqs.in/papers/8c45fedc-2100-49b6-9a35-769af2946c90.pdf"
+      },
+      {
+        "code": "PHIC-101",
+        "title": "Engineering Physics",
+        "branch": "ALL",
+        "sem": "1",
+        "exam": "MID1",
+        "url": "https://pdf.nitkkrpyqs.in/papers/f64a3200-a5dc-4fa7-b3f8-c4a8f7e228ce.pdf"
+      },
+      {
+        "code": "PHIC-101",
+        "title": "Engineering Physics",
+        "branch": "ALL",
+        "sem": "1",
+        "exam": "MID1",
+        "url": "https://pdf.nitkkrpyqs.in/papers/8aa8eb96-6c9c-4868-9981-353d660b946f.pdf"
+      },
+      {
+        "code": "CSPC-100/ITPC-100/AIPC-100",
+        "title": "Data Structures",
+        "branch": "AIML/CSE/IT",
+        "sem": "2",
+        "exam": "MID1",
+        "url": "https://pdf.nitkkrpyqs.in/papers/f137e4ec-c088-46cd-a62d-c65b71282b92.pdf"
+      },
+      {
+        "code": "CSPC-100/ITPC-100/AIPC-100",
+        "title": "Data Structures",
+        "branch": "AIML/CSE/IT",
+        "sem": "2",
+        "exam": "MID2",
+        "url": "https://pdf.nitkkrpyqs.in/papers/61af8220-beb8-4f26-a61a-d0f623856c18.pdf"
+      },
+      {
+        "code": "CHIC-102",
+        "title": "Chemistry",
+        "branch": "ALL",
+        "sem": "2",
+        "exam": "MID1",
+        "url": "https://pdf.nitkkrpyqs.in/papers/9a820975-4bd9-4d32-9fe7-de78a6a77826.pdf"
+      },
+      {
+        "code": "CHIC-103",
+        "title": "Chemistry",
+        "branch": "ALL",
+        "sem": "2",
+        "exam": "MID1",
+        "url": "https://pdf.nitkkrpyqs.in/papers/46db5965-269a-4e57-9823-bf10ee9923c0.pdf"
+      },
+      {
+        "code": "CHIC-103",
+        "title": "Chemistry",
+        "branch": "ALL",
+        "sem": "2",
+        "exam": "MID2",
+        "url": "https://pdf.nitkkrpyqs.in/papers/a65ec22a-8763-4548-a17d-f6951e61359a.pdf"
+      },
+      {
+        "code": "CSIC-100",
+        "title": "Digital System Design (DSD)",
+        "branch": "ALL",
+        "sem": "2",
+        "exam": "END",
+        "url": "https://pdf.nitkkrpyqs.in/papers/dfe34773-0e9d-4d25-935f-47e8f6407145.pdf"
+      },
+      {
+        "code": "CSIC-100",
+        "title": "Digital System Design (DSD)",
+        "branch": "ALL",
+        "sem": "2",
+        "exam": "MID1",
+        "url": "https://pdf.nitkkrpyqs.in/papers/ca84497c-b16e-4953-846e-abb1a0e1a432.pdf"
+      },
+      {
+        "code": "CSIC-100",
+        "title": "Digital System Design (DSD)",
+        "branch": "ALL",
+        "sem": "2",
+        "exam": "MID1",
+        "url": "https://pdf.nitkkrpyqs.in/papers/a40f4c88-1b11-4ccc-9a60-08d9af2c31e4.pdf"
+      },
+      {
+        "code": "CSIC-100",
+        "title": "Digital System Design (DSD)",
+        "branch": "ALL",
+        "sem": "2",
+        "exam": "MID2",
+        "url": "https://pdf.nitkkrpyqs.in/papers/92d745ab-b996-44e7-9831-10b10c87e705.pdf"
+      },
+      {
+        "code": "CSIC-100",
+        "title": "Digital System Design (DSD)",
+        "branch": "ALL",
+        "sem": "2",
+        "exam": "MID2",
+        "url": "https://pdf.nitkkrpyqs.in/papers/431559fe-cae8-4649-8df0-bdd44220e3bf.pdf"
+      },
+      {
+        "code": "CSIC-100",
+        "title": "Digital System Design ( DSD )",
+        "branch": "ALL",
+        "sem": "2",
+        "exam": "MID2",
+        "url": "https://pdf.nitkkrpyqs.in/papers/e4dfcbcf-398d-4ef3-9e1f-f3be50b9a2dd.pdf"
+      },
+      {
+        "code": "CSIC-104",
+        "title": "Python Programming",
+        "branch": "ALL",
+        "sem": "2",
+        "exam": "END",
+        "url": "https://pdf.nitkkrpyqs.in/papers/51fc3eeb-24b7-4d1b-88a2-48a34c3d7ee6.pdf"
+      },
+      {
+        "code": "CSIC-104",
+        "title": "Python Programming",
+        "branch": "ALL",
+        "sem": "2",
+        "exam": "MID1",
+        "url": "https://pdf.nitkkrpyqs.in/papers/e9f09192-75eb-426e-a25b-3fccfa53076c.pdf"
+      },
+      {
+        "code": "CSIC-104",
+        "title": "Python Programming",
+        "branch": "ALL",
+        "sem": "2",
+        "exam": "MID2",
+        "url": "https://pdf.nitkkrpyqs.in/papers/b41fbd48-e24a-4318-bc03-dc96a0318d24.pdf"
+      },
+      {
+        "code": "HSIC-101",
+        "title": "Communication skills in English",
+        "branch": "ALL",
+        "sem": "2",
+        "exam": "END",
+        "url": "https://pdf.nitkkrpyqs.in/papers/2f9ddbc3-6d5d-43ee-b574-8ae6f019b395.pdf"
+      },
+      {
+        "code": "HSIC-101",
+        "title": "Communication Skills in English",
+        "branch": "ALL",
+        "sem": "2",
+        "exam": "MID2",
+        "url": "https://pdf.nitkkrpyqs.in/papers/d2c6db77-4dd8-4512-b223-ce8186298ac6.pdf"
+      },
+      {
+        "code": "HSIC-102",
+        "title": "Economics for Engineers",
+        "branch": "ALL",
+        "sem": "2",
+        "exam": "END",
+        "url": "https://pdf.nitkkrpyqs.in/papers/7b470f8c-7759-4c16-a501-33e1b84d8cc3.pdf"
+      },
+      {
+        "code": "HSIC-102",
+        "title": "Economics for Engineers",
+        "branch": "ALL",
+        "sem": "2",
+        "exam": "MID1",
+        "url": "https://pdf.nitkkrpyqs.in/papers/2c05b227-5d29-4553-bdbc-4ee927cb429a.pdf"
+      },
+      {
+        "code": "HSIC-102",
+        "title": "Economics for Engineers",
+        "branch": "ALL",
+        "sem": "2",
+        "exam": "MID2",
+        "url": "https://pdf.nitkkrpyqs.in/papers/c9ec0a29-0739-4b0c-a201-3b89c658d36a.pdf"
+      },
+      {
+        "code": "HSIC-103",
+        "title": "Financial Education",
+        "branch": "ALL",
+        "sem": "2",
+        "exam": "MID2",
+        "url": "https://pdf.nitkkrpyqs.in/papers/1b43ef32-6454-42f2-8029-78959dd7d815.pdf"
+      },
+      {
+        "code": "HSIC-104",
+        "title": "Business Studies",
+        "branch": "ALL",
+        "sem": "2",
+        "exam": "END",
+        "url": "https://pdf.nitkkrpyqs.in/papers/754b4058-b388-4022-a2e4-de2a8172ba7d.pdf"
+      },
+      {
+        "code": "HSIC-104",
+        "title": "Business Studies",
+        "branch": "ALL",
+        "sem": "2",
+        "exam": "MID1",
+        "url": "https://pdf.nitkkrpyqs.in/papers/3a9c4bac-d06d-44d6-84dd-265efb0d59ab.pdf"
+      },
+      {
+        "code": "HSIC-104",
+        "title": "Business Studies",
+        "branch": "ALL",
+        "sem": "2",
+        "exam": "MID2",
+        "url": "https://pdf.nitkkrpyqs.in/papers/80f42694-0204-48f1-b688-fcec65d21170.pdf"
+      },
+      {
+        "code": "MAIC-102",
+        "title": "Integral Calculus & Differential Equations (Maths)",
+        "branch": "ALL",
+        "sem": "2",
+        "exam": "END",
+        "url": "https://pdf.nitkkrpyqs.in/papers/37e2699c-a359-40d3-ad92-5ff54263760d.pdf"
+      },
+      {
+        "code": "MAIC-102",
+        "title": "Integral Calculus & Differential Equations (Maths)",
+        "branch": "ALL",
+        "sem": "2",
+        "exam": "MID1",
+        "url": "https://pdf.nitkkrpyqs.in/papers/ae597f1d-e285-4efd-acfb-2f458dded72f.pdf"
+      },
+      {
+        "code": "MAIC-102",
+        "title": "Integral Calculus & Differential Equations (Maths)",
+        "branch": "ALL",
+        "sem": "2",
+        "exam": "MID1",
+        "url": "https://pdf.nitkkrpyqs.in/papers/de9528a6-9f76-4096-b55d-c7bc59c869b1.pdf"
+      },
+      {
+        "code": "MAIC-102",
+        "title": "Integral Calculus & Difference Equations ( Maths )",
+        "branch": "ALL",
+        "sem": "2",
+        "exam": "MID2",
+        "url": "https://pdf.nitkkrpyqs.in/papers/c1efcab3-fa0b-495f-b2f7-6be9bbcbd9ca.pdf"
+      },
+      {
+        "code": "MAIC-102",
+        "title": "Integral Calculus & Difference Equations ( Maths )",
+        "branch": "ALL",
+        "sem": "2",
+        "exam": "MID2",
+        "url": "https://pdf.nitkkrpyqs.in/papers/e2e2e2d2-6609-489d-a61f-1c3d081f6708.pdf"
+      },
+      {
+        "code": "MEIC-102",
+        "title": "Engineering Practice",
+        "branch": "ALL",
+        "sem": "2",
+        "exam": "END",
+        "url": "https://pdf.nitkkrpyqs.in/papers/4e499219-e324-48f6-b8fc-1ca5cd936ddc.pdf"
+      },
+      {
+        "code": "PHIC-103",
+        "title": "Engineering Physics",
+        "branch": "ALL",
+        "sem": "2",
+        "exam": "MID1",
+        "url": "https://pdf.nitkkrpyqs.in/papers/f1833ef2-30d8-4630-9d41-ac16541e4e80.pdf"
+      },
+      {
+        "code": "PHIC-103",
+        "title": "Physics",
+        "branch": "ALL",
+        "sem": "2",
+        "exam": "MID2",
+        "url": "https://pdf.nitkkrpyqs.in/papers/1a3ed9c5-f89b-46a1-b8c9-c31e908ff6ad.pdf"
+      },
+      {
+        "code": "ECPC-201",
+        "title": "Circuit Theory",
+        "branch": "ECE",
+        "sem": "2",
+        "exam": "MID1",
+        "url": "https://pdf.nitkkrpyqs.in/papers/9f9c73a1-7a2b-4b58-a529-9bbfdc8a2c55.pdf"
+      },
+      {
+        "code": "EEPC-101",
+        "title": "Electric Circuit Theory",
+        "branch": "EE",
+        "sem": "2",
+        "exam": "END",
+        "url": "https://pdf.nitkkrpyqs.in/papers/13982827-16a3-4861-9287-15dcedd38753.pdf"
+      },
+      {
+        "code": "EEPC-101",
+        "title": "Circuit Theory",
+        "branch": "EE",
+        "sem": "2",
+        "exam": "MID2",
+        "url": "https://pdf.nitkkrpyqs.in/papers/71a20e98-4969-4ff1-8014-f96326b57bfd.pdf"
+      },
+      {
+        "code": "PIPC-101",
+        "title": "Manufacturing Process",
+        "branch": "PIE",
+        "sem": "2",
+        "exam": "END",
+        "url": "https://pdf.nitkkrpyqs.in/papers/beaeb3e2-49ab-4c48-bb4e-caab9291096f.pdf"
+      },
+      {
+        "code": "RAPC-101",
+        "title": "engineering Mechanics",
+        "branch": "RA",
+        "sem": "2",
+        "exam": "MID1",
+        "url": "https://pdf.nitkkrpyqs.in/papers/32d5a19c-114f-4173-9aa7-b72dfbece032.pdf"
+      },
+      {
+        "code": "RAPC-101",
+        "title": "Engineering Mechanics",
+        "branch": "RA",
+        "sem": "2",
+        "exam": "MID2",
+        "url": "https://pdf.nitkkrpyqs.in/papers/20ff69f1-74c0-4e92-9a53-4a64aa9088c5.pdf"
+      },
+      {
+        "code": "DSPC-201",
+        "title": "Foundations of Data science",
+        "branch": "AIDS",
+        "sem": "3",
+        "exam": "MID1",
+        "url": "https://pdf.nitkkrpyqs.in/papers/6bf785d7-a1f0-412e-9d31-45cd973de05b.pdf"
+      },
+      {
+        "code": "CSPC-201/ DSPC-203",
+        "title": "Design and Analysis of Alograthims",
+        "branch": "AIDS/CS/M&C",
+        "sem": "3",
+        "exam": "END",
+        "url": "https://pdf.nitkkrpyqs.in/papers/d335585a-d47b-4f4b-a7b7-beb64fecb999.pdf"
+      },
+      {
+        "code": "CSPC-201/ DSPC-203",
+        "title": "Design and Analysis of Alograthims",
+        "branch": "AIDS/CS/M&C",
+        "sem": "3",
+        "exam": "MID2",
+        "url": "https://pdf.nitkkrpyqs.in/papers/5940a7d3-d1b8-498b-8dcb-66a6742281e0.pdf"
+      },
+      {
+        "code": "CSPC-201/DSPC-203",
+        "title": "Design and Analysis of Algorithm",
+        "branch": "AIDS/CS/M&C",
+        "sem": "3",
+        "exam": "MID1",
+        "url": "https://pdf.nitkkrpyqs.in/papers/3ade162b-83a3-442f-8345-17e23e54fef3.pdf"
+      },
+      {
+        "code": "ADPC-205/ITPC-203",
+        "title": "Computer Organisation and Architecture",
+        "branch": "AIDS/IT",
+        "sem": "3",
+        "exam": "MID1",
+        "url": "https://pdf.nitkkrpyqs.in/papers/051b234c-01ba-4c03-95fa-30a338676f4d.pdf"
+      },
+      {
+        "code": "ADPC-207/ITPC-207",
+        "title": "Software Engineering",
+        "branch": "AIDS/IT",
+        "sem": "3",
+        "exam": "MID1",
+        "url": "https://pdf.nitkkrpyqs.in/papers/bf167cd1-24e0-476e-8017-5065ceec3043.pdf"
+      },
+      {
+        "code": "DSPC-205/ITPC-203",
+        "title": "Computer Organixation and Architecture",
+        "branch": "AIDS/IT",
+        "sem": "3",
+        "exam": "MID1",
+        "url": "https://pdf.nitkkrpyqs.in/papers/7c6495ce-a46a-4a1d-9bd2-5cb11811390d.pdf"
+      },
+      {
+        "code": "AIPC-201",
+        "title": "Knowledge Representation & Problem Searching",
+        "branch": "AIML",
+        "sem": "3",
+        "exam": "MID1",
+        "url": "https://pdf.nitkkrpyqs.in/papers/e3f83499-6b03-4f3c-9127-21738b8cbb19.pdf"
+      },
+      {
+        "code": "AIPC-201",
+        "title": "Knowledge Representation & Problem Searching",
+        "branch": "AIML",
+        "sem": "3",
+        "exam": "MID2",
+        "url": "https://pdf.nitkkrpyqs.in/papers/aacc6e30-3a33-4ae6-bf1d-585084459774.pdf"
+      },
+      {
+        "code": "AIPC-205",
+        "title": "DBMS ( Database Management System )",
+        "branch": "AIML",
+        "sem": "3",
+        "exam": "MID1",
+        "url": "https://pdf.nitkkrpyqs.in/papers/ce041d76-33ec-4f62-bb10-44c595dadff7.pdf"
+      },
+      {
+        "code": "AIPC-205",
+        "title": "DBMS (Database Management System)",
+        "branch": "AIML",
+        "sem": "3",
+        "exam": "MID2",
+        "url": "https://pdf.nitkkrpyqs.in/papers/da4b29c6-2487-4356-ace9-e61e05eb37c6.pdf"
+      },
+      {
+        "code": "ITPC-201/AIPC-203",
+        "title": "Design and Analysis of Alograthims",
+        "branch": "AIML/IT",
+        "sem": "3",
+        "exam": "MID1",
+        "url": "https://pdf.nitkkrpyqs.in/papers/aa463748-02d0-4d54-9af0-374e7581c6ce.pdf"
+      },
+      {
+        "code": "CEPC-201",
+        "title": "Fluid Mechanics - 1",
+        "branch": "CIVIL",
+        "sem": "3",
+        "exam": "MID1",
+        "url": "https://pdf.nitkkrpyqs.in/papers/33bd9343-5934-4115-af00-5288b61a33fd.pdf"
+      },
+      {
+        "code": "CEPC-201",
+        "title": "Fluid Mechanics - 1",
+        "branch": "CIVIL",
+        "sem": "3",
+        "exam": "MID2",
+        "url": "https://pdf.nitkkrpyqs.in/papers/5085ba0c-afce-417f-82ba-bea88facbd75.pdf"
+      },
+      {
+        "code": "CEPC-203",
+        "title": "Structural Analysis - 1",
+        "branch": "CIVIL",
+        "sem": "3",
+        "exam": "MID1",
+        "url": "https://pdf.nitkkrpyqs.in/papers/d343f0f8-dafb-440b-8641-49ec0636a26e.pdf"
+      },
+      {
+        "code": "MAIC-201",
+        "title": "Discrete Mathematics and Statistical Methods",
+        "branch": "CS/IT/AI & ML/RA/IIOT",
+        "sem": "3",
+        "exam": "END",
+        "url": "https://pdf.nitkkrpyqs.in/papers/be5e3fed-04f9-40b7-9e66-a33bb4465929.pdf"
+      },
+      {
+        "code": "MAIC-201",
+        "title": "Discrete Mathematics and Statistical methods",
+        "branch": "CS/IT/AI & ML/RA/IIOT",
+        "sem": "3",
+        "exam": "MID1",
+        "url": "https://pdf.nitkkrpyqs.in/papers/0e735910-1c37-4ad0-90c6-751f1457b260.pdf"
+      },
+      {
+        "code": "MAIC-201",
+        "title": "Discrete Mathematics and Statistical methods",
+        "branch": "CS/IT/AI & ML/RA/IIOT",
+        "sem": "3",
+        "exam": "MID2",
+        "url": "https://pdf.nitkkrpyqs.in/papers/4c9e4bc3-ce33-4973-b506-d6be0641be7a.pdf"
+      },
+      {
+        "code": "CSPC-201",
+        "title": "Design Analysis of Alograthims",
+        "branch": "CS/M&C",
+        "sem": "3",
+        "exam": "MID1",
+        "url": "https://pdf.nitkkrpyqs.in/papers/0fbc1dd9-4af9-450f-ac66-5355941964da.pdf"
+      },
+      {
+        "code": "CSPC-203",
+        "title": "Computer Organisation & Architecture",
+        "branch": "CS/M&C",
+        "sem": "3",
+        "exam": "END",
+        "url": "https://pdf.nitkkrpyqs.in/papers/6fe7e2e3-fa13-4ef1-8d5d-4d4d66fe07aa.pdf"
+      },
+      {
+        "code": "CSIC-221",
+        "title": "Machine learning & Data Analytics (MLDA)",
+        "branch": "EE",
+        "sem": "3",
+        "exam": "END",
+        "url": "https://pdf.nitkkrpyqs.in/papers/8f51a852-7dc6-4684-a9c8-9df682fa4bf7.pdf"
+      },
+      {
+        "code": "CSIC-221",
+        "title": "Machine Learning and Data Analytics [EE]",
+        "branch": "EE",
+        "sem": "3",
+        "exam": "END",
+        "url": "https://pdf.nitkkrpyqs.in/papers/5ace0a4c-31f6-4e02-a7b1-59e9627cde6f.pdf"
+      },
+      {
+        "code": "CSIC-221",
+        "title": "Machine Learning & Data Analytics",
+        "branch": "EE",
+        "sem": "3",
+        "exam": "MID1",
+        "url": "https://pdf.nitkkrpyqs.in/papers/8cec8c56-ab45-41ec-9182-e8dfabbe0584.pdf"
+      },
+      {
+        "code": "CSIC-221",
+        "title": "Machine Learning & Data Analytics",
+        "branch": "EE",
+        "sem": "3",
+        "exam": "MID1",
+        "url": "https://pdf.nitkkrpyqs.in/papers/09509d91-7e61-41a3-829b-092bb51a159a.pdf"
+      },
+      {
+        "code": "CSIC-221",
+        "title": "Machine Learning & Data Analytics",
+        "branch": "EE",
+        "sem": "3",
+        "exam": "MID1",
+        "url": "https://pdf.nitkkrpyqs.in/papers/e22d621a-10b9-4e4d-a5e8-6d6a051d572b.pdf"
+      },
+      {
+        "code": "CSIC-221",
+        "title": "Machine Learning & Data Analytics (MLDA)",
+        "branch": "EE",
+        "sem": "3",
+        "exam": "MID2",
+        "url": "https://pdf.nitkkrpyqs.in/papers/4819ecf9-01f5-4460-baa5-28c8d53c4b6b.pdf"
+      },
+      {
+        "code": "EEPC -202",
+        "title": "Analog and Digital Electronics (EE)",
+        "branch": "EE",
+        "sem": "3",
+        "exam": "END",
+        "url": "https://pdf.nitkkrpyqs.in/papers/fc492fb2-7dc3-4512-aa5a-f1731f650c3d.pdf"
+      },
+      {
+        "code": "EEPC-201",
+        "title": "AC Machines",
+        "branch": "EE",
+        "sem": "3",
+        "exam": "END",
+        "url": "https://pdf.nitkkrpyqs.in/papers/ab1a0c18-62ed-404f-b509-fdfd829bab56.pdf"
+      },
+      {
+        "code": "EEPC-201",
+        "title": "AC Machine",
+        "branch": "EE",
+        "sem": "3",
+        "exam": "MID1",
+        "url": "https://pdf.nitkkrpyqs.in/papers/5df7641b-1bd6-46ac-9244-d74481af1017.pdf"
+      },
+      {
+        "code": "EEPC-202",
+        "title": "Analog Digital Electronics",
+        "branch": "EE",
+        "sem": "3",
+        "exam": "MID1",
+        "url": "https://pdf.nitkkrpyqs.in/papers/1384b73b-615a-47ac-bc44-5c1700622494.pdf"
+      },
+      {
+        "code": "EEPC-203",
+        "title": "Generation Transmission and Distribution",
+        "branch": "EE",
+        "sem": "3",
+        "exam": "END",
+        "url": "https://pdf.nitkkrpyqs.in/papers/594e6f56-9b4c-491b-8188-208b3d6f7e6b.pdf"
+      },
+      {
+        "code": "EEPC-204",
+        "title": "Signals and System[EE]",
+        "branch": "EE",
+        "sem": "3",
+        "exam": "END",
+        "url": "https://pdf.nitkkrpyqs.in/papers/6bd32e80-4185-4bcc-bb7c-8a594b786702.pdf"
+      },
+      {
+        "code": "EEPC-205",
+        "title": "Network Synthesis and Filters",
+        "branch": "EE",
+        "sem": "3",
+        "exam": "END",
+        "url": "https://pdf.nitkkrpyqs.in/papers/df92b99c-c6d3-4d84-ab87-ce1d292b2cb1.pdf"
+      },
+      {
+        "code": "EEPC-205",
+        "title": "Network Synthesis and Filters",
+        "branch": "EE",
+        "sem": "3",
+        "exam": "MID1",
+        "url": "https://pdf.nitkkrpyqs.in/papers/045aab22-8eda-4d62-aab5-62000240987d.pdf"
+      },
+      {
+        "code": "EEPC-206",
+        "title": "Linear System Theory",
+        "branch": "EE",
+        "sem": "3",
+        "exam": "END",
+        "url": "https://pdf.nitkkrpyqs.in/papers/172dbb41-bd90-4e69-9bed-eb9cec1fa79b.pdf"
+      },
+      {
+        "code": "EEPC-206",
+        "title": "Linear System Theory",
+        "branch": "EE",
+        "sem": "3",
+        "exam": "MID1",
+        "url": "https://pdf.nitkkrpyqs.in/papers/01cd5615-7c64-43a1-97bb-db4e10d21588.pdf"
+      },
+      {
+        "code": "ITPC-205",
+        "title": "OOP With Java",
+        "branch": "IT",
+        "sem": "3",
+        "exam": "END",
+        "url": "https://pdf.nitkkrpyqs.in/papers/9160d8f5-121e-4de1-b37b-a5bf39e72682.pdf"
+      },
+      {
+        "code": "ITPC-205",
+        "title": "OOP with JAVA",
+        "branch": "IT",
+        "sem": "3",
+        "exam": "MID1",
+        "url": "https://pdf.nitkkrpyqs.in/papers/c5b8f63d-e856-4caa-88a8-63289a14b4fa.pdf"
+      },
+      {
+        "code": "MAPC-201",
+        "title": "Linear Algebra & Applications",
+        "branch": "M&C",
+        "sem": "3",
+        "exam": "END",
+        "url": "https://pdf.nitkkrpyqs.in/papers/87112ade-e26b-40e2-b29e-86645f386155.pdf"
+      },
+      {
+        "code": "MAPC-203",
+        "title": "Discrete Mathematics",
+        "branch": "M&C",
+        "sem": "3",
+        "exam": "MID1",
+        "url": "https://pdf.nitkkrpyqs.in/papers/93225ce0-c1d9-4225-af1b-4bbae104a2b0.pdf"
+      },
+      {
+        "code": "MAPC-203",
+        "title": "Discrete Mathematics",
+        "branch": "M&C",
+        "sem": "3",
+        "exam": "MID2",
+        "url": "https://pdf.nitkkrpyqs.in/papers/251e6922-d581-430d-98bc-36274762c1c0.pdf"
+      },
+      {
+        "code": "MEPC-203",
+        "title": "Strength of Machines -1",
+        "branch": "MECH",
+        "sem": "3",
+        "exam": "MID1",
+        "url": "https://pdf.nitkkrpyqs.in/papers/8c62a9b7-4e77-4eac-82b3-4f71d4603cf8.pdf"
+      },
+      {
+        "code": "MAIC-103",
+        "title": "Mathematics - III",
+        "branch": "MNC",
+        "sem": "3",
+        "exam": "MID1",
+        "url": "https://pdf.nitkkrpyqs.in/papers/28a57613-beb8-4118-b81a-7f3ec9d34a37.pdf"
+      },
+      {
+        "code": "MAIC-205",
+        "title": "Statistical Distribution",
+        "branch": "MNC",
+        "sem": "3",
+        "exam": "END",
+        "url": "https://pdf.nitkkrpyqs.in/papers/0c87f7f4-7aaf-44b3-8d90-189c73845a23.pdf"
+      },
+      {
+        "code": "MAIC-205",
+        "title": "Statistical Distribution",
+        "branch": "MNC",
+        "sem": "3",
+        "exam": "MID1",
+        "url": "https://pdf.nitkkrpyqs.in/papers/7c5e36c7-f9b9-4784-a680-cec77d195f95.pdf"
+      },
+      {
+        "code": "MAIC-207",
+        "title": "Optimization Techniques",
+        "branch": "MNC",
+        "sem": "3",
+        "exam": "END",
+        "url": "https://pdf.nitkkrpyqs.in/papers/be5b42c8-8a82-48a4-9710-4af14ceab837.pdf"
+      },
+      {
+        "code": "MAIC-207",
+        "title": "Optimization Techniques",
+        "branch": "MNC",
+        "sem": "3",
+        "exam": "MID1",
+        "url": "https://pdf.nitkkrpyqs.in/papers/c8f5a665-7224-4a0b-9cf4-ef305b4d3456.pdf"
+      },
+      {
+        "code": "MAIC-207",
+        "title": "Optimization Techniques",
+        "branch": "MNC",
+        "sem": "3",
+        "exam": "MID2",
+        "url": "https://pdf.nitkkrpyqs.in/papers/fb294ed4-f4bd-4e25-820c-1835dd01e297.pdf"
+      },
+      {
+        "code": "MAIC-209",
+        "title": "Mathematics for Data Science (Maths)",
+        "branch": "MNC",
+        "sem": "3",
+        "exam": "MID1",
+        "url": "https://pdf.nitkkrpyqs.in/papers/91fa4c60-06fc-444c-935e-8f8993f3bb1a.pdf"
+      },
+      {
+        "code": "PIPC-201",
+        "title": "Thermodynamics",
+        "branch": "PIE",
+        "sem": "3",
+        "exam": "MID1",
+        "url": "https://pdf.nitkkrpyqs.in/papers/d08c337b-f38c-46a7-bdda-3f975f7740c7.pdf"
+      },
+      {
+        "code": "PIPC-201",
+        "title": "Thermodynamics",
+        "branch": "PIE",
+        "sem": "3",
+        "exam": "MID2",
+        "url": "https://pdf.nitkkrpyqs.in/papers/3b7bcd95-fe6b-4492-9de2-4396fb0d15d8.pdf"
+      },
+      {
+        "code": "PIPC-202",
+        "title": "Fluid Mechanics & Machines",
+        "branch": "PIE",
+        "sem": "3",
+        "exam": "MID1",
+        "url": "https://pdf.nitkkrpyqs.in/papers/a6c32fb6-f0ad-46cd-96ed-65726709979f.pdf"
+      },
+      {
+        "code": "PIPC-202",
+        "title": "Fluid Mechanics & Machines",
+        "branch": "PIE",
+        "sem": "3",
+        "exam": "MID2",
+        "url": "https://pdf.nitkkrpyqs.in/papers/b3e397f9-fb74-45e7-831e-e015f34197e2.pdf"
+      },
+      {
+        "code": "PIPC-203",
+        "title": "Facilities Design",
+        "branch": "PIE",
+        "sem": "3",
+        "exam": "MID1",
+        "url": "https://pdf.nitkkrpyqs.in/papers/9a310812-5e08-44d9-8383-6793c209731e.pdf"
+      },
+      {
+        "code": "PIPC-213",
+        "title": "Machine Drawing",
+        "branch": "PIE",
+        "sem": "3",
+        "exam": "MID1",
+        "url": "https://pdf.nitkkrpyqs.in/papers/51c6bba4-c838-44a4-a270-e7f1784fe330.pdf"
+      },
+      {
+        "code": "RAPC-201",
+        "title": "Mechanics of Machines",
+        "branch": "RA",
+        "sem": "3",
+        "exam": "END",
+        "url": "https://pdf.nitkkrpyqs.in/papers/1531fc01-4b4d-4924-961b-97488f16d7b6.pdf"
+      },
+      {
+        "code": "RAPC-201",
+        "title": "Mechanics of Machines",
+        "branch": "RA",
+        "sem": "3",
+        "exam": "MID1",
+        "url": "https://pdf.nitkkrpyqs.in/papers/090ebfed-fde4-480e-a22a-35d6fcb18d93.pdf"
+      },
+      {
+        "code": "RAPC-201",
+        "title": "Mechanics of Machines",
+        "branch": "RA",
+        "sem": "3",
+        "exam": "MID2",
+        "url": "https://pdf.nitkkrpyqs.in/papers/bd9b09b0-ddcf-4137-865f-ec192871bfca.pdf"
+      },
+      {
+        "code": "RAPC-202",
+        "title": "Basic Electrical & Electronics (BEE)",
+        "branch": "RA",
+        "sem": "3",
+        "exam": "END",
+        "url": "https://pdf.nitkkrpyqs.in/papers/95362b24-9f88-40d5-9895-0f0bdfec8550.pdf"
+      },
+      {
+        "code": "RAPC-202",
+        "title": "Basic Electrical & Electronics (BEE)",
+        "branch": "RA",
+        "sem": "3",
+        "exam": "MID1",
+        "url": "https://pdf.nitkkrpyqs.in/papers/bd10c6e6-4861-412d-b56a-aad7332401ef.pdf"
+      },
+      {
+        "code": "RAPC-202",
+        "title": "Basic Electrical & Electronics ( BEE )",
+        "branch": "RA",
+        "sem": "3",
+        "exam": "MID2",
+        "url": "https://pdf.nitkkrpyqs.in/papers/721ae5ee-8c95-4758-90d7-ee15bc8807a9.pdf"
+      },
+      {
+        "code": "RAPC-203",
+        "title": "Introduction to Automation",
+        "branch": "RA",
+        "sem": "3",
+        "exam": "END",
+        "url": "https://pdf.nitkkrpyqs.in/papers/8175a21a-f22b-49ed-bdc2-41c47caa06eb.pdf"
+      },
+      {
+        "code": "RAPC-203",
+        "title": "Introduction to Automation",
+        "branch": "RA",
+        "sem": "3",
+        "exam": "MID1",
+        "url": "https://pdf.nitkkrpyqs.in/papers/4ee24d68-8f00-4fa7-9769-ca2b5c0d29cd.pdf"
+      },
+      {
+        "code": "RAPC-203",
+        "title": "Introduction to Automation",
+        "branch": "RA",
+        "sem": "3",
+        "exam": "MID2",
+        "url": "https://pdf.nitkkrpyqs.in/papers/c510fd8a-7e9f-4cf4-af02-1075ca790ac5.pdf"
+      },
+      {
+        "code": "RAPC-204",
+        "title": "Signals and Systems",
+        "branch": "RA",
+        "sem": "3",
+        "exam": "END",
+        "url": "https://pdf.nitkkrpyqs.in/papers/02cbd222-d9a1-4c86-a944-78eeefd460d6.pdf"
+      },
+      {
+        "code": "RAPC-204",
+        "title": "Signals and Systems",
+        "branch": "RA",
+        "sem": "3",
+        "exam": "MID1",
+        "url": "https://pdf.nitkkrpyqs.in/papers/0c43fae9-ff53-4d68-8cd4-0c56e0d6c3f5.pdf"
+      },
+      {
+        "code": "RAPC-204",
+        "title": "Signals and Systems",
+        "branch": "RA",
+        "sem": "3",
+        "exam": "MID2",
+        "url": "https://pdf.nitkkrpyqs.in/papers/766025e7-b457-43e9-a96d-3302f7f4d8d6.pdf"
+      },
+      {
+        "code": "MAIC-204",
+        "title": "Applied Linear Algebra",
+        "branch": "RA/AIML",
+        "sem": "3",
+        "exam": "END",
+        "url": "https://pdf.nitkkrpyqs.in/papers/e61c630a-4528-4193-bc34-980fd1a3276f.pdf"
+      },
+      {
+        "code": "MAIC-204",
+        "title": "Applied Linear Algebra",
+        "branch": "RA/AIML",
+        "sem": "3",
+        "exam": "MID1",
+        "url": "https://pdf.nitkkrpyqs.in/papers/a8b3c8fe-351d-4c51-bdbf-26bd1e7431dd.pdf"
+      },
+      {
+        "code": "MAIC-101",
+        "title": "Maths (Differential Calculus Differential Equations )",
+        "branch": "RA/All",
+        "sem": "3",
+        "exam": "MID2",
+        "url": "https://pdf.nitkkrpyqs.in/papers/854def15-b2fe-46e9-a6d7-3197ae3f9f8e.pdf"
+      },
+      {
+        "code": "SETPC-204",
+        "title": "Network Synthesis and Filters",
+        "branch": "SE",
+        "sem": "3",
+        "exam": "MID1",
+        "url": "https://pdf.nitkkrpyqs.in/papers/9f414960-f8fe-4944-b11e-316c6423ea6d.pdf"
+      },
+      {
+        "code": "MVPC-201",
+        "title": "Electronics Devices and Circuits",
+        "branch": "VLSI",
+        "sem": "3",
+        "exam": "MID1",
+        "url": "https://pdf.nitkkrpyqs.in/papers/5e958429-92a7-4517-897f-e75b9c7e1f03.pdf"
+      },
+      {
+        "code": "MVPC-202",
+        "title": "Digital Design",
+        "branch": "VLSI",
+        "sem": "3",
+        "exam": "MID1",
+        "url": "https://pdf.nitkkrpyqs.in/papers/df4db172-8850-47cd-a54b-998c9e9467e3.pdf"
+      },
+      {
+        "code": "MVPC-203",
+        "title": "Signals and Systems",
+        "branch": "VLSI",
+        "sem": "3",
+        "exam": "MID1",
+        "url": "https://pdf.nitkkrpyqs.in/papers/f66ef6bf-42ff-4780-8ece-1a90171a6186.pdf"
+      },
+      {
+        "code": "ECPC-209/RAPC-209",
+        "title": "Analog Electronics",
+        "branch": "ECE/RA",
+        "sem": "4",
+        "exam": "END",
+        "url": "https://pdf.nitkkrpyqs.in/papers/fb1f8a17-0bf3-4e61-9d8b-00121bc28324.pdf"
+      },
+      {
+        "code": "ECPC-209/RAPC-209",
+        "title": "Analog Electronics",
+        "branch": "ECE/RA",
+        "sem": "4",
+        "exam": "MID1",
+        "url": "https://pdf.nitkkrpyqs.in/papers/fa9b2fa4-a255-4286-8030-d7c34276c41a.pdf"
+      },
+      {
+        "code": "ECPC-209/RAPC-209",
+        "title": "Analog Electronics",
+        "branch": "ECE/RA",
+        "sem": "4",
+        "exam": "MID2",
+        "url": "https://pdf.nitkkrpyqs.in/papers/06d56dcf-31dd-4388-8f74-d006093612be.pdf"
+      },
+      {
+        "code": "EEPC-208",
+        "title": "Control System",
+        "branch": "EE",
+        "sem": "4",
+        "exam": "END",
+        "url": "https://pdf.nitkkrpyqs.in/papers/b60c433b-3c37-448d-807a-d85682da6457.pdf"
+      },
+      {
+        "code": "EEPC-208",
+        "title": "Control System",
+        "branch": "EE",
+        "sem": "4",
+        "exam": "MID2",
+        "url": "https://pdf.nitkkrpyqs.in/papers/abf0d689-d542-41d0-b049-ccf499670f81.pdf"
+      },
+      {
+        "code": "EEPC-208",
+        "title": "Control System",
+        "branch": "EE",
+        "sem": "4",
+        "exam": "MID2",
+        "url": "https://pdf.nitkkrpyqs.in/papers/de166b4b-a6ee-44ad-9f89-8ae90f0cdc0d.pdf"
+      },
+      {
+        "code": "EEPC-210",
+        "title": "Power Electronics - 1",
+        "branch": "EE",
+        "sem": "4",
+        "exam": "MID1",
+        "url": "https://pdf.nitkkrpyqs.in/papers/6bb36d5b-b6ab-4bbe-87ae-0b202aa1aace.pdf"
+      },
+      {
+        "code": "EEPC-210",
+        "title": "Power Electronics - 1",
+        "branch": "EE",
+        "sem": "4",
+        "exam": "MID2",
+        "url": "https://pdf.nitkkrpyqs.in/papers/46b17e90-5d5f-4edc-b7f3-476cdc9a6cb4.pdf"
+      },
+      {
+        "code": "IIPC-209",
+        "title": "Micro Processors & Computer Architecture",
+        "branch": "IIOT",
+        "sem": "4",
+        "exam": "END",
+        "url": "https://pdf.nitkkrpyqs.in/papers/d2c2bf2a-4577-4079-9e7e-740dfdbeb8a3.pdf"
+      },
+      {
+        "code": "IIPC-210",
+        "title": "Data Structures and Algorithms",
+        "branch": "IIOT",
+        "sem": "4",
+        "exam": "MID1",
+        "url": "https://pdf.nitkkrpyqs.in/papers/11c88150-6f0f-4a4f-b71a-38e20460d932.pdf"
+      },
+      {
+        "code": "IIPC-210",
+        "title": "Data Structures and Algorithms",
+        "branch": "IIOT",
+        "sem": "4",
+        "exam": "MID2",
+        "url": "https://pdf.nitkkrpyqs.in/papers/ede2b93c-0dc3-4820-a800-b76a66528e50.pdf"
+      },
+      {
+        "code": "IIPC-211",
+        "title": "Data Communication & Networking",
+        "branch": "IIOT",
+        "sem": "4",
+        "exam": "END",
+        "url": "https://pdf.nitkkrpyqs.in/papers/b3794610-1c2f-4605-bf66-9ab824434578.pdf"
+      },
+      {
+        "code": "IIPC-211",
+        "title": "Industry 4.0 and IIOT",
+        "branch": "IIOT",
+        "sem": "4",
+        "exam": "END",
+        "url": "https://pdf.nitkkrpyqs.in/papers/5204daed-67d5-482d-a5de-f43d753fa02b.pdf"
+      },
+      {
+        "code": "IIPC-211",
+        "title": "Industry 4.0 and IIOT",
+        "branch": "IIOT",
+        "sem": "4",
+        "exam": "MID1",
+        "url": "https://pdf.nitkkrpyqs.in/papers/e5c64e33-58f6-41e9-a2f0-8d77632493a0.pdf"
+      },
+      {
+        "code": "IIPC-211",
+        "title": "Industry 4.0 and IIOT",
+        "branch": "IIOT",
+        "sem": "4",
+        "exam": "MID2",
+        "url": "https://pdf.nitkkrpyqs.in/papers/844474b0-3bb9-41bd-baaa-e770cb5dc979.pdf"
+      },
+      {
+        "code": "IIPC-212",
+        "title": "Data Communication & Networking",
+        "branch": "IIOT",
+        "sem": "4",
+        "exam": "MID1",
+        "url": "https://pdf.nitkkrpyqs.in/papers/76d96d61-e8a6-480c-a62d-7e90176a6d38.pdf"
+      },
+      {
+        "code": "IIPC-212",
+        "title": "Data Communication & Networking",
+        "branch": "IIOT",
+        "sem": "4",
+        "exam": "MID2",
+        "url": "https://pdf.nitkkrpyqs.in/papers/fb7e4246-62b3-4587-baa1-a172bde6f4bb.pdf"
+      },
+      {
+        "code": "IIPC-213",
+        "title": "Object Oriented Programming ( OOP) with Java",
+        "branch": "IIOT",
+        "sem": "4",
+        "exam": "END",
+        "url": "https://pdf.nitkkrpyqs.in/papers/d03efa1e-dacf-42d1-a966-1843536ab1b5.pdf"
+      },
+      {
+        "code": "IIPC-213",
+        "title": "Object Oriented Programming (OOP) with Java",
+        "branch": "IIOT",
+        "sem": "4",
+        "exam": "MID1",
+        "url": "https://pdf.nitkkrpyqs.in/papers/26ea2e33-d730-453d-a664-93e75c81a733.pdf"
+      },
+      {
+        "code": "MAIC-204",
+        "title": "Linear Algebra",
+        "branch": "RA/AIML",
+        "sem": "4",
+        "exam": "END",
+        "url": "https://pdf.nitkkrpyqs.in/papers/2a59f8d1-299a-487f-8f2c-efa7c5de6637.pdf"
+      },
+      {
+        "code": "AIPC-305",
+        "title": "Data Mining and Analytics",
+        "branch": "AIML",
+        "sem": "5",
+        "exam": "MID1",
+        "url": "https://pdf.nitkkrpyqs.in/papers/01463484-27d2-44a3-919d-c1ea971e4609.pdf"
+      },
+      {
+        "code": "CSPC-***",
+        "title": "Data warehousing and Data Mining",
+        "branch": "CSE",
+        "sem": "5",
+        "exam": "MID1",
+        "url": "https://pdf.nitkkrpyqs.in/papers/44615780-1305-44d8-9642-388f23213f8f.pdf"
+      }
+    ],
     "warnings": []
   },
   {
-    "session": "2025-26",
-    "sub": "COMING SOON",
-    "available": false,
-    "papers": [],
+    "session": "2026",
+    "sub": "B.TECH · NIT KURUKSHETRA",
+    "available": true,
+    "papers": [
+      {
+        "code": "CHIC-103",
+        "title": "Chemistry",
+        "branch": "ALL",
+        "sem": "2",
+        "exam": "MID2",
+        "url": "https://pdf.nitkkrpyqs.in/papers/2ceaa261-d80e-453c-bb34-5a5e3bce83ac.pdf"
+      },
+      {
+        "code": "CSIC-100",
+        "title": "Digital System Design",
+        "branch": "ALL",
+        "sem": "2",
+        "exam": "END",
+        "url": "https://pdf.nitkkrpyqs.in/papers/f874017d-28bf-4d4a-b9e8-e3d7e11adc2b.pdf"
+      },
+      {
+        "code": "CSIC-100",
+        "title": "Digital System and Design",
+        "branch": "ALL",
+        "sem": "2",
+        "exam": "MID2",
+        "url": "https://pdf.nitkkrpyqs.in/papers/59724b05-756d-4e57-acd0-189ea1b5f824.pdf"
+      },
+      {
+        "code": "CSIC-104",
+        "title": "Programming using Python",
+        "branch": "ALL",
+        "sem": "2",
+        "exam": "END",
+        "url": "https://pdf.nitkkrpyqs.in/papers/38e98c6e-bfd6-42a0-8947-24e62b321b3d.pdf"
+      },
+      {
+        "code": "CSIC-104",
+        "title": "CSIC-104",
+        "branch": "ALL",
+        "sem": "2",
+        "exam": "MID1",
+        "url": "https://pdf.nitkkrpyqs.in/papers/1a0aaedc-ec61-4220-bfc0-0a156d81ac57.pdf"
+      },
+      {
+        "code": "CSIC-104",
+        "title": "Programming with Python",
+        "branch": "ALL",
+        "sem": "2",
+        "exam": "MID2",
+        "url": "https://pdf.nitkkrpyqs.in/papers/19300a25-0970-4389-9b59-3638e15450e2.pdf"
+      },
+      {
+        "code": "HSIC-101",
+        "title": "Communications Skills in English",
+        "branch": "ALL",
+        "sem": "2",
+        "exam": "END",
+        "url": "https://pdf.nitkkrpyqs.in/papers/be1d76c1-a939-4801-aca5-1dcfab2d6272.pdf"
+      },
+      {
+        "code": "HSIC-101",
+        "title": "Communication skills in English",
+        "branch": "ALL",
+        "sem": "2",
+        "exam": "MID2",
+        "url": "https://pdf.nitkkrpyqs.in/papers/324be1f5-e045-47f5-9d2e-1c8357fe53ff.pdf"
+      },
+      {
+        "code": "MAIC-102",
+        "title": "Integral calculus and Difference equations",
+        "branch": "ALL",
+        "sem": "2",
+        "exam": "END",
+        "url": "https://pdf.nitkkrpyqs.in/papers/55a8ed92-2b6a-4f7f-815f-9b5011c54b3d.pdf"
+      },
+      {
+        "code": "MAIC-102",
+        "title": "Integral calculus and Difference equations",
+        "branch": "ALL",
+        "sem": "2",
+        "exam": "END",
+        "url": "https://pdf.nitkkrpyqs.in/papers/cc11cf3a-8291-4718-abf8-b6fcc960a553.pdf"
+      },
+      {
+        "code": "MAIC-102",
+        "title": "Integral Calculus & Differential Equations (Maths)",
+        "branch": "ALL",
+        "sem": "2",
+        "exam": "MID1",
+        "url": "https://pdf.nitkkrpyqs.in/papers/54f83ec0-76a2-4ecb-87d6-e93105e8a014.pdf"
+      },
+      {
+        "code": "MAIC-102",
+        "title": "Integral Calculus & Differential Equations (Maths)",
+        "branch": "ALL",
+        "sem": "2",
+        "exam": "MID2",
+        "url": "https://pdf.nitkkrpyqs.in/papers/53d76dbc-ba61-4419-a04f-23203d77340c.pdf"
+      },
+      {
+        "code": "MAIC-102",
+        "title": "Integral Calculus and Difference Equation (Maths)",
+        "branch": "ALL",
+        "sem": "2",
+        "exam": "MID2",
+        "url": "https://pdf.nitkkrpyqs.in/papers/335d30ef-2b46-48aa-bf65-1b3efa1d8483.pdf"
+      },
+      {
+        "code": "MEIC-102",
+        "title": "Engineering Practice",
+        "branch": "ALL",
+        "sem": "2",
+        "exam": "END",
+        "url": "https://pdf.nitkkrpyqs.in/papers/3e159bb9-3361-447f-88f3-84eab890b2a5.pdf"
+      },
+      {
+        "code": "MEIC-102",
+        "title": "Engineering Practice",
+        "branch": "ALL",
+        "sem": "2",
+        "exam": "MID1",
+        "url": "https://pdf.nitkkrpyqs.in/papers/6bd70912-a0e9-42f9-9422-ae30502fb5c7.pdf"
+      },
+      {
+        "code": "MEIC-102",
+        "title": "Enginerring Practice",
+        "branch": "ALL",
+        "sem": "2",
+        "exam": "MID1",
+        "url": "https://pdf.nitkkrpyqs.in/papers/4236f1f8-b0a4-4b1c-8011-578c7c2a28df.pdf"
+      },
+      {
+        "code": "MEIC-102",
+        "title": "Engineering Practice",
+        "branch": "ALL",
+        "sem": "2",
+        "exam": "MID2",
+        "url": "https://pdf.nitkkrpyqs.in/papers/a0d03f30-316d-4273-ae88-ce7ffaaa422c.pdf"
+      },
+      {
+        "code": "MEIC102",
+        "title": "Engineering Practice",
+        "branch": "ALL",
+        "sem": "2",
+        "exam": "MID2",
+        "url": "https://pdf.nitkkrpyqs.in/papers/1a14f83f-6861-47bb-a0e3-174b70113f45.pdf"
+      },
+      {
+        "code": "PHIC-104",
+        "title": "Advanced Engineering Physics",
+        "branch": "ALL",
+        "sem": "2",
+        "exam": "MID1",
+        "url": "https://pdf.nitkkrpyqs.in/papers/c2ad9db2-6303-42be-a109-00a89245700d.pdf"
+      },
+      {
+        "code": "PHIC-104",
+        "title": "Advanced Engineering Physics",
+        "branch": "ALL",
+        "sem": "2",
+        "exam": "MID1",
+        "url": "https://pdf.nitkkrpyqs.in/papers/95ef759d-ea5b-4033-a7fa-d0fed274191b.pdf"
+      },
+      {
+        "code": "PHIC-104",
+        "title": "Advanced Engineering Physics",
+        "branch": "ALL",
+        "sem": "2",
+        "exam": "MID2",
+        "url": "https://pdf.nitkkrpyqs.in/papers/d3c2306b-01a7-42ea-99c0-1896c7ee3c6f.pdf"
+      },
+      {
+        "code": "PHIC-104",
+        "title": "Advanced Engineering Physics",
+        "branch": "ALL",
+        "sem": "2",
+        "exam": "MID2",
+        "url": "https://pdf.nitkkrpyqs.in/papers/dff8f703-3e38-4529-9083-d92abb96874b.pdf"
+      },
+      {
+        "code": "PHIC-104",
+        "title": "Advanced Engineering Physics",
+        "branch": "ALL",
+        "sem": "2",
+        "exam": "MID2",
+        "url": "https://pdf.nitkkrpyqs.in/papers/fd074d0b-7dce-4314-84f7-54178bc0a1fb.pdf"
+      },
+      {
+        "code": "EEPC-101",
+        "title": "Electrical Circuit Theory",
+        "branch": "EE",
+        "sem": "2",
+        "exam": "MID1",
+        "url": "https://pdf.nitkkrpyqs.in/papers/2c558081-6022-4cdf-8a6a-176e5aa788af.pdf"
+      },
+      {
+        "code": "EEPC-201",
+        "title": "Electrical Circuit Theory",
+        "branch": "EE",
+        "sem": "2",
+        "exam": "MID2",
+        "url": "https://pdf.nitkkrpyqs.in/papers/c46467dd-0775-4703-97eb-7146140dfe56.pdf"
+      },
+      {
+        "code": "RAPC-101",
+        "title": "Engineering Mechanics",
+        "branch": "RA",
+        "sem": "2",
+        "exam": "END",
+        "url": "https://pdf.nitkkrpyqs.in/papers/d7eed88c-f896-420b-a5c1-5d8a8ca7638a.pdf"
+      },
+      {
+        "code": "RAPC-101",
+        "title": "Engineering Mechanics",
+        "branch": "RA",
+        "sem": "2",
+        "exam": "MID2",
+        "url": "https://pdf.nitkkrpyqs.in/papers/1c94a542-afb9-41e4-bef2-6851cca9c77d.pdf"
+      },
+      {
+        "code": "DSPC-204",
+        "title": "Artificial Intelligence",
+        "branch": "AIDS",
+        "sem": "4",
+        "exam": "END",
+        "url": "https://pdf.nitkkrpyqs.in/papers/f334218b-05d2-47fc-8b0b-9670c7e30328.pdf"
+      },
+      {
+        "code": "DSPC-206/CSPC-206",
+        "title": "Database Management System ( DBMS )",
+        "branch": "AIDS/CS/M&C",
+        "sem": "4",
+        "exam": "END",
+        "url": "https://pdf.nitkkrpyqs.in/papers/9efec489-3a62-470b-8ada-d4726e183f6c.pdf"
+      },
+      {
+        "code": "AIPC-200",
+        "title": "Decision Making using AI",
+        "branch": "AIML",
+        "sem": "4",
+        "exam": "END",
+        "url": "https://pdf.nitkkrpyqs.in/papers/b024d316-3178-42bd-b472-f38502d6aed9.pdf"
+      },
+      {
+        "code": "AIPC-200",
+        "title": "Decision Making Using AI",
+        "branch": "AIML",
+        "sem": "4",
+        "exam": "MID1",
+        "url": "https://pdf.nitkkrpyqs.in/papers/96e20a19-696d-4147-89d3-a7a9aa6390e8.pdf"
+      },
+      {
+        "code": "AIPC-204",
+        "title": "Neural Networks",
+        "branch": "AIML",
+        "sem": "4",
+        "exam": "END",
+        "url": "https://pdf.nitkkrpyqs.in/papers/bfe3bae7-af18-4047-b3f7-3d82c62d251f.pdf"
+      },
+      {
+        "code": "AIPC-204",
+        "title": "Neural Networks",
+        "branch": "AIML",
+        "sem": "4",
+        "exam": "MID1",
+        "url": "https://pdf.nitkkrpyqs.in/papers/198805ec-4bc7-4607-8d29-a438e2ddc7b6.pdf"
+      },
+      {
+        "code": "AIPC-206",
+        "title": "Fuzzy Systems and Evolutionary Computing",
+        "branch": "AIML",
+        "sem": "4",
+        "exam": "MID1",
+        "url": "https://pdf.nitkkrpyqs.in/papers/c2c8527b-cdbe-43dd-8270-0e4b7e2fc01b.pdf"
+      },
+      {
+        "code": "MAIC-203",
+        "title": "Numerical and Statistical Methods",
+        "branch": "AIML",
+        "sem": "4",
+        "exam": "END",
+        "url": "https://pdf.nitkkrpyqs.in/papers/2179e573-20a6-4d3e-8a9d-26c5e90f56e5.pdf"
+      },
+      {
+        "code": "AIPC-202/ITPC-200/CSPC-200",
+        "title": "Operating System ( OS )",
+        "branch": "AIML/CS/IT/M&C",
+        "sem": "4",
+        "exam": "END",
+        "url": "https://pdf.nitkkrpyqs.in/papers/e3645c72-3f0b-4380-94b1-3caa11de5711.pdf"
+      },
+      {
+        "code": "ITPC-200/CSPC-200/AIPC-202",
+        "title": "Operating System ( OS )",
+        "branch": "AIML/CS/IT/M&C",
+        "sem": "4",
+        "exam": "MID1",
+        "url": "https://pdf.nitkkrpyqs.in/papers/b3ef16f4-730c-4706-8869-12b56cf058a4.pdf"
+      },
+      {
+        "code": "CSPC-202/ITPC-202",
+        "title": "Computer Networks",
+        "branch": "CS/IT",
+        "sem": "4",
+        "exam": "MID1",
+        "url": "https://pdf.nitkkrpyqs.in/papers/bc175e46-8388-413e-9c8a-1d614bc76584.pdf"
+      },
+      {
+        "code": "CSPE-214/ITPE-214",
+        "title": "Scripting Languages",
+        "branch": "CS/IT",
+        "sem": "4",
+        "exam": "END",
+        "url": "https://pdf.nitkkrpyqs.in/papers/309ff41d-d19f-4db1-a2d7-4df64b2d7eac.pdf"
+      },
+      {
+        "code": "ITPC-202/CSPC-202",
+        "title": "Computer Networks",
+        "branch": "CS/IT",
+        "sem": "4",
+        "exam": "END",
+        "url": "https://pdf.nitkkrpyqs.in/papers/35047150-a7e3-4f21-9144-b23594b492c8.pdf"
+      },
+      {
+        "code": "ITPC-202/CSPC-202",
+        "title": "Computer Networks",
+        "branch": "CS/IT",
+        "sem": "4",
+        "exam": "MID2",
+        "url": "https://pdf.nitkkrpyqs.in/papers/e3b7978d-9502-405e-9039-b87a244d9153.pdf"
+      },
+      {
+        "code": "CSPC-204/ITPC-204",
+        "title": "Artificial Intelligence and Soft Computing",
+        "branch": "CS/IT/M&C",
+        "sem": "4",
+        "exam": "MID1",
+        "url": "https://pdf.nitkkrpyqs.in/papers/7a18c54d-49eb-4ea5-ab7c-24bcb59a68cb.pdf"
+      },
+      {
+        "code": "CSPC-206/ITPC-206",
+        "title": "Database Management System ( DBMS )",
+        "branch": "CS/IT/M&C",
+        "sem": "4",
+        "exam": "MID1",
+        "url": "https://pdf.nitkkrpyqs.in/papers/ab018238-836e-4c62-bb15-0c591aa0e664.pdf"
+      },
+      {
+        "code": "ITPC-204/CSPC-204",
+        "title": "Artificial Intelligence and Soft Computing",
+        "branch": "CS/IT/M&C",
+        "sem": "4",
+        "exam": "END",
+        "url": "https://pdf.nitkkrpyqs.in/papers/8c30fba7-990d-498b-8b51-5593cac6eaa8.pdf"
+      },
+      {
+        "code": "ITPC-204/CSPC-204",
+        "title": "Artificial Intelligence and Soft Computing",
+        "branch": "CS/IT/M&C",
+        "sem": "4",
+        "exam": "MID2",
+        "url": "https://pdf.nitkkrpyqs.in/papers/0aac46e7-7ac7-4989-9e42-e53f87d73de6.pdf"
+      },
+      {
+        "code": "ITPC-206/CSPC-206",
+        "title": "Database Management System (DBMS)",
+        "branch": "CS/IT/M&C",
+        "sem": "4",
+        "exam": "END",
+        "url": "https://pdf.nitkkrpyqs.in/papers/d0888475-5cec-49e4-9c26-55fc7b277b61.pdf"
+      },
+      {
+        "code": "ITPC-206/CSPC-206",
+        "title": "Database Management System (DBMS)",
+        "branch": "CS/IT/M&C",
+        "sem": "4",
+        "exam": "MID2",
+        "url": "https://pdf.nitkkrpyqs.in/papers/7a73066e-46a8-4b76-8d71-f56ee5abb7af.pdf"
+      },
+      {
+        "code": "ECPC-209",
+        "title": "Analog Electronics",
+        "branch": "ECE",
+        "sem": "4",
+        "exam": "END",
+        "url": "https://pdf.nitkkrpyqs.in/papers/a9e670f2-e00d-450e-a38c-2b98a8260e9f.pdf"
+      },
+      {
+        "code": "ECPC-209",
+        "title": "Analog Electronics",
+        "branch": "ECE",
+        "sem": "4",
+        "exam": "END",
+        "url": "https://pdf.nitkkrpyqs.in/papers/91ad9411-96b1-4292-9412-b2882cd15801.pdf"
+      },
+      {
+        "code": "ECPC-209",
+        "title": "Analog Electronics",
+        "branch": "ECE",
+        "sem": "4",
+        "exam": "MID1",
+        "url": "https://pdf.nitkkrpyqs.in/papers/1584b5b4-8d84-482a-95e6-fab955a34091.pdf"
+      },
+      {
+        "code": "ECPC-209",
+        "title": "Analog Electronics",
+        "branch": "ECE",
+        "sem": "4",
+        "exam": "MID2",
+        "url": "https://pdf.nitkkrpyqs.in/papers/3a93f081-9b48-46d5-9502-a6ed78736ec4.pdf"
+      },
+      {
+        "code": "EEPC-208",
+        "title": "Contol System",
+        "branch": "EE",
+        "sem": "4",
+        "exam": "END",
+        "url": "https://pdf.nitkkrpyqs.in/papers/b50f2c00-e6c5-4880-b9d1-758da613a1c7.pdf"
+      },
+      {
+        "code": "EEPC-208",
+        "title": "Control System",
+        "branch": "EE",
+        "sem": "4",
+        "exam": "MID1",
+        "url": "https://pdf.nitkkrpyqs.in/papers/1886f4cf-a9c5-422d-b68c-be2f34993cf0.pdf"
+      },
+      {
+        "code": "EEPC-209",
+        "title": "Power System Analysis",
+        "branch": "EE",
+        "sem": "4",
+        "exam": "END",
+        "url": "https://pdf.nitkkrpyqs.in/papers/65d29725-5db2-4020-a810-b9fbd5e5c968.pdf"
+      },
+      {
+        "code": "EEPC-209",
+        "title": "Power System Analysis",
+        "branch": "EE",
+        "sem": "4",
+        "exam": "MID1",
+        "url": "https://pdf.nitkkrpyqs.in/papers/155962e4-8d50-4a60-b2b1-853cf01b8318.pdf"
+      },
+      {
+        "code": "EEPC-209",
+        "title": "Power System Analysis",
+        "branch": "EE",
+        "sem": "4",
+        "exam": "MID2",
+        "url": "https://pdf.nitkkrpyqs.in/papers/2e9e4b23-7941-4313-9948-2e3e66f49d33.pdf"
+      },
+      {
+        "code": "EEPC-210",
+        "title": "Power Electronics - 1",
+        "branch": "EE",
+        "sem": "4",
+        "exam": "END",
+        "url": "https://pdf.nitkkrpyqs.in/papers/0732dd47-2326-43ac-acda-80823a7504bb.pdf"
+      },
+      {
+        "code": "EEPC-210",
+        "title": "Power Electronics - 1",
+        "branch": "EE",
+        "sem": "4",
+        "exam": "MID1",
+        "url": "https://pdf.nitkkrpyqs.in/papers/c78ec57d-4f2c-4349-884e-a170fead5eff.pdf"
+      },
+      {
+        "code": "EEPC-211",
+        "title": "DC and Synchronous Machines",
+        "branch": "EE",
+        "sem": "4",
+        "exam": "END",
+        "url": "https://pdf.nitkkrpyqs.in/papers/24c6fe4f-8f87-477c-a2f6-bdc58ad88d70.pdf"
+      },
+      {
+        "code": "EEPC-211",
+        "title": "DC and Synchronous Machines",
+        "branch": "EE",
+        "sem": "4",
+        "exam": "MID1",
+        "url": "https://pdf.nitkkrpyqs.in/papers/c9220159-1813-47ce-9c13-8da2815dbbe2.pdf"
+      },
+      {
+        "code": "EEPEC-212",
+        "title": "Measurements and Instrumention",
+        "branch": "EE",
+        "sem": "4",
+        "exam": "END",
+        "url": "https://pdf.nitkkrpyqs.in/papers/c7e90b03-85d0-43e4-a090-eb3068a97544.pdf"
+      },
+      {
+        "code": "IIPC-209",
+        "title": "Computer Architecture & Microprocessor",
+        "branch": "IIOT",
+        "sem": "4",
+        "exam": "MID1",
+        "url": "https://pdf.nitkkrpyqs.in/papers/81dfec72-d9ee-4a7c-9e71-13d21f4394df.pdf"
+      },
+      {
+        "code": "IIPC-211",
+        "title": "Industry 4.0 and IIOT",
+        "branch": "IIOT",
+        "sem": "4",
+        "exam": "MID1",
+        "url": "https://pdf.nitkkrpyqs.in/papers/1235f984-f633-41fc-96b4-a01adbd0805d.pdf"
+      },
+      {
+        "code": "IIPC-213",
+        "title": "OOPS with Java",
+        "branch": "IIOT",
+        "sem": "4",
+        "exam": "MID1",
+        "url": "https://pdf.nitkkrpyqs.in/papers/2531eb72-b413-439b-a6e8-853a4761bbd5.pdf"
+      },
+      {
+        "code": "ITPC-206",
+        "title": "Database Management System ( DBMS )",
+        "branch": "IT",
+        "sem": "4",
+        "exam": "MID2",
+        "url": "https://pdf.nitkkrpyqs.in/papers/005cea0b-9103-4614-8b19-1ce06e6e78f3.pdf"
+      },
+      {
+        "code": "MAPC-204",
+        "title": "Computer Oriented Numerical Methods",
+        "branch": "M&C",
+        "sem": "4",
+        "exam": "END",
+        "url": "https://pdf.nitkkrpyqs.in/papers/31de238a-ce8c-46ca-9cc9-15cc59f0c2a1.pdf"
+      },
+      {
+        "code": "MAPC-204",
+        "title": "Computer Oriented Numerical Methods",
+        "branch": "M&C",
+        "sem": "4",
+        "exam": "MID1",
+        "url": "https://pdf.nitkkrpyqs.in/papers/98fac974-7911-4bb0-9f37-738fb9e79d56.pdf"
+      },
+      {
+        "code": "MAPC-204",
+        "title": "Computer Oriented Numerical Methods",
+        "branch": "M&C",
+        "sem": "4",
+        "exam": "MID2",
+        "url": "https://pdf.nitkkrpyqs.in/papers/b73e1c1b-3573-4199-a442-1703413c1bc6.pdf"
+      },
+      {
+        "code": "MAPC-206",
+        "title": "Theory of Computation",
+        "branch": "M&C",
+        "sem": "4",
+        "exam": "END",
+        "url": "https://pdf.nitkkrpyqs.in/papers/4d40de24-7d9d-4648-8bee-d05b0e99b948.pdf"
+      },
+      {
+        "code": "MAPC-206",
+        "title": "Theory of Computation",
+        "branch": "M&C",
+        "sem": "4",
+        "exam": "MID1",
+        "url": "https://pdf.nitkkrpyqs.in/papers/974447d7-cdcc-43c8-b61e-f8a05f3b4761.pdf"
+      },
+      {
+        "code": "MAPC-206",
+        "title": "Theory of Computation",
+        "branch": "M&C",
+        "sem": "4",
+        "exam": "MID2",
+        "url": "https://pdf.nitkkrpyqs.in/papers/2acc9189-c496-44e5-9f8e-0a09277cf9e4.pdf"
+      },
+      {
+        "code": "MEPC-210",
+        "title": "Fluid Machinery",
+        "branch": "MECH",
+        "sem": "4",
+        "exam": "MID1",
+        "url": "https://pdf.nitkkrpyqs.in/papers/5992c822-94fc-4621-af1e-122bd1bf3eb5.pdf"
+      },
+      {
+        "code": "MAIC-207",
+        "title": "Optimization Techniques",
+        "branch": "MNC",
+        "sem": "4",
+        "exam": "END",
+        "url": "https://pdf.nitkkrpyqs.in/papers/c3595f0c-0428-42c9-9dbf-de95a9bcc24e.pdf"
+      },
+      {
+        "code": "PIPC-209",
+        "title": "Production Technology - 2",
+        "branch": "PIE",
+        "sem": "4",
+        "exam": "END",
+        "url": "https://pdf.nitkkrpyqs.in/papers/1d68b125-a976-4b48-9bc5-c27c87606174.pdf"
+      },
+      {
+        "code": "PIPC-209",
+        "title": "Production Technology - 2",
+        "branch": "PIE",
+        "sem": "4",
+        "exam": "MID1",
+        "url": "https://pdf.nitkkrpyqs.in/papers/92b84fda-b991-4a99-aa6c-c1749127417f.pdf"
+      },
+      {
+        "code": "PIPC-209",
+        "title": "Production Technology - 2",
+        "branch": "PIE",
+        "sem": "4",
+        "exam": "MID2",
+        "url": "https://pdf.nitkkrpyqs.in/papers/96665823-be5f-412a-8433-ad9f86df82f5.pdf"
+      },
+      {
+        "code": "PIPC-210",
+        "title": "Operations Research",
+        "branch": "PIE",
+        "sem": "4",
+        "exam": "END",
+        "url": "https://pdf.nitkkrpyqs.in/papers/30d3ee6a-d131-4a1c-9065-cdf72f47ecf8.pdf"
+      },
+      {
+        "code": "PIPC-210",
+        "title": "Operations Research",
+        "branch": "PIE",
+        "sem": "4",
+        "exam": "MID1",
+        "url": "https://pdf.nitkkrpyqs.in/papers/fb0611c1-acc0-4e45-94a4-4468099822ec.pdf"
+      },
+      {
+        "code": "PIPC-210",
+        "title": "Operations Reasearch",
+        "branch": "PIE",
+        "sem": "4",
+        "exam": "MID2",
+        "url": "https://pdf.nitkkrpyqs.in/papers/9bc51b44-7f34-49e9-bc55-78772d680bfc.pdf"
+      },
+      {
+        "code": "PIPC-211",
+        "title": "Strength of Materials",
+        "branch": "PIE",
+        "sem": "4",
+        "exam": "END",
+        "url": "https://pdf.nitkkrpyqs.in/papers/c6c916a2-aa58-4810-8009-f5969942c311.pdf"
+      },
+      {
+        "code": "PIPC-211",
+        "title": "Strength of Machines",
+        "branch": "PIE",
+        "sem": "4",
+        "exam": "MID1",
+        "url": "https://pdf.nitkkrpyqs.in/papers/0b663905-03f9-45bf-9a01-b50aa34340b4.pdf"
+      },
+      {
+        "code": "PIPC-212",
+        "title": "Heat Transfer",
+        "branch": "PIE",
+        "sem": "4",
+        "exam": "END",
+        "url": "https://pdf.nitkkrpyqs.in/papers/2f26683b-4061-4ab0-a0e2-d846b8092174.pdf"
+      },
+      {
+        "code": "PIPC-212",
+        "title": "Heat Transfer",
+        "branch": "PIE",
+        "sem": "4",
+        "exam": "MID1",
+        "url": "https://pdf.nitkkrpyqs.in/papers/6f917e68-b71a-40c6-be02-38db03e8bb8e.pdf"
+      },
+      {
+        "code": "PIPC-212",
+        "title": "Heat Transfer",
+        "branch": "PIE",
+        "sem": "4",
+        "exam": "MID2",
+        "url": "https://pdf.nitkkrpyqs.in/papers/4b426dee-da74-4ea5-a331-a9cb4b3c34f9.pdf"
+      },
+      {
+        "code": "PIPC-213",
+        "title": "Machine Drawing",
+        "branch": "PIE",
+        "sem": "4",
+        "exam": "END",
+        "url": "https://pdf.nitkkrpyqs.in/papers/82ee9726-9f19-4363-bc14-fb6e3de88ec2.pdf"
+      },
+      {
+        "code": "PIPC-214",
+        "title": "Value Engineering",
+        "branch": "PIE",
+        "sem": "4",
+        "exam": "END",
+        "url": "https://pdf.nitkkrpyqs.in/papers/620e0739-72b0-42aa-b0dd-71381117d07d.pdf"
+      },
+      {
+        "code": "PIPC-214",
+        "title": "Value Engineering",
+        "branch": "PIE",
+        "sem": "4",
+        "exam": "MID1",
+        "url": "https://pdf.nitkkrpyqs.in/papers/3bddcbbb-1226-4c4a-8953-11d76dde284e.pdf"
+      },
+      {
+        "code": "PIPC-215",
+        "title": "Material Science",
+        "branch": "PIE",
+        "sem": "4",
+        "exam": "END",
+        "url": "https://pdf.nitkkrpyqs.in/papers/f1d5d45f-888c-4469-8a8a-5833f18451b1.pdf"
+      },
+      {
+        "code": "RAPC-208",
+        "title": "Control System",
+        "branch": "RA",
+        "sem": "4",
+        "exam": "MID1",
+        "url": "https://pdf.nitkkrpyqs.in/papers/1486e17c-f035-4dd4-81b9-e27a25a5e3cf.pdf"
+      },
+      {
+        "code": "RAPC-208",
+        "title": "Control System",
+        "branch": "RA",
+        "sem": "4",
+        "exam": "MID2",
+        "url": "https://pdf.nitkkrpyqs.in/papers/abefcc2a-92b6-438b-a526-f6735f3c751f.pdf"
+      },
+      {
+        "code": "RAPC-209",
+        "title": "Analog Electronics",
+        "branch": "RA",
+        "sem": "4",
+        "exam": "END",
+        "url": "https://pdf.nitkkrpyqs.in/papers/fa483400-7616-4578-8f28-bfd63def2f4e.pdf"
+      },
+      {
+        "code": "RAPC-209",
+        "title": "Analog Electronics",
+        "branch": "RA",
+        "sem": "4",
+        "exam": "MID1",
+        "url": "https://pdf.nitkkrpyqs.in/papers/8e457661-254d-4a01-ac43-a240205f3037.pdf"
+      },
+      {
+        "code": "RAPC-209",
+        "title": "Analog Electronics",
+        "branch": "RA",
+        "sem": "4",
+        "exam": "MID2",
+        "url": "https://pdf.nitkkrpyqs.in/papers/72cb27ce-591d-467b-ae04-21a3221623aa.pdf"
+      },
+      {
+        "code": "RAPC-210",
+        "title": "Actuators Drives and Sensors",
+        "branch": "RA",
+        "sem": "4",
+        "exam": "MID1",
+        "url": "https://pdf.nitkkrpyqs.in/papers/67bbbfc0-4920-448b-b618-850370475c43.pdf"
+      },
+      {
+        "code": "RAPC-210",
+        "title": "Actuators Drives and Sensors",
+        "branch": "RA",
+        "sem": "4",
+        "exam": "MID2",
+        "url": "https://pdf.nitkkrpyqs.in/papers/a76ca910-8a95-4083-ab8f-33c14cd0d054.pdf"
+      },
+      {
+        "code": "RAPC-211",
+        "title": "Introduction to Robotics",
+        "branch": "RA",
+        "sem": "4",
+        "exam": "MID1",
+        "url": "https://pdf.nitkkrpyqs.in/papers/063862fb-f287-4916-8685-f17790fce277.pdf"
+      },
+      {
+        "code": "RAPC-211",
+        "title": "Introduction to Robotics",
+        "branch": "RA",
+        "sem": "4",
+        "exam": "MID2",
+        "url": "https://pdf.nitkkrpyqs.in/papers/b2e74bba-8b5e-41ae-a444-dbf92e23d906.pdf"
+      },
+      {
+        "code": "RAPC-212",
+        "title": "Manufacturing processes",
+        "branch": "RA",
+        "sem": "4",
+        "exam": "END",
+        "url": "https://pdf.nitkkrpyqs.in/papers/82d29c9e-3def-4559-a409-51f822cd5bf0.pdf"
+      },
+      {
+        "code": "RAPC-212",
+        "title": "Manufacturing Processes",
+        "branch": "RA",
+        "sem": "4",
+        "exam": "MID1",
+        "url": "https://pdf.nitkkrpyqs.in/papers/32618412-370c-4d8e-a4e0-2c50402598aa.pdf"
+      },
+      {
+        "code": "RAPC-212",
+        "title": "Manufacturing Processes",
+        "branch": "RA",
+        "sem": "4",
+        "exam": "MID2",
+        "url": "https://pdf.nitkkrpyqs.in/papers/3867c658-3664-47ad-8640-eac7fd322bc3.pdf"
+      },
+      {
+        "code": "RAPC-212",
+        "title": "Manufacturing Processes",
+        "branch": "RA",
+        "sem": "4",
+        "exam": "MID2",
+        "url": "https://pdf.nitkkrpyqs.in/papers/b52a0c8a-4a01-45ca-b41d-13955219fd2f.pdf"
+      },
+      {
+        "code": "MAIC-204",
+        "title": "Applied Linear Algebra",
+        "branch": "RA/AIML",
+        "sem": "4",
+        "exam": "END",
+        "url": "https://pdf.nitkkrpyqs.in/papers/abde4054-074e-498f-b971-d8ff881ee2d9.pdf"
+      },
+      {
+        "code": "MAIC-204",
+        "title": "Applied Linear Algebra",
+        "branch": "RA/AIML",
+        "sem": "4",
+        "exam": "MID1",
+        "url": "https://pdf.nitkkrpyqs.in/papers/a7f34e5d-88b1-4cdb-badd-fddd38156995.pdf"
+      },
+      {
+        "code": "MAIC-204",
+        "title": "Applied Linear Algebra",
+        "branch": "RA/AIML",
+        "sem": "4",
+        "exam": "MID2",
+        "url": "https://pdf.nitkkrpyqs.in/papers/4f5c314c-15ad-42fd-b7b5-6e54adb8a0b4.pdf"
+      }
+    ],
     "warnings": []
   }
 ]

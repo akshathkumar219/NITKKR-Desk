@@ -2,9 +2,6 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { SESSION_KEYS, readSession, writeSession } from '../lib/storage'
 import IntroWeb from './IntroWeb'
 
-// How many times a tab replays the entrance before it goes quiet.
-const MAX_PLAYS = 5
-
 // Fixed choreography, matched to the keyframes in src/index.css:
 //   0-150     web scale-slam + corner collage shards pop in
 //   0-500     web draws in
@@ -25,6 +22,15 @@ function prefersReducedMotion() {
   )
 }
 
+function isPageReload() {
+  if (typeof window === 'undefined' || typeof performance === 'undefined') return false
+  const navEntries = performance.getEntriesByType?.('navigation')
+  if (navEntries && navEntries.length > 0) {
+    return navEntries[0].type === 'reload'
+  }
+  return performance.navigation?.type === 1
+}
+
 let decided = false
 let decision = false
 
@@ -35,10 +41,13 @@ function useShouldPlay() {
     if (!decided) {
       decided = true
       const plays = Number(readSession(SESSION_KEYS.introPlays, 0)) || 0
-      if (!prefersReducedMotion() && plays < MAX_PLAYS) {
-        writeSession(SESSION_KEYS.introPlays, plays + 1)
+      const isReload = isPageReload()
+
+      // Plays on opening a new tab, but suppressed on refresh/reload
+      if (!prefersReducedMotion() && plays === 0 && !isReload) {
         decision = true
       }
+      writeSession(SESSION_KEYS.introPlays, plays + 1)
     }
     if (decision) setPlay(true)
   }, [])

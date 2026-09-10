@@ -1,11 +1,9 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import {
   ArrowRight,
-  CalendarDays,
   CheckSquare,
   ClipboardCheck,
-  Coffee,
   Moon,
   Plus,
   Repeat,
@@ -19,22 +17,28 @@ import {
   Check,
   X,
   User,
+  UtensilsCrossed,
+  Sparkles,
 } from 'lucide-react'
 import {
   avatarOf,
   useCustomStatus,
+  useEventCategories,
   useEvents,
   useProfile,
   useRollcallSettings,
   useTheme,
   useTodos,
+  useMessOverrides,
 } from '../lib/storage'
 import { branchName, hostelName } from '../data/campus'
 import { coursesOf, currentSession, filterSessionsByGroup, nextSession, sessionsForDay, useBoard } from '../lib/board'
-import { currentMeal } from '../data/mess'
+import { MEALS, getNextMealInfo, menuFor } from '../data/mess'
 import { status, STATUS_COLOR, tally, useRollcall } from '../lib/rollcall'
 import { dayCode, fmtRange, minutesNow, todayISO, fmtDateDDMMYYYY } from '../lib/time'
+import { CURRENT_TERM, getNoClassEvent } from '../data/info'
 import AppHeader from '../components/AppHeader'
+import VisualTimetableWidget from '../components/VisualTimetableWidget'
 import { inkFor } from '../lib/palette'
 
 function useClock() {
@@ -46,7 +50,13 @@ function useClock() {
   return now
 }
 
-function signalFor({ live, next }) {
+function signalFor({ live, next, noClass }) {
+  if (noClass) {
+    return {
+      title: `${noClass.label} (No Classes)`,
+      tone: noClass.isExam ? 'var(--color-coral)' : 'var(--color-acid)',
+    }
+  }
   if (live) {
     return {
       title: 'In Session Now',
@@ -155,7 +165,7 @@ function Cover({ name, theme, toggle }) {
 }
 
 /** Mini Month Calendar component with clean grid cells */
-function HeroMiniCalendar({ events }) {
+function HeroMiniCalendar({ events, getCatStyle }) {
   const [currentDate, setCurrentDate] = useState(() => new Date())
   const year = currentDate.getFullYear()
   const month = currentDate.getMonth()
@@ -166,10 +176,13 @@ function HeroMiniCalendar({ events }) {
 
   const todayStr = todayISO()
 
-  const eventDates = useMemo(() => {
-    const set = new Set()
-    events.forEach((e) => set.add(e.date))
-    return set
+  const eventsByDate = useMemo(() => {
+    const map = {}
+    events.forEach((e) => {
+      if (!map[e.date]) map[e.date] = []
+      map[e.date].push(e)
+    })
+    return map
   }, [events])
 
   const cells = useMemo(() => {
@@ -224,12 +237,15 @@ function HeroMiniCalendar({ events }) {
           {cells.map((c, i) => {
             if (!c) return <div key={`empty-${i}`} className="min-h-[26px] sm:min-h-[28px] rounded bg-transparent" />
             const isToday = c.iso === todayStr
-            const hasEvent = eventDates.has(c.iso)
+            const dayEvts = eventsByDate[c.iso] || []
+            const hasEvent = dayEvts.length > 0
+            const primaryCat = hasEvent && getCatStyle ? getCatStyle(dayEvts[0].category) : null
 
             return (
               <Link
                 key={c.iso}
                 to="/calendar"
+                title={hasEvent ? dayEvts.map((e) => `${e.title} (${e.category})`).join(' · ') : undefined}
                 style={
                   isToday
                     ? {
@@ -237,17 +253,36 @@ function HeroMiniCalendar({ events }) {
                         borderColor: 'var(--color-present)',
                         color: 'var(--on-accent)',
                       }
-                    : undefined
+                    : hasEvent && primaryCat
+                      ? {
+                          borderColor: primaryCat.bg,
+                          backgroundColor: `color-mix(in srgb, ${primaryCat.bg} 18%, var(--surface))`,
+                          color: 'var(--text)',
+                        }
+                      : undefined
                 }
                 className={`min-h-[26px] sm:min-h-[28px] text-xs sm:text-[0.8125rem] font-bold rounded border transition-all grid place-items-center relative ${
                   isToday
-                    ? 'shadow-sm font-extrabold'
-                    : 'border-[var(--border)] bg-[var(--surface)] hover:bg-[var(--surface-2)] text-[var(--text)]'
+                    ? 'shadow-sm font-black'
+                    : hasEvent
+                      ? 'shadow-2xs font-extrabold hover:opacity-90'
+                      : 'border-[var(--border)] bg-[var(--surface)] hover:bg-[var(--surface-2)] text-[var(--text)]'
                 }`}
               >
-                {c.d}
-                {hasEvent && !isToday && (
-                  <span className="absolute bottom-0.5 size-1 rounded-full bg-[var(--color-present)]" />
+                <span className="leading-none">{c.d}</span>
+                {hasEvent && (
+                  <span className="absolute bottom-0.5 flex items-center justify-center gap-0.5 pointer-events-none">
+                    {dayEvts.slice(0, 3).map((ev) => {
+                      const catStyle = getCatStyle ? getCatStyle(ev.category) : { bg: 'var(--color-present)' }
+                      return (
+                        <span
+                          key={ev.id}
+                          className="size-1 sm:size-1.5 rounded-full border border-black/30"
+                          style={{ background: isToday ? 'var(--on-accent)' : catStyle.bg }}
+                        />
+                      )
+                    })}
+                  </span>
                 )}
               </Link>
             )
@@ -264,106 +299,145 @@ function HeroMiniCalendar({ events }) {
   )
 }
 
-function QuickTimetableWidget({ sessions, day, mins }) {
-  const todaySessions = useMemo(
-    () => sessionsForDay(sessions, day),
-    [sessions, day],
-  )
+
+
+function MessWidget({ mins, day, profile }) {
+  const nextInfo = useMemo(() => getNextMealInfo(mins, day), [mins, day])
+  const [selectedMealKey, setSelectedMealKey] = useState(null)
+  const { overrides } = useMessOverrides(profile.hostel)
+
+  const activeMealKey = selectedMealKey || nextInfo.meal.key
+  const isAutoNext = !selectedMealKey || selectedMealKey === nextInfo.meal.key
+  const targetDay = isAutoNext && nextInfo.isTomorrow ? nextInfo.dayCode : day
+  const isLive = isAutoNext && nextInfo.isLive
+
+  const hostelMenu = useMemo(() => {
+    return menuFor(profile.hostel, targetDay, overrides)
+  }, [profile.hostel, targetDay, overrides])
+
+  const mealData = hostelMenu?.[activeMealKey]
+  const items = Array.isArray(mealData) ? mealData : mealData?.items ?? []
+  const extra = !Array.isArray(mealData) ? mealData?.extra : null
 
   return (
-    <div className="board board-hard flex-1 flex flex-col p-3.5 sm:p-4 border-l-4 border-l-[var(--color-violet)] transition-all duration-200 hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-hard-lg min-h-0">
+    <div
+      className="board board-hard flex-1 flex flex-col p-3.5 sm:p-4 border-l-4 transition-all duration-200 hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-hard-lg min-h-0"
+      style={{
+        borderLeftColor: isLive ? 'var(--color-present)' : 'var(--color-amber)',
+      }}
+    >
+      {/* Header */}
       <div className="flex items-center justify-between border-b border-[var(--border)] pb-2.5 shrink-0">
-        <div className="flex items-center gap-2">
-          <CalendarDays size={18} className="text-[var(--color-violet)]" />
-          <h2 className="heading text-sm sm:text-base font-extrabold text-[var(--color-violet)]">TODAY'S TIMETABLE</h2>
+        <div className="flex items-center gap-2 min-w-0">
+          <UtensilsCrossed
+            size={18}
+            className={isLive ? 'text-[var(--color-present)]' : 'text-[var(--color-amber)]'}
+          />
+          <h2
+            className="heading text-sm sm:text-base font-extrabold truncate"
+            style={{ color: isLive ? 'var(--color-present)' : 'var(--color-amber)' }}
+          >
+            NEXT MEAL
+          </h2>
+          {isLive ? (
+            <span
+              className="px-1.5 py-0.2 text-[0.625rem] sm:text-[0.65rem] font-black rounded tracking-wider animate-pulse shadow-xs"
+              style={{
+                backgroundColor: 'var(--color-present)',
+                color: 'var(--on-accent)',
+              }}
+            >
+              LIVE
+            </span>
+          ) : isAutoNext && nextInfo.isTomorrow ? (
+            <span className="chip !py-0.2 !px-1.5 text-[0.625rem] sm:text-[0.65rem] font-black bg-[var(--color-amber)] text-[var(--on-accent)] border-[var(--color-amber)]">
+              TOMORROW
+            </span>
+          ) : null}
         </div>
-        <Link to="/home" className="label text-[var(--color-violet)] hover:underline flex items-center gap-1.5 text-xs sm:text-[0.8125rem] font-bold">
-          FULL BOARD <ArrowRight size={12} />
+
+        <Link
+          to="/mess"
+          className="label hover:underline flex items-center gap-1.5 text-xs sm:text-[0.8125rem] font-bold shrink-0"
+          style={{ color: isLive ? 'var(--color-present)' : 'var(--color-amber)' }}
+        >
+          FULL MENU <ArrowRight size={12} />
         </Link>
       </div>
 
-      <div className="mt-3 flex-1 space-y-2 overflow-y-auto pr-1 min-h-0">
-        {todaySessions.length === 0 ? (
-          <div className="h-full flex items-center justify-center text-center py-6">
-            <p className="label muted text-xs sm:text-sm">NO CLASSES SCHEDULED TODAY</p>
-          </div>
-        ) : (
-          todaySessions.map((s) => {
-            const isLive = mins >= s.start && mins < s.end
-            const isPast = mins >= s.end
-            const isBreak = s.type === 'break'
-
-            if (isBreak) {
-              return (
-                <div
-                  key={s.id}
-                  className={`flex items-center justify-between p-2.5 rounded border-2 border-black transition-all shadow-xs ${
-                    isLive ? 'ring-2 ring-black animate-pulse' : ''
-                  }`}
-                  style={{
-                    backgroundColor: 'var(--color-violet)',
-                    color: 'var(--on-accent)',
-                  }}
-                >
-                  <div className="flex flex-col gap-1.5 min-w-0" style={{ color: 'var(--on-accent)' }}>
-                    <div className="flex items-center gap-2">
-                      <Coffee size={13} strokeWidth={2.5} className="shrink-0" style={{ color: 'var(--on-accent)' }} />
-                      <span className="heading text-xs sm:text-sm font-black truncate" style={{ color: 'var(--on-accent)' }}>
-                        {s.name || 'BREAK'}
-                      </span>
-                      {isLive && (
-                        <span
-                          className="px-1.5 py-0.2 text-[0.55rem] sm:text-[0.6rem] font-black rounded bg-black text-white"
-                        >
-                          LIVE BREAK
-                        </span>
-                      )}
-                    </div>
-                    <span className="label text-[0.6875rem] sm:text-xs font-bold opacity-90" style={{ color: 'var(--on-accent)' }}>
-                      {fmtRange(s.start, s.end)} · FREE SLOT
-                    </span>
-                  </div>
-                  <span className="chip text-xs font-black px-2 py-0.5 !bg-black !text-white !border-black">
-                    BREAK
-                  </span>
-                </div>
-              )
-            }
-
+      {/* Tabs: Breakfast / Lunch / Dinner */}
+      <div className="mt-2.5 shrink-0">
+        <div className="grid grid-cols-3 gap-1 p-0.5 rounded bg-[var(--surface-2)] border border-[var(--border)] w-full">
+          {MEALS.map((m) => {
+            const isSelected = m.key === activeMealKey
+            const isCurrentNext = m.key === nextInfo.meal.key
             return (
-              <div
-                key={s.id}
-                className={`flex items-center justify-between p-2.5 rounded border transition-all ${
-                  isLive
-                    ? 'border-[var(--color-present)] bg-[var(--color-present)]/15 font-bold'
-                    : isPast
-                    ? 'border-[var(--border)] opacity-60'
-                    : 'border-[var(--border)] bg-[var(--surface-2)]'
+              <button
+                key={m.key}
+                type="button"
+                onClick={() => setSelectedMealKey(m.key)}
+                className={`w-full py-1.5 px-2 text-[0.65rem] sm:text-[0.75rem] font-extrabold rounded-xs transition-all cursor-pointer flex items-center justify-center gap-1.5 text-center ${
+                  isSelected
+                    ? 'bg-[var(--surface)] text-[var(--text)] shadow-xs border border-[var(--border)]'
+                    : 'muted hover:text-[var(--text)]'
                 }`}
               >
-                <div className="flex flex-col gap-1.5">
-                  <div className="flex items-center gap-2">
-                    <span className="heading text-xs sm:text-sm font-bold">{s.name}</span>
-                    {isLive && (
-                      <span
-                        className="px-2 py-0.5 text-[0.65rem] sm:text-[0.7rem] font-bold rounded shadow-xs"
-                        style={{
-                          backgroundColor: 'var(--color-present)',
-                          color: 'var(--on-accent)',
-                        }}
-                      >
-                        LIVE
-                      </span>
-                    )}
-                  </div>
-                  <span className="label muted text-[0.6875rem] sm:text-xs font-medium">
-                    {fmtRange(s.start, s.end)} {s.room ? `· Room ${s.room}` : ''}
-                  </span>
-                </div>
-                {s.code ? <span className="chip text-xs font-bold px-2 py-0.5">{s.code}</span> : null}
-              </div>
+                {isCurrentNext && (
+                  <span
+                    className="size-1.5 rounded-full shrink-0"
+                    style={{
+                      backgroundColor: nextInfo.isLive ? 'var(--color-present)' : 'var(--color-amber)',
+                    }}
+                  />
+                )}
+                <span className="truncate">{m.label}</span>
+              </button>
             )
-          })
+          })}
+        </div>
+      </div>
+
+      {/* Dishes list */}
+      <div className="mt-2.5 flex-1 space-y-1.5 overflow-y-auto pr-1 min-h-0">
+        {items.length === 0 ? (
+          <div className="h-full min-h-[90px] flex flex-col items-center justify-center text-center py-4 px-2 space-y-1 rounded bg-[var(--surface-2)]/60 border border-[var(--border)]">
+            <p className="label muted text-xs font-bold">NO MENU SCHEDULED</p>
+            <p className="label text-[0.6875rem] muted">Check full mess page or select a hostel</p>
+          </div>
+        ) : (
+          items.map((item, idx) => (
+            <div
+              key={`${activeMealKey}-${idx}`}
+              className="flex items-center gap-2.5 px-2.5 py-1.5 rounded border border-[var(--border)] bg-[var(--surface-2)] transition-colors hover:border-[var(--color-amber)]/60"
+            >
+              <span className="text-[0.625rem] sm:text-[0.6875rem] font-bold font-mono px-1.5 py-0.5 rounded bg-[var(--surface)] border border-[var(--border)] text-[var(--muted)] shrink-0">
+                {String(idx + 1).padStart(2, '0')}
+              </span>
+              <span className="text-xs sm:text-[0.8125rem] font-bold uppercase truncate text-[var(--text)]">
+                {item}
+              </span>
+            </div>
+          ))
+        )}
+
+        {/* Extra / Treat */}
+        {extra && (
+          <div className="mt-2 p-2 rounded border-2 border-[var(--color-amber)]/60 bg-[var(--color-amber)]/10 flex items-center justify-between gap-2">
+            <div className="flex items-center gap-1.5 min-w-0">
+              <Sparkles size={14} className="text-[var(--color-amber)] shrink-0" />
+              <div className="min-w-0">
+                <span className="text-[0.55rem] sm:text-[0.6rem] font-black uppercase tracking-widest text-[var(--color-amber)] block">
+                  SPECIAL EXTRA
+                </span>
+                <span className="text-xs sm:text-[0.8125rem] font-black uppercase truncate block text-[var(--text)]">
+                  {extra}
+                </span>
+              </div>
+            </div>
+            <span className="chip !py-0.2 !px-1.5 text-[0.55rem] font-black bg-[var(--color-amber)] text-[var(--on-accent)] shrink-0">
+              TREAT
+            </span>
+          </div>
         )}
       </div>
     </div>
@@ -384,7 +458,7 @@ function TodoWidget() {
   const completedCount = todos.filter((t) => t.done).length
 
   return (
-    <div className="board board-hard flex-1 flex flex-col p-3.5 sm:p-4 border-l-4 border-l-[var(--color-amber)] transition-all duration-200 hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-hard-lg min-h-0">
+    <div className="board board-hard flex-1 flex flex-col p-3.5 sm:p-4 border-l-4 border-l-[var(--color-amber)] transition-all duration-200 hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-hard-lg h-full min-h-0">
       <div className="flex items-center justify-between border-b border-[var(--border)] pb-2.5 shrink-0">
         <div className="flex items-center gap-2">
           <ClipboardCheck size={18} className="text-[var(--color-amber)]" />
@@ -395,7 +469,7 @@ function TodoWidget() {
         </span>
       </div>
 
-      <form onSubmit={handleSubmit} className="mt-3 flex gap-2 shrink-0">
+      <form onSubmit={handleSubmit} className="mt-2.5 flex gap-2 shrink-0">
         <input
           type="text"
           className="field flex-1 !py-1.5 !px-3 text-xs sm:text-sm"
@@ -411,7 +485,7 @@ function TodoWidget() {
         </button>
       </form>
 
-      <div className="mt-3 flex-1 space-y-2 overflow-y-auto pr-1 min-h-0">
+      <div className="mt-2.5 flex-1 space-y-1.5 overflow-y-auto pr-1 min-h-0">
         {todos.length === 0 ? (
           <div className="h-full flex items-center justify-center text-center py-4">
             <p className="label muted text-xs sm:text-sm">NO TASKS YET. ADD ONE ABOVE!</p>
@@ -427,21 +501,21 @@ function TodoWidget() {
               <button
                 type="button"
                 onClick={() => toggleTodo(todo.id)}
-                className="flex items-center gap-3 flex-1 text-left cursor-pointer"
+                className="flex items-center gap-2.5 flex-1 text-left cursor-pointer min-w-0"
               >
                 {todo.done ? (
                   <CheckSquare size={16} className="text-[var(--color-present)] shrink-0" />
                 ) : (
                   <Square size={16} className="text-[var(--muted)] shrink-0" />
                 )}
-                <span className={`text-xs sm:text-sm font-semibold ${todo.done ? 'line-through muted' : ''}`}>
+                <span className={`text-xs sm:text-sm font-semibold truncate ${todo.done ? 'line-through muted' : ''}`}>
                   {todo.text}
                 </span>
               </button>
               <button
                 type="button"
                 onClick={() => deleteTodo(todo.id)}
-                className="p-1 hover:text-[var(--color-absent)] muted transition-colors cursor-pointer"
+                className="p-1 hover:text-[var(--color-absent)] muted transition-colors cursor-pointer shrink-0"
                 title="Delete task"
               >
                 <Trash2 size={14} />
@@ -461,10 +535,34 @@ export default function Landing() {
   const { sessions } = useBoard(profile.branch, year)
   const effectiveSessions = useMemo(() => filterSessionsByGroup(sessions, group), [sessions, group])
   const { marks, adjustments } = useRollcall()
-  const { events, addEvent } = useEvents()
+  const { events, addEvent } = useEvents(CURRENT_TERM)
+  const { categories } = useEventCategories()
   const [customStatus, setCustomStatus] = useCustomStatus()
   const [editingStatus, setEditingStatus] = useState(false)
   const [statusInput, setStatusInput] = useState('')
+
+  // Map categories by ID for quick lookup
+  const categoryMap = useMemo(() => {
+    const map = {}
+    categories.forEach((c) => {
+      map[c.id] = c
+    })
+    return map
+  }, [categories])
+
+  const getCatStyle = useCallback(
+    (catId) => {
+      if (categoryMap[catId]) {
+        return {
+          bg: categoryMap[catId].bg,
+          ink: categoryMap[catId].ink || '#111111',
+          label: categoryMap[catId].label,
+        }
+      }
+      return { bg: 'var(--surface-2)', ink: 'var(--text)', label: catId || 'EVENT' }
+    },
+    [categoryMap],
+  )
 
   // Quick Add Event Modal state
   const [showAddEvent, setShowAddEvent] = useState(false)
@@ -474,13 +572,16 @@ export default function Landing() {
 
   const [settings] = useRollcallSettings()
   const now = useClock()
+  const todayDateStr = todayISO(now)
+  const todayNoClass = useMemo(() => getNoClassEvent(todayDateStr), [todayDateStr])
 
   const mins = minutesNow(now)
   const day = dayCode(now)
-  const live = currentSession(effectiveSessions, day, mins)
-  const next = nextSession(effectiveSessions, day, mins)
-  const meal = currentMeal(mins)
-  const signal = signalFor({ live, next })
+  const live = todayNoClass ? null : currentSession(effectiveSessions, day, mins)
+  const next = todayNoClass ? null : nextSession(effectiveSessions, day, mins)
+  const nextMealInfo = useMemo(() => getNextMealInfo(mins, day), [mins, day])
+  const meal = nextMealInfo.meal
+  const signal = signalFor({ live, next, noClass: todayNoClass })
 
   // Mirrors Attendance.jsx's own `overall` tally exactly (same session-id set,
   // same manual per-subject adjustments summed, same base attendance carried
@@ -495,16 +596,19 @@ export default function Landing() {
   const baseHeldVal = baseAttendance?.held || 0
 
   const attendance = useMemo(() => {
-    const ids = coursesOf(effectiveSessions).flatMap((c) => c.sessions.map((s) => s.id))
-    return tally(marks, ids, settings.trackingSince, totalAdjustments, {
+    const teachingSessions = coursesOf(effectiveSessions).flatMap((c) => c.sessions)
+    return tally(marks, teachingSessions, settings.trackingSince, totalAdjustments, {
       present: basePresentVal,
       held: baseHeldVal,
     })
   }, [marks, effectiveSessions, settings.trackingSince, totalAdjustments, basePresentVal, baseHeldVal])
 
   const remaining = useMemo(
-    () => sessionsForDay(effectiveSessions, day).filter((s) => s.type !== 'break' && s.end > mins).length,
-    [effectiveSessions, day, mins],
+    () =>
+      todayNoClass
+        ? 0
+        : sessionsForDay(effectiveSessions, day).filter((s) => s.type !== 'break' && s.end > mins).length,
+    [effectiveSessions, day, mins, todayNoClass],
   )
 
   const clock = now
@@ -554,7 +658,12 @@ export default function Landing() {
       ? 0
       : (Math.min(100, Math.max(0, attendance.percent)) / 100) * circumference
 
-  const upcomingEvents = useMemo(() => events, [events])
+  const upcomingEvents = useMemo(() => {
+    const today = todayISO(now)
+    return events
+      .filter((e) => (e.endDate || e.date) >= today)
+      .sort((a, b) => a.date.localeCompare(b.date))
+  }, [events, now])
 
   const handleSaveStatus = (e) => {
     e.preventDefault()
@@ -609,7 +718,9 @@ export default function Landing() {
               NITKKR DESK
             </span>
           </div>
-          <ThemeToggle theme={theme} toggle={toggle} />
+          <div className="flex items-center gap-2">
+            <ThemeToggle theme={theme} toggle={toggle} />
+          </div>
         </header>
 
         <hr className="hidden lg:block rule-ink shrink-0" style={{ background: 'var(--color-present)', opacity: 1 }} />
@@ -764,7 +875,7 @@ export default function Landing() {
               <div className="grid grid-cols-1 sm:grid-cols-12 gap-3 pt-1 lg:pt-3 flex-1 items-stretch min-h-0">
                 {/* Left: Tight Mini Month Calendar with expanding date grid */}
                 <div className="sm:col-span-6 h-full flex flex-col min-h-0">
-                  <HeroMiniCalendar events={events} />
+                  <HeroMiniCalendar events={events} getCatStyle={getCatStyle} />
                 </div>
 
                 {/* Right: Upcoming Events List with Quick Add Event Button */}
@@ -787,16 +898,47 @@ export default function Landing() {
                           <p className="label muted text-xs sm:text-sm">NO UPCOMING EVENTS</p>
                         </div>
                       ) : (
-                        upcomingEvents.map((evt) => (
-                          <div key={evt.id} className="flex items-center justify-between text-xs p-1.5 sm:p-2.5 rounded border border-[var(--border)] bg-[var(--surface)] hover:border-[var(--color-present)] transition-colors">
-                            <div className="flex items-center gap-1.5 min-w-0 pr-1">
-                              <span className="size-1.5 rounded-full bg-[var(--color-present)] shrink-0" />
-                              <span className="truncate text-xs sm:text-sm font-bold" title={evt.title}>{evt.title}</span>
-                              <span className="hidden sm:inline label text-[0.65rem] sm:text-[0.7rem] muted font-medium">({evt.category})</span>
+                        upcomingEvents.map((evt) => {
+                          const catStyle = getCatStyle(evt.category)
+                          const isEvtToday = evt.date === todayDateStr
+                          return (
+                            <div
+                              key={evt.id}
+                              className="flex items-center justify-between gap-2 text-xs p-1.5 sm:p-2 rounded border border-[var(--border)] bg-[var(--surface)] hover:bg-[var(--surface-2)] transition-all border-l-4"
+                              style={{ borderLeftColor: catStyle.bg }}
+                            >
+                              <div className="flex items-center gap-2 min-w-0 pr-1">
+                                <span
+                                  className="size-2 rounded-full shrink-0 border border-black/30"
+                                  style={{ background: catStyle.bg }}
+                                />
+                                <div className="flex items-center gap-1.5 min-w-0">
+                                  <span className="truncate text-xs sm:text-sm font-bold" title={evt.title}>
+                                    {evt.title}
+                                  </span>
+                                  {isEvtToday && (
+                                    <span
+                                      className="px-1 py-0.5 text-[0.55rem] font-black rounded uppercase tracking-wider shadow-2xs shrink-0"
+                                      style={{ background: 'var(--color-acid)', color: 'var(--on-accent)' }}
+                                    >
+                                      TODAY
+                                    </span>
+                                  )}
+                                </div>
+                              </div>
+                              <span
+                                className="chip !py-0.5 !px-2 text-[0.6875rem] font-bold shrink-0 border transition-all"
+                                style={{
+                                  borderColor: catStyle.bg,
+                                  backgroundColor: `color-mix(in srgb, ${catStyle.bg} 18%, var(--surface))`,
+                                  color: 'var(--text)',
+                                }}
+                              >
+                                {fmtDateDDMMYYYY(evt.date)}
+                              </span>
                             </div>
-                            <span className="chip !py-0.5 !px-2 text-[0.6875rem] font-bold shrink-0">{fmtDateDDMMYYYY(evt.date)}</span>
-                          </div>
-                        ))
+                          )
+                        })
                       )}
                     </div>
                   </div>
@@ -873,7 +1015,7 @@ export default function Landing() {
                   <ArrowRight size={14} strokeWidth={2.5} className="shrink-0" aria-hidden />
                 </p>
                 <p className="heading mt-2 text-xl sm:text-2xl font-extrabold tracking-tight truncate">
-                  {meal.label}
+                  {nextMealInfo.isTomorrow ? `TOMORROW'S ${meal.label}` : meal.label}
                 </p>
                 <p className="label mt-1.5 text-xs sm:text-[0.8125rem] font-medium muted truncate">
                   {meal.time}
@@ -917,12 +1059,27 @@ export default function Landing() {
           </div>
 
           {/* ---- RIGHT COLUMN: Glance Control Widgets (order-1 on mobile, order-2 on desktop) ---- */}
-          <div className="order-1 lg:order-2 lg:col-span-5 flex flex-col justify-between gap-3 lg:gap-4 h-full min-h-0">
-            {/* Quick Timetable Preview */}
-            <QuickTimetableWidget sessions={effectiveSessions} day={day} mins={mins} />
+          <div className="order-1 lg:order-2 lg:col-span-5 flex flex-col gap-3 lg:gap-4 h-full min-h-0">
+            {/* Timetable Widget: 3-day scroll on mobile, 5-day full view on desktop */}
+            <div className="flex flex-col h-[calc(100dvh*450/956)] lg:h-auto lg:flex-[1.25] lg:min-h-0 shrink-0 lg:shrink">
+              <VisualTimetableWidget
+                sessions={effectiveSessions}
+                day={day}
+                mins={mins}
+                profile={profile}
+                year={year}
+              />
+            </div>
 
-            {/* Student To-Do List */}
-            <TodoWidget />
+            {/* Mobile Only: Next Meal */}
+            <div className="lg:hidden flex-1 flex flex-col min-h-[260px]">
+              <MessWidget mins={mins} day={day} profile={profile} />
+            </div>
+
+            {/* Desktop Only: Student To-Dos */}
+            <div className="hidden lg:flex flex-1 flex-col min-h-0">
+              <TodoWidget />
+            </div>
           </div>
         </div>
 
@@ -980,10 +1137,11 @@ export default function Landing() {
                     value={newEventCategory}
                     onChange={(e) => setNewEventCategory(e.target.value)}
                   >
-                    <option value="EXAMS">EXAMS</option>
-                    <option value="CLASSES">CLASSES</option>
-                    <option value="DEADLINE">DEADLINE</option>
-                    <option value="PERSONAL">PERSONAL</option>
+                    {categories.map((c) => (
+                      <option key={c.id} value={c.id}>
+                        {c.label}
+                      </option>
+                    ))}
                   </select>
                 </div>
               </div>

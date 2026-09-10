@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import {
   CalendarDays,
   Check,
@@ -19,6 +19,7 @@ import SessionModal from '../components/SessionModal'
 import { Panel } from '../ui'
 import { SORTED_BRANCHES, YEARS, branchName } from '../data/campus'
 import { baseTimetable, groupsFor } from '../data/timetables'
+import { getNoClassEvent } from '../data/info'
 import { useProfile, useRollcallSettings } from '../lib/storage'
 import {
   coursesOf,
@@ -192,17 +193,21 @@ function SessionCard({
   let isSimulating = false
   let simStatus = st
 
+  const credit = session.attendanceCredits != null
+    ? Number(session.attendanceCredits)
+    : (session.type === 'lab' || (session.name || '').toUpperCase().includes('LAB') ? 2 : 1)
+
   if (hoverSim === 'present') {
     isSimulating = true
-    const nextPresent = mark === 'present' ? presentCount : presentCount + 1
-    const nextHeld = mark === 'present' ? heldCount : mark === 'absent' ? heldCount : heldCount + 1
+    const nextPresent = mark === 'present' ? presentCount : presentCount + credit
+    const nextHeld = mark === 'present' ? heldCount : mark === 'absent' ? heldCount : heldCount + credit
     displayPercent = nextHeld > 0 ? Math.round((nextPresent / nextHeld) * 100) : 100
     simDelta = actualPercent != null ? displayPercent - actualPercent : 0
     simStatus = status(displayPercent, effectiveCutoff)
   } else if (hoverSim === 'absent') {
     isSimulating = true
-    const nextPresent = mark === 'present' ? Math.max(0, presentCount - 1) : presentCount
-    const nextHeld = mark === 'absent' ? heldCount : mark === 'present' ? heldCount : heldCount + 1
+    const nextPresent = mark === 'present' ? Math.max(0, presentCount - credit) : presentCount
+    const nextHeld = mark === 'absent' ? heldCount : mark === 'present' ? heldCount : heldCount + credit
     displayPercent = nextHeld > 0 ? Math.round((nextPresent / nextHeld) * 100) : 0
     simDelta = actualPercent != null ? displayPercent - actualPercent : 0
     simStatus = status(displayPercent, effectiveCutoff)
@@ -252,6 +257,12 @@ function SessionCard({
               <span className="opacity-40">·</span>
               <span>{theme.label}</span>
             </span>
+
+            {credit >= 2 ? (
+              <span className="px-2 py-1 text-[0.6rem] sm:text-xs rounded font-mono font-black tracking-wider border-2 border-[var(--border)] bg-[var(--surface-2)] text-[var(--color-present)] shadow-2xs uppercase">
+                {credit}× CREDITS
+              </span>
+            ) : null}
 
             {isLive ? (
               <span className="chip !py-0.5 !px-2 text-[0.6rem] sm:text-xs text-[var(--color-present)] flex items-center gap-1.5 border-2 border-[var(--color-present)] bg-[var(--color-present)]/10 font-black tracking-widest uppercase">
@@ -652,14 +663,14 @@ export default function Board() {
   const required = settings?.required ?? 65
   const since = settings?.trackingSince
 
-  // Computes the ISO calendar date for the selected weekday in the current week
-  const activeIso = useMemo(() => {
+  // Computes the ISO calendar date for any weekday in the active week
+  const getIsoForWeekday = useCallback((targetDay) => {
     const now = new Date()
     const currentDay = dayCode(now)
-    if (day === currentDay) return todayISO(now)
+    if (targetDay === currentDay) return todayISO(now)
 
     const currentDayIndex = (now.getDay() + 6) % 7
-    const targetDayIndex = DAYS.indexOf(day)
+    const targetDayIndex = DAYS.indexOf(targetDay)
     if (targetDayIndex === -1) return todayISO(now)
 
     const targetDate = new Date(now)
@@ -670,7 +681,12 @@ export default function Board() {
     }
     targetDate.setDate(now.getDate() + diff)
     return todayISO(targetDate)
-  }, [day])
+  }, [])
+
+  // Computes the ISO calendar date for the selected weekday in the current week
+  const activeIso = useMemo(() => getIsoForWeekday(day), [day, getIsoForWeekday])
+
+  const noClassEvent = useMemo(() => getNoClassEvent(activeIso), [activeIso])
 
   const currentMins = minutesNow()
 
@@ -679,8 +695,7 @@ export default function Board() {
     const map = {}
     const courses = coursesOf(sessions)
     for (const c of courses) {
-      const sIds = c.sessions.map((s) => s.id)
-      const res = tally(marks, sIds, since)
+      const res = tally(marks, c.sessions, since)
       map[c.key] = res
       if (c.code) map[c.code] = res
       if (c.name) map[c.name] = res
@@ -724,11 +739,11 @@ export default function Board() {
     return list
   }, [filtered, day, hideBreaks, query])
 
-  // Next upcoming session today
+  // Next upcoming session today (suppressed on no-class days such as mid-sems or holidays)
   const nextSess = useMemo(() => {
-    if (day !== today) return null
+    if (day !== today || noClassEvent) return null
     return nextSession(dayList, today, currentMins)
-  }, [day, today, dayList, currentMins])
+  }, [day, today, noClassEvent, dayList, currentMins])
 
   return (
     <Shell>
@@ -815,11 +830,13 @@ export default function Board() {
               {DAYS.map((d) => {
                 const isActive = day === d
                 const isTodayDot = d === today
+                const dNoClass = getNoClassEvent(getIsoForWeekday(d))
                 return (
                   <button
                     key={d}
                     type="button"
                     onClick={() => setDay(d)}
+                    title={dNoClass ? `${d}: ${dNoClass.label} (No classes scheduled)` : d}
                     className={`btn !px-3 !py-1.5 text-xs sm:text-sm font-bold uppercase flex items-center gap-1.5 cursor-pointer transition-all ${
                       isActive
                         ? '!bg-[var(--text)] !text-[var(--bg)] !border-[var(--text)] shadow-hard-sm'
@@ -832,6 +849,18 @@ export default function Board() {
                         <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[var(--color-present)] opacity-75" />
                         <span className="relative inline-flex rounded-full size-1.5 bg-[var(--color-present)]" />
                       </span>
+                    ) : dNoClass ? (
+                      <span
+                        className="size-1.5 rounded-full shrink-0"
+                        title={dNoClass.label}
+                        style={{
+                          background: dNoClass.isExam
+                            ? 'var(--color-coral)'
+                            : dNoClass.isBreak
+                              ? 'var(--color-acid)'
+                              : 'var(--color-amber)',
+                        }}
+                      />
                     ) : null}
                   </button>
                 )
@@ -1037,6 +1066,39 @@ export default function Board() {
           />
         ) : (
           <div className="flex-1 overflow-y-auto min-h-0 no-scrollbar pr-1 pb-2">
+            {noClassEvent && (
+              <div
+                className="board board-hard mb-3 p-2.5 sm:p-3 rounded bg-[var(--surface-2)] border-2 flex flex-wrap items-center justify-between gap-2 shadow-xs"
+                style={{
+                  borderColor: noClassEvent.isExam
+                    ? 'var(--color-coral)'
+                    : noClassEvent.isBreak
+                      ? 'var(--color-acid)'
+                      : 'var(--color-amber)',
+                }}
+              >
+                <div className="flex items-center gap-2 flex-wrap">
+                  <span
+                    className="chip !py-0.5 !px-2 text-xs font-black uppercase"
+                    style={{
+                      background: noClassEvent.isExam
+                        ? 'var(--color-coral)'
+                        : noClassEvent.isBreak
+                          ? 'var(--color-acid)'
+                          : 'var(--color-amber)',
+                      color: '#111111',
+                    }}
+                  >
+                    {noClassEvent.category} · NO CLASSES SCHEDULED
+                  </span>
+                  <span className="text-xs sm:text-sm font-black">{noClassEvent.label}</span>
+                </div>
+                <span className="t-micro muted font-bold uppercase">
+                  Showing regular schedule below for reference
+                </span>
+              </div>
+            )}
+
             {dayList.length === 0 ? (
               <div className="h-full flex flex-col items-center justify-center p-8 text-center rounded bg-[var(--surface-2)] border-2 border-[var(--border)] space-y-2">
                 <CalendarDays className="icon-lg text-[var(--muted)]" />

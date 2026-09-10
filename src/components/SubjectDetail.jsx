@@ -79,11 +79,6 @@ export default function SubjectDetail({
   const requiredCutoff =
     Number(data.targetCutoff) || Number(rollcallSettings?.required) || 65;
 
-  // Attendance stats calculation for this subject's sessions
-  const sessionIds = useMemo(
-    () => (subject.sessions || []).map((s) => s.id),
-    [subject.sessions],
-  );
 
   const manualAdj = (rollcall.adjustments || {})[courseKey] || 0;
 
@@ -94,7 +89,7 @@ export default function SubjectDetail({
   const attendanceStats = useMemo(() => {
     const res = tally(
       rollcall.marks || {},
-      sessionIds,
+      subject.sessions || [],
       rollcallSettings?.trackingSince,
       manualAdj,
     );
@@ -102,7 +97,7 @@ export default function SubjectDetail({
     const safeBunkCount = canSkip(res.present, res.held, requiredCutoff);
     const mustAttendCount = mustAttend(res.present, res.held, requiredCutoff);
     return { ...res, pct, safeBunkCount, mustAttendCount };
-  }, [rollcall.marks, sessionIds, rollcallSettings, manualAdj, requiredCutoff]);
+  }, [rollcall.marks, subject.sessions, rollcallSettings, manualAdj, requiredCutoff]);
 
   // Syllabus completion metrics
   const syllabusMetrics = useMemo(() => {

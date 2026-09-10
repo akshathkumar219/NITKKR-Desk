@@ -14,7 +14,7 @@ import {
   X,
 } from 'lucide-react'
 import AppHeader from './AppHeader'
-import { avatarOf, useProfile, useTheme } from '../lib/storage'
+import { avatarOf, useNotifications, useProfile, useTheme } from '../lib/storage'
 import { inkFor } from '../lib/palette'
 
 const NAV = [
@@ -65,6 +65,7 @@ function NavItem({ to, label, icon: Icon, onNavigate }) {
 export default function Shell({ children }) {
   const { profile, year } = useProfile()
   const { theme, toggle } = useTheme()
+  const { unreadCount } = useNotifications()
   const navigate = useNavigate()
   const { pathname } = useLocation()
   const [isBannerDismissed, setBannerDismissed] = useGuideBannerDismissed()
@@ -126,30 +127,45 @@ export default function Shell({ children }) {
             <span>{theme === 'dark' ? 'LIGHT MODE' : 'DARK MODE'}</span>
           </button>
 
-          {/* 2 Side-by-Side Smaller Buttons: GUIDE & ABOUT */}
-          <div className="grid grid-cols-2 gap-2">
+          {/* 3 Side-by-Side Buttons: GUIDE, UPDATES & ABOUT */}
+          <div className="grid grid-cols-3 gap-1.5">
+            <button
+              type="button"
+              className={`btn w-full !px-1 font-bold text-[11px] sm:text-xs tracking-wider uppercase !justify-center cursor-pointer ${
+                pathname === '/guide' ? '!bg-[var(--text)] !border-[var(--text)] !text-[var(--bg)] shadow-hard-sm' : ''
+              }`}
+              onClick={() => navigate('/guide')}
+            >
+              GUIDE
+            </button>
             <div className="relative">
               <button
                 type="button"
-                className="btn w-full font-bold text-xs sm:text-sm tracking-wider uppercase !justify-center cursor-pointer"
-                onClick={() => navigate('/guide')}
+                className={`btn w-full !px-1 font-bold text-[11px] sm:text-xs tracking-wider uppercase !justify-center cursor-pointer ${
+                  pathname === '/notifications' ? '!bg-[var(--text)] !border-[var(--text)] !text-[var(--bg)] shadow-hard-sm' : ''
+                }`}
+                onClick={() => navigate('/notifications')}
               >
-                GUIDE
+                UPDATES
               </button>
-              <span
-                className="sticker absolute -top-2.5 -right-2 pointer-events-none !px-1.5 !py-0.5 !text-[10.5px] !font-black !tracking-wider !leading-none z-20"
-                style={{
-                  backgroundColor: 'var(--color-lime)',
-                  color: 'var(--color-ink)',
-                  transform: 'rotate(7.5deg)',
-                }}
-              >
-                NEW
-              </span>
+              {unreadCount > 0 && (
+                <span
+                  className="sticker absolute -top-2.5 -right-1 pointer-events-none !px-1.5 !py-0.5 !text-[9px] !font-black !tracking-wider !leading-none z-20"
+                  style={{
+                    backgroundColor: 'var(--color-lime)',
+                    color: 'var(--color-ink, #111)',
+                    transform: 'rotate(7.5deg)',
+                  }}
+                >
+                  NEW
+                </span>
+              )}
             </div>
             <button
               type="button"
-              className="btn font-bold text-xs sm:text-sm tracking-wider uppercase !justify-center cursor-pointer"
+              className={`btn w-full !px-1 font-bold text-[11px] sm:text-xs tracking-wider uppercase !justify-center cursor-pointer ${
+                pathname === '/about' ? '!bg-[var(--text)] !border-[var(--text)] !text-[var(--bg)] shadow-hard-sm' : ''
+              }`}
               onClick={() => navigate('/about')}
             >
               ABOUT

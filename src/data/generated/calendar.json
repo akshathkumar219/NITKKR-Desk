@@ -1,17 +1,17 @@
 {
   "calendars": [
     {
-      "title": "ACADEMIC CALENDAR (EVEN SEMESTER 2026-27)",
+      "title": "REVISED ACADEMIC CALENDAR (EVEN SEMESTER 2026-27)",
       "term": "even-2026-27",
-      "audience": "UG, PG & PhD Programmes",
-      "source": "Notification No. Acad./2026/1104 dated 18.06.2026 (Senate 59th Meeting)",
+      "audience": "All UG and PG Programmes",
+      "source": "Revised Academic Calendar for Even Semester AY 2026-27 (Senate Notification)",
       "verified": true,
       "events": [
         {
-          "label": "Registration for Even Semester Starts",
-          "value": "JAN 11, 2027",
-          "category": "REGISTRATION",
-          "date": "2027-01-11",
+          "label": "Christmas",
+          "value": "DEC 25, 2026",
+          "category": "HOLIDAYS",
+          "date": "2026-12-25",
           "endDate": null
         },
         {
@@ -22,10 +22,10 @@
           "endDate": null
         },
         {
-          "label": "Registration for Even Semester Ends",
-          "value": "MAR 10, 2027",
-          "category": "REGISTRATION",
-          "date": "2027-03-10",
+          "label": "Republic Day",
+          "value": "JAN 26, 2027",
+          "category": "HOLIDAYS",
+          "date": "2027-01-26",
           "endDate": null
         },
         {
@@ -36,11 +36,25 @@
           "endDate": "2027-02-07"
         },
         {
+          "label": "Techspardha-2027 (Half Day Classes)",
+          "value": "MAR 04, 2027",
+          "category": "EVENTS",
+          "date": "2027-03-04",
+          "endDate": null
+        },
+        {
           "label": "Techspardha-2027",
           "value": "MAR 05 – 07, 2027",
           "category": "EVENTS",
           "date": "2027-03-05",
           "endDate": "2027-03-07"
+        },
+        {
+          "label": "Id-ul-Fitr",
+          "value": "MAR 10, 2027",
+          "category": "HOLIDAYS",
+          "date": "2027-03-10",
+          "endDate": null
         },
         {
           "label": "Mid Semester Exam-I",
@@ -50,11 +64,46 @@
           "endDate": "2027-03-19"
         },
         {
-          "label": "Mid Semester Break",
-          "value": "MAR 22 – 26, 2027",
-          "category": "BREAKS",
+          "label": "Holi",
+          "value": "MAR 22, 2027",
+          "category": "HOLIDAYS",
           "date": "2027-03-22",
-          "endDate": "2027-03-26"
+          "endDate": null
+        },
+        {
+          "label": "Mid Semester Break",
+          "value": "MAR 23 – 25, 2027",
+          "category": "BREAKS",
+          "date": "2027-03-23",
+          "endDate": "2027-03-25"
+        },
+        {
+          "label": "Good Friday",
+          "value": "MAR 26, 2027",
+          "category": "HOLIDAYS",
+          "date": "2027-03-26",
+          "endDate": null
+        },
+        {
+          "label": "Ambedkar Jayanti",
+          "value": "APR 14, 2027",
+          "category": "HOLIDAYS",
+          "date": "2027-04-14",
+          "endDate": null
+        },
+        {
+          "label": "Ram Navami",
+          "value": "APR 15, 2027",
+          "category": "HOLIDAYS",
+          "date": "2027-04-15",
+          "endDate": null
+        },
+        {
+          "label": "Mahavir Jayanti",
+          "value": "APR 19, 2027",
+          "category": "HOLIDAYS",
+          "date": "2027-04-19",
+          "endDate": null
         },
         {
           "label": "Mid Semester Exam-II",
@@ -64,11 +113,11 @@
           "endDate": "2027-04-22"
         },
         {
-          "label": "Practical Examination Begins",
-          "value": "APR 26, 2027",
+          "label": "Practical Examinations",
+          "value": "APR 26 – 30, 2027",
           "category": "EXAMS",
           "date": "2027-04-26",
-          "endDate": null
+          "endDate": "2027-04-30"
         },
         {
           "label": "Teaching Closes",
@@ -78,32 +127,53 @@
           "endDate": null
         },
         {
-          "label": "End Semester Examination Begins",
-          "value": "MAY 07, 2027",
+          "label": "End Semester Examinations",
+          "value": "MAY 07 – 24, 2027",
           "category": "EXAMS",
           "date": "2027-05-07",
+          "endDate": "2027-05-24"
+        },
+        {
+          "label": "Id-ul-Juha (Bakrid)",
+          "value": "MAY 17, 2027",
+          "category": "HOLIDAYS",
+          "date": "2027-05-17",
           "endDate": null
         },
         {
-          "label": "End Semester Examination Concludes",
-          "value": "MAY 24, 2027",
-          "category": "EXAMS",
-          "date": "2027-05-24",
+          "label": "Buddha Purnima",
+          "value": "MAY 20, 2027",
+          "category": "HOLIDAYS",
+          "date": "2027-05-20",
           "endDate": null
         },
         {
-          "label": "Summer Break",
-          "value": "JUN 04 – JUL 28, 2027",
+          "label": "Summer Break Starts",
+          "value": "JUN 04, 2027",
           "category": "BREAKS",
           "date": "2027-06-04",
-          "endDate": "2027-07-28"
+          "endDate": null
         },
         {
-          "label": "Registration for Odd Semester (2027-28)",
-          "value": "JUL 20 – AUG 19, 2027",
-          "category": "REGISTRATION",
-          "date": "2027-07-20",
-          "endDate": "2027-08-19"
+          "label": "Muharram",
+          "value": "JUN 15, 2027",
+          "category": "HOLIDAYS",
+          "date": "2027-06-15",
+          "endDate": null
+        },
+        {
+          "label": "International Yoga Day",
+          "value": "JUN 21, 2027",
+          "category": "EVENTS",
+          "date": "2027-06-21",
+          "endDate": null
+        },
+        {
+          "label": "Summer Break Ends",
+          "value": "JUL 28, 2027",
+          "category": "BREAKS",
+          "date": "2027-07-28",
+          "endDate": null
         },
         {
           "label": "Commencement of Classes (Odd Semester 2027-28)",
@@ -111,21 +181,35 @@
           "category": "ACADEMIC",
           "date": "2027-07-29",
           "endDate": null
+        },
+        {
+          "label": "Independence Day",
+          "value": "AUG 15, 2027",
+          "category": "HOLIDAYS",
+          "date": "2027-08-15",
+          "endDate": null
+        },
+        {
+          "label": "Janmashtami",
+          "value": "AUG 25, 2027",
+          "category": "HOLIDAYS",
+          "date": "2027-08-25",
+          "endDate": null
         }
       ]
     },
     {
-      "title": "ACADEMIC CALENDAR (ODD SEMESTER 2026-27)",
+      "title": "REVISED ACADEMIC CALENDAR (ODD SEMESTER 2026-27)",
       "term": "odd-2026-27",
-      "audience": "UG, PG & PhD Programmes",
-      "source": "Notification No. Acad./2026/1104 dated 18.06.2026 (Senate 59th Meeting)",
+      "audience": "All UG and PG Programmes",
+      "source": "Revised Academic Calendar for Odd Semester AY 2026-27 (Senate Notification)",
       "verified": true,
       "events": [
         {
-          "label": "Registration for Odd Semester Starts",
-          "value": "AUG 21, 2026",
-          "category": "REGISTRATION",
-          "date": "2026-08-21",
+          "label": "Independence Day",
+          "value": "AUG 15, 2026",
+          "category": "HOLIDAYS",
+          "date": "2026-08-15",
           "endDate": null
         },
         {
@@ -136,18 +220,25 @@
           "endDate": null
         },
         {
+          "label": "Milad-un-Nabi",
+          "value": "AUG 26, 2026",
+          "category": "HOLIDAYS",
+          "date": "2026-08-26",
+          "endDate": null
+        },
+        {
+          "label": "Janmashtami",
+          "value": "SEP 04, 2026",
+          "category": "HOLIDAYS",
+          "date": "2026-09-04",
+          "endDate": null
+        },
+        {
           "label": "Talent Show",
           "value": "SEP 19 – 20, 2026",
           "category": "EVENTS",
           "date": "2026-09-19",
           "endDate": "2026-09-20"
-        },
-        {
-          "label": "Registration for Odd Semester Ends",
-          "value": "SEP 21, 2026",
-          "category": "REGISTRATION",
-          "date": "2026-09-21",
-          "endDate": null
         },
         {
           "label": "Mid Semester Exam-I",
@@ -157,11 +248,39 @@
           "endDate": "2026-09-30"
         },
         {
-          "label": "Confluence-2026",
-          "value": "OCT 09 – 11, 2026",
+          "label": "Gandhi Jayanti",
+          "value": "OCT 02, 2026",
+          "category": "HOLIDAYS",
+          "date": "2026-10-02",
+          "endDate": null
+        },
+        {
+          "label": "Dussehra",
+          "value": "OCT 20, 2026",
+          "category": "HOLIDAYS",
+          "date": "2026-10-20",
+          "endDate": null
+        },
+        {
+          "label": "Confluence-2026 (Half Day Classes)",
+          "value": "OCT 30, 2026",
           "category": "EVENTS",
-          "date": "2026-10-09",
-          "endDate": "2026-10-11"
+          "date": "2026-10-30",
+          "endDate": null
+        },
+        {
+          "label": "Confluence-2026",
+          "value": "OCT 31 – NOV 02, 2026",
+          "category": "EVENTS",
+          "date": "2026-10-31",
+          "endDate": "2026-11-02"
+        },
+        {
+          "label": "Deepawali",
+          "value": "NOV 08, 2026",
+          "category": "HOLIDAYS",
+          "date": "2026-11-08",
+          "endDate": null
         },
         {
           "label": "Mid Semester Exam-II",
@@ -171,11 +290,18 @@
           "endDate": "2026-11-20"
         },
         {
-          "label": "Practical Examination Begins",
-          "value": "NOV 30, 2026",
+          "label": "Guru Nanak Jayanti",
+          "value": "NOV 24, 2026",
+          "category": "HOLIDAYS",
+          "date": "2026-11-24",
+          "endDate": null
+        },
+        {
+          "label": "Practical Examinations",
+          "value": "NOV 30 – DEC 04, 2026",
           "category": "EXAMS",
           "date": "2026-11-30",
-          "endDate": null
+          "endDate": "2026-12-04"
         },
         {
           "label": "Teaching Closes",
@@ -185,17 +311,17 @@
           "endDate": null
         },
         {
-          "label": "End Semester Examination Begins",
-          "value": "DEC 11, 2026",
+          "label": "End Semester Examinations",
+          "value": "DEC 11 – 28, 2026",
           "category": "EXAMS",
           "date": "2026-12-11",
-          "endDate": null
+          "endDate": "2026-12-28"
         },
         {
-          "label": "End Semester Examination Concludes",
-          "value": "DEC 28, 2026",
-          "category": "EXAMS",
-          "date": "2026-12-28",
+          "label": "Christmas Day",
+          "value": "DEC 25, 2026",
+          "category": "HOLIDAYS",
+          "date": "2026-12-25",
           "endDate": null
         },
         {
@@ -206,17 +332,17 @@
           "endDate": "2027-01-17"
         },
         {
-          "label": "Registration for Even Semester (2026-27)",
-          "value": "DEC 29, 2026 – JAN 28, 2027",
-          "category": "REGISTRATION",
-          "date": "2026-12-29",
-          "endDate": "2027-01-28"
-        },
-        {
           "label": "Commencement of Classes (Even Semester)",
           "value": "JAN 18, 2027",
           "category": "ACADEMIC",
           "date": "2027-01-18",
+          "endDate": null
+        },
+        {
+          "label": "Republic Day",
+          "value": "JAN 26, 2027",
+          "category": "HOLIDAYS",
+          "date": "2027-01-26",
           "endDate": null
         }
       ]

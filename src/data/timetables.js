@@ -22,9 +22,44 @@ import { getSubsectionsForBranch } from './campus.js'
 
 export const TIMETABLES = generated
 
+let _sessionById = null
+
+export function getSessionById(id) {
+  if (!id) return null
+  if (!_sessionById) {
+    _sessionById = new Map()
+    for (const byYear of Object.values(TIMETABLES)) {
+      for (const list of Object.values(byYear)) {
+        for (const s of list) {
+          const isLab =
+            s.type === 'lab' ||
+            (s.name || '').toUpperCase().includes('LAB') ||
+            (s.code || '').toUpperCase().includes('(P)')
+          _sessionById.set(s.id, {
+            ...s,
+            attendanceCredits: s.attendanceCredits != null ? Number(s.attendanceCredits) : (isLab ? 2 : 1),
+          })
+        }
+      }
+    }
+  }
+  return _sessionById.get(id) || null
+}
+
 /** Published (non-editable-source) timetable for a branch/year. */
 export function baseTimetable(branch, year) {
-  return TIMETABLES[branch]?.[year] ?? []
+  const list = TIMETABLES[branch]?.[year] ?? []
+  return list.map((s) => {
+    if (s.attendanceCredits != null) return s
+    const isLab =
+      s.type === 'lab' ||
+      (s.name || '').toUpperCase().includes('LAB') ||
+      (s.code || '').toUpperCase().includes('(P)')
+    return {
+      ...s,
+      attendanceCredits: isLab ? 2 : 1,
+    }
+  })
 }
 
 /** Every room mentioned anywhere — used by Open Rooms. */

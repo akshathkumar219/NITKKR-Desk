@@ -1,86 +1,530 @@
 [
   {
-    "name": "MAIN GATE",
+    "id": "main-gate",
+    "name": "MAIN GATE (GATE NO. 1)",
     "tag": "ENTRANCE",
-    "lat": null,
-    "lng": null,
+    "lat": 29.946,
+    "lng": 76.8124,
     "query": "NIT Kurukshetra Main Gate"
   },
   {
-    "name": "ADMIN BLOCK",
+    "id": "gate-2",
+    "name": "KIRMICH ROAD GATE NO. 2",
+    "tag": "ENTRANCE",
+    "lat": 29.945,
+    "lng": 76.8152,
+    "query": "NIT Kurukshetra Gate No 2"
+  },
+  {
+    "id": "kuk-gate",
+    "name": "KUK SIDE GATE",
+    "tag": "ENTRANCE",
+    "lat": 29.9485,
+    "lng": 76.8228,
+    "query": "Kurukshetra University Gate NIT"
+  },
+  {
+    "id": "dayalpur-gate",
+    "name": "VILLAGE DAYALPUR GATE",
+    "tag": "ENTRANCE",
+    "lat": 29.9535,
+    "lng": 76.814,
+    "query": "Dayalpur Gate NIT Kurukshetra"
+  },
+  {
+    "id": "admin",
+    "name": "GOLDEN JUBILEE ADMINISTRATIVE BUILDING",
     "tag": "ADMIN",
-    "lat": null,
-    "lng": null,
+    "lat": 29.9498,
+    "lng": 76.8145,
     "query": "NIT Kurukshetra Administrative Block"
   },
   {
-    "name": "CENTRAL LIBRARY",
-    "tag": "STUDY",
-    "lat": null,
-    "lng": null,
-    "query": "NIT Kurukshetra Central Library"
-  },
-  {
-    "name": "LECTURE HALL COMPLEX",
-    "tag": "ACADEMIC",
-    "lat": null,
-    "lng": null,
-    "query": "NIT Kurukshetra Lecture Hall Complex"
-  },
-  {
-    "name": "COMPUTER CENTRE",
-    "tag": "ACADEMIC",
-    "lat": null,
-    "lng": null,
-    "query": "NIT Kurukshetra Computer Centre"
-  },
-  {
-    "name": "C.V. RAMAN HOSTEL",
-    "tag": "HOSTEL",
-    "lat": null,
-    "lng": null,
-    "query": "NIT Kurukshetra CV Raman Hostel"
-  },
-  {
-    "name": "KALPANA CHAWLA HOSTEL",
-    "tag": "HOSTEL",
-    "lat": null,
-    "lng": null,
-    "query": "NIT Kurukshetra Kalpana Chawla Hostel"
-  },
-  {
-    "name": "SPORTS COMPLEX",
-    "tag": "SPORTS",
-    "lat": null,
-    "lng": null,
-    "query": "NIT Kurukshetra Sports Complex"
-  },
-  {
-    "name": "WORKSHOPS",
-    "tag": "LAB",
-    "lat": null,
-    "lng": null,
-    "query": "NIT Kurukshetra Workshop"
-  },
-  {
-    "name": "STUDENT ACTIVITY CENTRE",
-    "tag": "FOOD",
-    "lat": null,
-    "lng": null,
-    "query": "NIT Kurukshetra Student Activity Centre"
-  },
-  {
-    "name": "HEALTH CENTRE",
+    "id": "central-library",
+    "name": "JAWAHARLAL NEHRU CENTRAL LIBRARY",
     "tag": "ADMIN",
-    "lat": null,
-    "lng": null,
-    "query": "NIT Kurukshetra Health Centre"
+    "lat": 29.9515,
+    "lng": 76.821,
+    "query": "Central Library NIT Kurukshetra"
   },
   {
-    "name": "OPEN AIR THEATRE",
+    "id": "senate-hall",
+    "name": "SENATE HALL",
+    "tag": "ADMIN",
+    "lat": 29.9495,
+    "lng": 76.8147,
+    "query": "Senate Hall NIT Kurukshetra"
+  },
+  {
+    "id": "health-centre",
+    "name": "INSTITUTE HEALTH CENTRE",
+    "tag": "ADMIN",
+    "lat": 29.95,
+    "lng": 76.8225,
+    "query": "Health Centre NIT Kurukshetra"
+  },
+  {
+    "id": "parking",
+    "name": "CENTRAL CAMPUS PARKING",
+    "tag": "ADMIN",
+    "lat": 29.9488,
+    "lng": 76.8155,
+    "query": "Parking NIT Kurukshetra"
+  },
+  {
+    "id": "uhbvn-substation",
+    "name": "UHBVN POWER SUBSTATION",
+    "tag": "ADMIN",
+    "lat": 29.9442,
+    "lng": 76.8215,
+    "query": "UHBVN Substation NIT Kurukshetra"
+  },
+  {
+    "id": "pwd-complex",
+    "name": "PWD COMPLEX",
+    "tag": "ADMIN",
+    "lat": 29.952,
+    "lng": 76.8225,
+    "query": "PWD NIT Kurukshetra"
+  },
+  {
+    "id": "lhc",
+    "name": "LECTURE HALL COMPLEX (LHC)",
+    "tag": "ACADEMIC",
+    "lat": 29.949,
+    "lng": 76.816,
+    "query": "Lecture Hall Complex NIT Kurukshetra"
+  },
+  {
+    "id": "dept-computer",
+    "name": "COMPUTER ENGINEERING DEPARTMENT",
+    "tag": "ACADEMIC",
+    "lat": 29.9492,
+    "lng": 76.8175,
+    "query": "Computer Engineering Department NIT Kurukshetra"
+  },
+  {
+    "id": "ccn",
+    "name": "CENTRE OF COMPUTING & NETWORKING (CCN)",
+    "tag": "ACADEMIC",
+    "lat": 29.9505,
+    "lng": 76.8185,
+    "query": "CCN NIT Kurukshetra"
+  },
+  {
+    "id": "dept-science",
+    "name": "BASIC SCIENCES & HUMANITIES DEPARTMENT",
+    "tag": "ACADEMIC",
+    "lat": 29.952,
+    "lng": 76.8138,
+    "query": "Applied Sciences Department NIT Kurukshetra"
+  },
+  {
+    "id": "dept-electrical",
+    "name": "ELECTRICAL ENGINEERING DEPARTMENT",
+    "tag": "ACADEMIC",
+    "lat": 29.952,
+    "lng": 76.8155,
+    "query": "Electrical Engineering Department NIT Kurukshetra"
+  },
+  {
+    "id": "dept-mechanical",
+    "name": "MECHANICAL ENGINEERING DEPARTMENT",
+    "tag": "ACADEMIC",
+    "lat": 29.952,
+    "lng": 76.8168,
+    "query": "Mechanical Engineering Department NIT Kurukshetra"
+  },
+  {
+    "id": "dept-civil",
+    "name": "CIVIL ENGINEERING DEPARTMENT",
+    "tag": "ACADEMIC",
+    "lat": 29.9515,
+    "lng": 76.818,
+    "query": "Civil Engineering Department NIT Kurukshetra"
+  },
+  {
+    "id": "dept-chem-mech",
+    "name": "CHEMICAL ENGG & APPLIED MECHANICS",
+    "tag": "ACADEMIC",
+    "lat": 29.9515,
+    "lng": 76.8188,
+    "query": "Chemical Engineering NIT Kurukshetra"
+  },
+  {
+    "id": "block-ab",
+    "name": "AB BLOCK",
+    "tag": "ACADEMIC",
+    "lat": 29.9515,
+    "lng": 76.8193,
+    "query": "AB Block NIT Kurukshetra"
+  },
+  {
+    "id": "block-ba-scoe",
+    "name": "BA BLOCK / SCOE BLOCK",
+    "tag": "ACADEMIC",
+    "lat": 29.9515,
+    "lng": 76.8198,
+    "query": "School of VLSI NIT Kurukshetra"
+  },
+  {
+    "id": "dept-mba-mca",
+    "name": "MBA & MCA DEPARTMENT",
+    "tag": "ACADEMIC",
+    "lat": 29.9515,
+    "lng": 76.8203,
+    "query": "Department of Business Administration NIT Kurukshetra"
+  },
+  {
+    "id": "workshop",
+    "name": "CENTRAL WORKSHOP COMPLEX",
+    "tag": "ACADEMIC",
+    "lat": 29.9502,
+    "lng": 76.8138,
+    "query": "Central Workshop NIT Kurukshetra"
+  },
+  {
+    "id": "exam-hall",
+    "name": "EXAMINATION HALL",
+    "tag": "ACADEMIC",
+    "lat": 29.9495,
+    "lng": 76.8138,
+    "query": "Examination Hall NIT Kurukshetra"
+  },
+  {
+    "id": "l-block",
+    "name": "L-BLOCK (ECE DEPARTMENT)",
+    "tag": "ACADEMIC",
+    "lat": 29.95,
+    "lng": 76.8155,
+    "query": "ECE Department NIT Kurukshetra"
+  },
+  {
+    "id": "jubilee-hall",
+    "name": "JUBILEE HALL",
+    "tag": "ACADEMIC",
+    "lat": 29.9493,
+    "lng": 76.8158,
+    "query": "Jubilee Hall NIT Kurukshetra"
+  },
+  {
+    "id": "collab-blocks",
+    "name": "COLLABORATION & RESEARCH LABS",
+    "tag": "ACADEMIC",
+    "lat": 29.949,
+    "lng": 76.8168,
+    "query": "Collaboration Center NIT Kurukshetra"
+  },
+  {
+    "id": "sac",
+    "name": "STUDENTS ACTIVITY CENTRE (SAC)",
+    "tag": "FOOD",
+    "lat": 29.9498,
+    "lng": 76.819,
+    "query": "Students Activity Centre NIT Kurukshetra"
+  },
+  {
+    "id": "canteen",
+    "name": "GOL CANTEEN / FOOD COURT",
+    "tag": "FOOD",
+    "lat": 29.949,
+    "lng": 76.8195,
+    "query": "Gol Canteen NIT Kurukshetra"
+  },
+  {
+    "id": "market",
+    "name": "NIT MARKET & SHOPPING COMPLEX",
+    "tag": "FOOD",
+    "lat": 29.9488,
+    "lng": 76.8145,
+    "query": "Shopping Complex NIT Kurukshetra"
+  },
+  {
+    "id": "playground",
+    "name": "MAIN ATHLETIC PLAY GROUND",
     "tag": "SPORTS",
-    "lat": null,
-    "lng": null,
-    "query": "NIT Kurukshetra Open Air Theatre"
+    "lat": 29.9475,
+    "lng": 76.8215,
+    "query": "Sports Ground NIT Kurukshetra"
+  },
+  {
+    "id": "sports-pavilion",
+    "name": "PLAY GROUND GRAND PAVILION",
+    "tag": "SPORTS",
+    "lat": 29.9485,
+    "lng": 76.8208,
+    "query": "Sports Pavilion NIT Kurukshetra"
+  },
+  {
+    "id": "playground-club",
+    "name": "SPORTS COMPLEX & COURTS CLUB",
+    "tag": "SPORTS",
+    "lat": 29.9468,
+    "lng": 76.8208,
+    "query": "Sports Club NIT Kurukshetra"
+  },
+  {
+    "id": "swimming-pool",
+    "name": "SWIMMING POOL & BADMINTON COURT",
+    "tag": "SPORTS",
+    "lat": 29.9505,
+    "lng": 76.8205,
+    "query": "Swimming Pool NIT Kurukshetra"
+  },
+  {
+    "id": "oat",
+    "name": "OPEN AIR THEATRE (OAT)",
+    "tag": "SPORTS",
+    "lat": 29.9498,
+    "lng": 76.8198,
+    "query": "Open Air Theatre NIT Kurukshetra"
+  },
+  {
+    "id": "amphitheatre",
+    "name": "OPEN AMPHITHEATRE & CENTRAL STAGE",
+    "tag": "SPORTS",
+    "lat": 29.9468,
+    "lng": 76.8175,
+    "query": "Amphitheatre NIT Kurukshetra"
+  },
+  {
+    "id": "sports-complex",
+    "name": "SPORTS COMPLEX & MT LABS",
+    "tag": "SPORTS",
+    "lat": 29.9488,
+    "lng": 76.8138,
+    "query": "Sports Complex NIT Kurukshetra"
+  },
+  {
+    "id": "sports-courts",
+    "name": "OUTDOOR TENNIS & BASKETBALL COURTS",
+    "tag": "SPORTS",
+    "lat": 29.9452,
+    "lng": 76.8135,
+    "query": "Tennis Courts NIT Kurukshetra"
+  },
+  {
+    "id": "hostel-1",
+    "name": "HOSTEL 1 - ABHIMANYU BHAWAN (H1)",
+    "tag": "HOSTEL",
+    "lat": 29.9442,
+    "lng": 76.8168,
+    "query": "Hostel 1 Abhimanyu Bhawan NIT Kurukshetra"
+  },
+  {
+    "id": "hostel-2",
+    "name": "HOSTEL 2 - BHISHMA BHAWAN (H2)",
+    "tag": "HOSTEL",
+    "lat": 29.9449,
+    "lng": 76.8168,
+    "query": "Hostel 2 Bhishma Bhawan NIT Kurukshetra"
+  },
+  {
+    "id": "hostel-3",
+    "name": "HOSTEL 3 - CHAKRADHAR BHAWAN (H3)",
+    "tag": "HOSTEL",
+    "lat": 29.9442,
+    "lng": 76.8182,
+    "query": "Hostel 3 Chakradhar Bhawan NIT Kurukshetra"
+  },
+  {
+    "id": "hostel-4",
+    "name": "HOSTEL 4 - DRONACHARYA BHAWAN (H4)",
+    "tag": "HOSTEL",
+    "lat": 29.9449,
+    "lng": 76.8182,
+    "query": "Hostel 4 Dronacharya Bhawan NIT Kurukshetra"
+  },
+  {
+    "id": "hostel-5",
+    "name": "HOSTEL 5 - EKLAVYA BHAWAN (H5)",
+    "tag": "HOSTEL",
+    "lat": 29.944,
+    "lng": 76.8195,
+    "query": "Hostel 5 Eklavya Bhawan NIT Kurukshetra"
+  },
+  {
+    "id": "hostel-6",
+    "name": "HOSTEL 6 - FANIBHUSHAN BHAWAN (H6)",
+    "tag": "HOSTEL",
+    "lat": 29.9448,
+    "lng": 76.8195,
+    "query": "Hostel 6 Fanibhushan Bhawan NIT Kurukshetra"
+  },
+  {
+    "id": "hostel-7",
+    "name": "HOSTEL 7 - GIRIVAR BHAWAN (H7)",
+    "tag": "HOSTEL",
+    "lat": 29.9465,
+    "lng": 76.8118,
+    "query": "Hostel 7 Girivar Bhawan NIT Kurukshetra"
+  },
+  {
+    "id": "hostel-8",
+    "name": "HOSTEL 8 - HARIHAR BHAWAN (H8)",
+    "tag": "HOSTEL",
+    "lat": 29.9452,
+    "lng": 76.816,
+    "query": "Hostel 8 Harihar Bhawan NIT Kurukshetra"
+  },
+  {
+    "id": "hostel-9",
+    "name": "HOSTEL 9 - INDIVAR BHAWAN (H9)",
+    "tag": "HOSTEL",
+    "lat": 29.9455,
+    "lng": 76.8148,
+    "query": "Hostel 9 Indivar Bhawan NIT Kurukshetra"
+  },
+  {
+    "id": "hostel-10",
+    "name": "HOSTEL 10 - VISVESVARAYA BHAWAN (MEGA HOSTEL)",
+    "tag": "HOSTEL",
+    "lat": 29.9472,
+    "lng": 76.813,
+    "query": "Hostel 10 Visvesvaraya Bhawan NIT Kurukshetra"
+  },
+  {
+    "id": "hostel-11",
+    "name": "HOSTEL 11 - VIVEKANAND BHAWAN (H11)",
+    "tag": "HOSTEL",
+    "lat": 29.944,
+    "lng": 76.8205,
+    "query": "Hostel 11 Vivekanand Bhawan NIT Kurukshetra"
+  },
+  {
+    "id": "gh-1",
+    "name": "GIRLS HOSTEL 1 - ALAKNANDA BHAWAN (ALK)",
+    "tag": "HOSTEL",
+    "lat": 29.9472,
+    "lng": 76.8152,
+    "query": "Alaknanda Bhawan NIT Kurukshetra"
+  },
+  {
+    "id": "gh-2",
+    "name": "GIRLS HOSTEL 2 - BHAGIRATHI BHAWAN (BHA)",
+    "tag": "HOSTEL",
+    "lat": 29.9472,
+    "lng": 76.8162,
+    "query": "Bhagirathi Bhawan NIT Kurukshetra"
+  },
+  {
+    "id": "gh-3",
+    "name": "GIRLS HOSTEL 3 - CAUVERY BHAWAN (CVR)",
+    "tag": "HOSTEL",
+    "lat": 29.948,
+    "lng": 76.8152,
+    "query": "Cauvery Bhawan NIT Kurukshetra"
+  },
+  {
+    "id": "gh-4",
+    "name": "GIRLS HOSTEL 4 - KALPANA CHAWLA BHAWAN",
+    "tag": "HOSTEL",
+    "lat": 29.948,
+    "lng": 76.8162,
+    "query": "Kalpana Chawla Bhawan NIT Kurukshetra"
+  },
+  {
+    "id": "guest-house",
+    "name": "INSTITUTE GUEST HOUSE",
+    "tag": "HOUSING",
+    "lat": 29.9508,
+    "lng": 76.8222,
+    "query": "Guest House NIT Kurukshetra"
+  },
+  {
+    "id": "dir-residence",
+    "name": "DIRECTOR RESIDENCE (A-1)",
+    "tag": "HOUSING",
+    "lat": 29.9488,
+    "lng": 76.8165,
+    "query": "Director Residence NIT Kurukshetra"
+  },
+  {
+    "id": "teachers-flat",
+    "name": "FACULTY & TEACHERS FLATS",
+    "tag": "HOUSING",
+    "lat": 29.9468,
+    "lng": 76.8185,
+    "query": "Teachers Flats NIT Kurukshetra"
+  },
+  {
+    "id": "res-ra",
+    "name": "RA TYPE RESIDENCES",
+    "tag": "HOUSING",
+    "lat": 29.9488,
+    "lng": 76.8178,
+    "query": "RA Type NIT Kurukshetra"
+  },
+  {
+    "id": "res-bt-ct",
+    "name": "BT & CT TYPE RESIDENCES",
+    "tag": "HOUSING",
+    "lat": 29.9488,
+    "lng": 76.8185,
+    "query": "BT Type NIT Kurukshetra"
+  },
+  {
+    "id": "res-bb",
+    "name": "BB TYPE RESIDENCES",
+    "tag": "HOUSING",
+    "lat": 29.9488,
+    "lng": 76.8192,
+    "query": "BB Type NIT Kurukshetra"
+  },
+  {
+    "id": "res-ca",
+    "name": "CA TYPE RESIDENCES",
+    "tag": "HOUSING",
+    "lat": 29.949,
+    "lng": 76.8208,
+    "query": "CA Type NIT Kurukshetra"
+  },
+  {
+    "id": "res-cb",
+    "name": "CB TYPE RESIDENCES",
+    "tag": "HOUSING",
+    "lat": 29.949,
+    "lng": 76.8215,
+    "query": "CB Type NIT Kurukshetra"
+  },
+  {
+    "id": "res-f",
+    "name": "F TYPE RESIDENCES",
+    "tag": "HOUSING",
+    "lat": 29.9478,
+    "lng": 76.8182,
+    "query": "F Type NIT Kurukshetra"
+  },
+  {
+    "id": "res-g",
+    "name": "G TYPE RESIDENCES",
+    "tag": "HOUSING",
+    "lat": 29.9478,
+    "lng": 76.8188,
+    "query": "G Type NIT Kurukshetra"
+  },
+  {
+    "id": "forest-area",
+    "name": "CAMPUS FOREST & ECO ZONE",
+    "tag": "NATURE",
+    "lat": 29.95,
+    "lng": 76.812,
+    "query": "NIT Kurukshetra"
+  },
+  {
+    "id": "open-plantation",
+    "name": "OPEN PLANTATION & ARBORETUM",
+    "tag": "NATURE",
+    "lat": 29.9435,
+    "lng": 76.822,
+    "query": "NIT Kurukshetra"
+  },
+  {
+    "id": "central-park",
+    "name": "CENTRAL LAWN & PARK",
+    "tag": "NATURE",
+    "lat": 29.9485,
+    "lng": 76.8172,
+    "query": "NIT Kurukshetra"
   }
 ]

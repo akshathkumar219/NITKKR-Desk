@@ -1,6 +1,7 @@
 import { useState, useMemo, useEffect } from 'react'
 import {
   Bell,
+  Check,
   ChevronDown,
   ChevronUp,
   RefreshCw,
@@ -14,7 +15,7 @@ import { usePwa } from '../lib/pwa'
 export default function Notifications() {
   const { notifications, markAllAsRead } = useNotifications()
   const { needRefresh, updateApp, checkForUpdates, checkStatus } = usePwa()
-  const [expandedIds, setExpandedIds] = useState(() => new Set(['update-v1-4']))
+  const [expandedIds, setExpandedIds] = useState(() => new Set(['update-v1-5']))
 
   // Automatically mark notifications as seen when opening the page
   useEffect(() => {
@@ -131,7 +132,7 @@ export default function Notifications() {
                 >
                   <div className="flex items-center justify-between gap-3">
                     <div className="flex items-center gap-2.5 min-w-0">
-                      {item.version === '1.4' ? (
+                      {item.isNew || item.version === '1.5' ? (
                         <span
                           className="sticker !px-1.5 !py-0.5 !text-[11px] !font-black !tracking-wider select-none shrink-0"
                           style={{

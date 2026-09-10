@@ -42,9 +42,33 @@ export const INSTITUTE = {
 
 // -------------------------------------------------------------- calendar --
 
-const term =
-  (calendarJson.calendars.find((c) => c.term?.toLowerCase().includes('odd')) ||
-    calendarJson.calendars[0]) ?? { title: '', events: [] }
+export const CALENDARS = calendarJson.calendars ?? []
+
+/**
+ * Determines whether Odd or Even semester is currently ongoing.
+ * At NIT Kurukshetra, Odd Semester runs from late July / August through mid-January,
+ * and Even Semester runs from mid-January (Jan 18) through July 28.
+ */
+export function getCurrentTerm(now = new Date()) {
+  const month = now.getMonth() + 1 // 1-12
+  const day = now.getDate()
+  if (month === 1 && day >= 18) return 'even'
+  if (month >= 2 && month <= 6) return 'even'
+  if (month === 7 && day <= 28) return 'even'
+  return 'odd'
+}
+
+export const CURRENT_TERM = getCurrentTerm()
+
+export function getCalendarByTerm(termKey = CURRENT_TERM) {
+  return (
+    CALENDARS.find((c) => c.term?.toLowerCase().includes(termKey.toLowerCase())) ||
+    CALENDARS[0] ||
+    { title: '', events: [] }
+  )
+}
+
+const term = getCalendarByTerm(CURRENT_TERM)
 
 export const CALENDAR = {
   title: term.title,
@@ -150,13 +174,15 @@ export function relativeLabel(event) {
 }
 
 /** The soonest event that has not finished yet — the one to lead with. */
-export const CALENDAR_NEXT = (() => {
+export function getCalendarNext(events = term.events) {
   const today = startOfToday()
-  const dated = term.events
+  const dated = (events || [])
     .filter((e) => parseISO(e.date))
     .sort((a, b) => parseISO(a.date) - parseISO(b.date))
   return dated.find((e) => (parseISO(e.endDate) ?? parseISO(e.date)) >= today) ?? null
-})()
+}
+
+export const CALENDAR_NEXT = getCalendarNext(term.events)
 
 /**
  * Semester progress for the rail: 0–1 between the first and last dated
@@ -219,29 +245,110 @@ export function byDate(events) {
 /** Exam schedule — same shape, its own content/exams/*.md files. */
 export const EXAMS = calendarJson.exams ?? []
 
-/**
- * Dates with no classes, as ISO strings. Attendance uses this to stop
- * counting a holiday as an unmarked day. Only events that carry a real
- * `Date` can contribute; a human-readable `value` alone is not enough.
- */
-export const HOLIDAYS = [...calendarJson.calendars, ...(calendarJson.exams ?? [])]
-  .flatMap((c) => c.events)
-  .filter((e) => e.category === 'HOLIDAYS' || e.category === 'BREAKS')
-  .flatMap((e) => expandRange(e.date, e.endDate))
-  .filter(Boolean)
-
-function expandRange(from, to) {
+export function expandRange(from, to) {
   if (!from) return []
   if (!to) return [from]
   const out = []
-  const cur = new Date(`${from}T00:00:00`)
-  const end = new Date(`${to}T00:00:00`)
+  const [fy, fm, fd] = from.split('-').map(Number)
+  const [ty, tm, td] = to.split('-').map(Number)
+  const cur = new Date(fy, fm - 1, fd)
+  const end = new Date(ty, tm - 1, td)
   // Bounded so a typo'd end date cannot hang the app.
   for (let guard = 0; cur <= end && guard < 400; guard++) {
-    out.push(cur.toISOString().slice(0, 10))
+    const y = cur.getFullYear()
+    const m = String(cur.getMonth() + 1).padStart(2, '0')
+    const d = String(cur.getDate()).padStart(2, '0')
+    out.push(`${y}-${m}-${d}`)
     cur.setDate(cur.getDate() + 1)
   }
   return out
+}
+
+/**
+ * Dates with NO regular classes scheduled (Mid-Sems, End-Sems, Holidays, Breaks,
+ * and full-day Fest non-teaching days).
+ */
+export const NO_CLASS_DATES_MAP = (() => {
+  const map = {}
+  const allEvents = CALENDARS.flatMap((c) => c.events)
+
+  for (const e of allEvents) {
+    const isHoliday = e.category === 'HOLIDAYS'
+    const isBreak = e.category === 'BREAKS'
+    const isExam =
+      e.category === 'EXAMS' && !e.label.toLowerCase().includes('practical')
+    // Confluence 2026 Nov 2 (Mon) is a no-class fest day; Citius Feb 5 (Fri) & Techspardha Mar 5 (Fri)
+    const isFestNoClass =
+      (e.label === 'CITIUS-2027') ||
+      (e.label === 'Confluence-2026' && e.date === '2026-10-31') ||
+      (e.label === 'Techspardha-2027' && e.date === '2027-03-05')
+
+    if (isHoliday || isBreak || isExam || isFestNoClass) {
+      const dates = expandRange(e.date, e.endDate)
+      for (const d of dates) {
+        // Prefer exams/holidays if duplicate
+        if (!map[d] || isExam) {
+          map[d] = {
+            label: e.label,
+            category: e.category,
+            value: e.value,
+            isExam,
+            isHoliday,
+            isBreak,
+          }
+        }
+      }
+    }
+  }
+  return map
+})()
+
+/** Returns details if the given ISO date is a day without classes, else null */
+export function getNoClassEvent(iso) {
+  if (!iso) return null
+  return NO_CLASS_DATES_MAP[iso] ?? null
+}
+
+/** Checks whether a given ISO date has no classes */
+export function isNoClassDay(iso) {
+  return Boolean(getNoClassEvent(iso))
+}
+
+/**
+ * Dates with no classes, as ISO strings. Attendance and schedule views use this
+ * to stop counting a holiday, break, or mid-sem exam as a teaching day.
+ */
+export const HOLIDAYS = Object.keys(NO_CLASS_DATES_MAP)
+
+/**
+ * Normalized official calendar events for displaying in the interactive
+ * Calendar page and MiniCalendar widget. Each event is a single entry with
+ * its start and end date, tagged with its academic semester.
+ */
+export const OFFICIAL_CALENDAR_EVENTS = CALENDARS.flatMap((c) => {
+  const sem = c.term?.toLowerCase().includes('even') ? 'even' : 'odd'
+  return (c.events || [])
+    .filter((e) => Boolean(e.date))
+    .map((e, idx) => ({
+      id: `official_${c.term}_${idx}`,
+      title: e.label,
+      date: e.date,
+      endDate: e.endDate || null,
+      value: e.value,
+      category: e.category,
+      term: c.term,
+      semester: sem,
+      isOfficial: true,
+    }))
+})
+
+/** Returns official calendar events filtered to a specific term ('odd' or 'even'), or all if null */
+export function getOfficialCalendarEvents(termKey = null) {
+  if (!termKey) return OFFICIAL_CALENDAR_EVENTS
+  const normalized = termKey.toLowerCase()
+  return OFFICIAL_CALENDAR_EVENTS.filter(
+    (e) => e.semester === normalized || e.term?.toLowerCase().includes(normalized),
+  )
 }
 
 // --------------------------------------------------------------- helpline --
@@ -271,8 +378,11 @@ export const PLACEMENT_CHECKLIST = rows('placements').map((r) => ({
 const maps = (q) => `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(q)}`
 
 export const LANDMARKS = landmarksJson.map((l) => ({
+  id: l.id ?? null,
   name: l.name,
   tag: l.tag,
+  lat: l.lat ?? null,
+  lng: l.lng ?? null,
   // Coordinates beat a name search, which can land on a same-named place in
   // another town. Fall back to the query only while lat/lng are missing.
   url: l.lat !== null && l.lng !== null ? maps(`${l.lat},${l.lng}`) : maps(l.query),
@@ -303,9 +413,11 @@ export const INSPIRED_BY = {
 // --------------------------------------------------------------- version --
 
 export const VERSION = {
-  number: '1.4',
+  number: '1.5',
   changes: [
-    'Cleaned mobile layout',
+    'Updated Academic Calendar',
+    'PYQs uploaded',
+    'Dashboard redesigned',
     'Fixed minor bugs',
   ],
 }

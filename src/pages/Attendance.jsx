@@ -30,6 +30,7 @@ import SubjectModal from '../components/SubjectModal'
 import { EmptyState, Field, Meter, Modal, Panel, Ring } from '../ui'
 import { useProfile, useRollcallSettings } from '../lib/storage'
 import { coursesOf, filterSessionsByGroup, nextClassDay, sessionsForDay, useBoard } from '../lib/board'
+import { getNoClassEvent } from '../data/info'
 import {
   STATUS_COLOR,
   STATUS_INK,
@@ -87,17 +88,21 @@ function AttendanceRow({ session, mark, tallyData, required, onMark, onReset, on
   let isSimulating = false
   let simStatus = st
 
+  const credit = session.attendanceCredits != null
+    ? Number(session.attendanceCredits)
+    : (session.type === 'lab' || (session.name || '').toUpperCase().includes('LAB') ? 2 : 1)
+
   if (hoverSim === 'present') {
     isSimulating = true
-    const nextPresent = mark === 'present' ? presentCount : presentCount + 1
-    const nextHeld = mark === 'present' ? heldCount : mark === 'absent' ? heldCount : heldCount + 1
+    const nextPresent = mark === 'present' ? presentCount : presentCount + credit
+    const nextHeld = mark === 'present' ? heldCount : mark === 'absent' ? heldCount : heldCount + credit
     displayPercent = nextHeld > 0 ? Math.round((nextPresent / nextHeld) * 100) : 100
     simDelta = actualPercent != null ? displayPercent - actualPercent : 0
     simStatus = status(displayPercent, effectiveCutoff)
   } else if (hoverSim === 'absent') {
     isSimulating = true
-    const nextPresent = mark === 'present' ? Math.max(0, presentCount - 1) : presentCount
-    const nextHeld = mark === 'absent' ? heldCount : mark === 'present' ? heldCount : heldCount + 1
+    const nextPresent = mark === 'present' ? Math.max(0, presentCount - credit) : presentCount
+    const nextHeld = mark === 'absent' ? heldCount : mark === 'present' ? heldCount : heldCount + credit
     displayPercent = nextHeld > 0 ? Math.round((nextPresent / nextHeld) * 100) : 0
     simDelta = actualPercent != null ? displayPercent - actualPercent : 0
     simStatus = status(displayPercent, effectiveCutoff)
@@ -146,6 +151,12 @@ function AttendanceRow({ session, mark, tallyData, required, onMark, onReset, on
               <span className="opacity-40">·</span>
               <span>{theme.label}</span>
             </span>
+
+            {credit >= 2 ? (
+              <span className="px-2 py-1 text-[0.6rem] sm:text-xs rounded font-mono font-black tracking-wider border-2 border-[var(--border)] bg-[var(--surface-2)] text-[var(--color-present)] shadow-2xs uppercase">
+                {credit}× CREDITS
+              </span>
+            ) : null}
 
             {isLive ? (
               <span className="chip !py-0.5 !px-2 text-[0.6rem] sm:text-xs text-[var(--color-present)] flex items-center gap-1.5 border-2 border-[var(--color-present)] bg-[var(--color-present)]/10 font-black tracking-widest uppercase">
@@ -355,13 +366,12 @@ function AttendanceRow({ session, mark, tallyData, required, onMark, onReset, on
 }
 
 function resolveTab(raw) {
-
-  if (!raw) return 'TODAY'
+  if (!raw) return 'SUBJECTS'
   const clean = decodeURIComponent(raw).trim().toLowerCase().replace(/[\s_-]+/g, '')
   if (clean.includes('subject')) return 'SUBJECTS'
   if (clean.includes('fix') || clean.includes('backfill') || clean.includes('day')) return 'BACKFILL'
   if (clean.includes('today') || clean.includes('daily')) return 'TODAY'
-  return 'TODAY'
+  return 'SUBJECTS'
 }
 
 /* ------------------------------------------------------------- Main Page -- */
@@ -393,8 +403,8 @@ export default function Attendance() {
     triggerHaptic(8)
     setTab(nextKey)
     const targetPath =
-      nextKey === 'SUBJECTS'
-        ? '/attendance/subjects'
+      nextKey === 'TODAY'
+        ? '/attendance/today'
         : nextKey === 'BACKFILL'
           ? '/attendance/fix-a-day'
           : '/attendance'
@@ -450,7 +460,10 @@ export default function Attendance() {
   }, [since, iso])
 
   const effectiveSessions = useMemo(() => filterSessionsByGroup(sessions, group), [sessions, group])
-  const courses = useMemo(() => coursesOf(effectiveSessions), [effectiveSessions])
+  const courses = useMemo(
+    () => [...coursesOf(effectiveSessions)].sort((a, b) => (a.name || '').localeCompare(b.name || '')),
+    [effectiveSessions],
+  )
 
   // Compute total manual adjustments offset
   const totalAdjustments = useMemo(() => {
@@ -462,12 +475,16 @@ export default function Attendance() {
 
   // Overall cumulative semester attendance statistics (Till Now)
   const overall = useMemo(() => {
-    const teachingSessions = effectiveSessions.filter((s) => s.type !== 'break').map((s) => s.id)
+    const teachingSessions = effectiveSessions.filter((s) => s.type !== 'break')
     return tally(marks, teachingSessions, since, totalAdjustments, { present: basePresentVal, held: baseHeldVal })
   }, [marks, effectiveSessions, since, totalAdjustments, basePresentVal, baseHeldVal])
 
   const overallStatus = status(overall.percent, required)
-  const todaySessions = sessionsForDay(effectiveSessions, today).filter((s) => s.type !== 'break')
+  const todayNoClass = useMemo(() => getNoClassEvent(iso), [iso])
+  const todaySessions = useMemo(() => {
+    if (todayNoClass) return []
+    return sessionsForDay(effectiveSessions, today).filter((s) => s.type !== 'break')
+  }, [effectiveSessions, today, todayNoClass])
 
   // Unmarked sessions in tracking window
   const pending = useMemo(() => {
@@ -482,17 +499,26 @@ export default function Attendance() {
     let unmarked = 0
     for (const s of todaySessions) {
       const m = getMark(iso, s.id)
-      if (m === 'present') present += 1
-      else if (m === 'absent') absent += 1
-      else if (m === 'cancelled') cancelled += 1
-      else unmarked += 1
+      const credit = s.attendanceCredits != null
+        ? Number(s.attendanceCredits)
+        : (s.type === 'lab' || (s.name || '').toUpperCase().includes('LAB') ? 2 : 1)
+      if (m === 'present') present += credit
+      else if (m === 'absent') absent += credit
+      else if (m === 'cancelled') cancelled += credit
+      else unmarked += credit
     }
+    const totalCredits = todaySessions.reduce((sum, s) => {
+      const credit = s.attendanceCredits != null
+        ? Number(s.attendanceCredits)
+        : (s.type === 'lab' || (s.name || '').toUpperCase().includes('LAB') ? 2 : 1)
+      return sum + credit
+    }, 0)
     return {
       present,
       absent,
       cancelled,
       unmarked,
-      total: todaySessions.length,
+      total: totalCredits,
       marked: present + absent + cancelled,
     }
   }, [todaySessions, getMark, iso])
@@ -504,9 +530,8 @@ export default function Attendance() {
     let atRisk = 0
     let untracked = 0
     const list = courses.map((c) => {
-      const sIds = c.sessions.map((s) => s.id)
       const courseAdj = adjustments[c.key] || 0
-      const t = tally(marks, sIds, since, courseAdj)
+      const t = tally(marks, c.sessions, since, courseAdj)
       const firstSession = c.sessions[0] || {}
       const effCutoff = firstSession.targetCutoff != null ? firstSession.targetCutoff : required
       const st = status(t.percent, effCutoff)
@@ -521,17 +546,22 @@ export default function Attendance() {
 
   // Filtered courses for the Subjects tab
   const filteredCourses = useMemo(() => {
-    if (subjectFilter === 'AT_RISK') return subjectStats.list.filter((c) => c.status === 'short')
-    if (subjectFilter === 'EDGE') return subjectStats.list.filter((c) => c.status === 'edge')
-    if (subjectFilter === 'SAFE') return subjectStats.list.filter((c) => c.status === 'safe')
-    return subjectStats.list
+    let base = subjectStats.list
+    if (subjectFilter === 'AT_RISK') base = base.filter((c) => c.status === 'short')
+    else if (subjectFilter === 'EDGE') base = base.filter((c) => c.status === 'edge')
+    else if (subjectFilter === 'SAFE') base = base.filter((c) => c.status === 'safe')
+    return [...base].sort((a, b) => (a.name || '').localeCompare(b.name || ''))
   }, [subjectStats, subjectFilter])
 
   // Sessions for Fix-a-day tab
   const fixDay = DAYS[(isoToDate(fixDate).getDay() + 6) % 7]
-  const fixSessions = DAYS.includes(fixDay)
-    ? sessionsForDay(effectiveSessions, fixDay).filter((s) => s.type !== 'break')
-    : []
+  const fixNoClass = useMemo(() => getNoClassEvent(fixDate), [fixDate])
+  const fixSessions = useMemo(() => {
+    if (fixNoClass) return []
+    return DAYS.includes(fixDay)
+      ? sessionsForDay(effectiveSessions, fixDay).filter((s) => s.type !== 'break')
+      : []
+  }, [fixNoClass, effectiveSessions, fixDay])
 
   // NOTE: overall safe-skip / recovery figures were removed deliberately.
   // Attendance is enforced per subject, so pooling present/held across all
@@ -1380,8 +1410,8 @@ export default function Attendance() {
         <div className="p-1 rounded bg-[var(--surface-2)] border-2 border-[var(--border)] shrink-0 shadow-xs">
           <div className="grid grid-cols-3 gap-1.5 sm:gap-1.5">
             {[
-              { key: 'TODAY', label: `TODAY (${todaySessions.length})` },
               { key: 'SUBJECTS', label: `SUBJECTS (${courses.length})` },
+              { key: 'TODAY', label: todayNoClass ? 'TODAY (OFF)' : `TODAY (${todaySessions.length})` },
               { key: 'BACKFILL', label: 'FIX A DAY' },
             ].map((t, i, arr) => {
               const active = tab === t.key
@@ -1421,7 +1451,7 @@ export default function Attendance() {
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 px-1 py-1">
               <div className="flex items-center gap-2 flex-wrap">
                 <h3 className="t-card-title text-[var(--text)]">
-                  {todaySessions.length} {todaySessions.length === 1 ? 'CLASS' : 'CLASSES'} TODAY
+                  {todayNoClass ? `${todayNoClass.label} · NO CLASSES` : `${todaySessions.length} ${todaySessions.length === 1 ? 'CLASS' : 'CLASSES'} TODAY`}
                 </h3>
                 <span className="t-meta muted">·</span>
                 <span className="t-meta text-[var(--present-ink)]">{todayMarks.present} Present</span>
@@ -1495,7 +1525,31 @@ export default function Attendance() {
             </div>
 
             {/* List of Today's Sessions */}
-            {todaySessions.length === 0 ? (
+            {todayNoClass ? (
+              <div className="board board-hard bg-[var(--surface-2)] p-6 sm:p-8 text-center flex flex-col items-center justify-center space-y-3 border-2 border-[var(--border)]">
+                <span
+                  className="chip !py-1 !px-3 text-xs font-black uppercase tracking-wider border-2 shadow-sm"
+                  style={{
+                    background: todayNoClass.isExam
+                      ? 'var(--color-coral)'
+                      : todayNoClass.isBreak
+                        ? 'var(--color-acid)'
+                        : 'var(--color-amber)',
+                    color: '#111111',
+                  }}
+                >
+                  {todayNoClass.category} · NO CLASSES
+                </span>
+                <h3 className="t-card-title text-xl sm:text-2xl font-black">{todayNoClass.label}</h3>
+                <p className="t-body muted max-w-md text-xs sm:text-sm">
+                  {todayNoClass.isExam
+                    ? 'Examinations in progress. Regular teaching classes are suspended.'
+                    : todayNoClass.isBreak
+                      ? 'Academic break in progress. Attendance is not marked on break days.'
+                      : 'Official holiday. No classes are held today.'}
+                </p>
+              </div>
+            ) : todaySessions.length === 0 ? (
               <EmptyState
                 title="NO CLASSES TODAY"
                 hint={
@@ -1510,7 +1564,7 @@ export default function Attendance() {
                   const courseKey = s.code || s.name
                   const tallyData = tally(
                     marks,
-                    courses.find((c) => c.key === courseKey)?.sessions.map((sess) => sess.id) || [s.id],
+                    courses.find((c) => c.key === courseKey)?.sessions || [s],
                     since,
                     adjustments[courseKey] || 0,
                   )
@@ -1856,7 +1910,27 @@ export default function Attendance() {
 
             {/* Sessions on Selected Date */}
             <div className="space-y-3 pt-2">
-              {fixSessions.length === 0 ? (
+              {fixNoClass ? (
+                <div className="p-8 text-center rounded bg-[var(--surface-2)] border-2 border-[var(--border)] space-y-2">
+                  <span
+                    className="chip !py-1 !px-3 text-xs font-black uppercase tracking-wider"
+                    style={{
+                      background: fixNoClass.isExam
+                        ? 'var(--color-coral)'
+                        : fixNoClass.isBreak
+                          ? 'var(--color-acid)'
+                          : 'var(--color-amber)',
+                      color: '#111111',
+                    }}
+                  >
+                    {fixNoClass.category} · NO CLASSES
+                  </span>
+                  <p className="t-card-title text-[var(--text)] mt-2">{fixNoClass.label}</p>
+                  <p className="t-meta muted max-w-sm mx-auto">
+                    {fmtDateShort(fixDate)} was a non-teaching day ({fixNoClass.label}). No classes were held.
+                  </p>
+                </div>
+              ) : fixSessions.length === 0 ? (
                 <div className="p-8 text-center rounded bg-[var(--surface-2)] border-2 border-dashed border-[var(--border)]">
                   <Calendar size={32} className="text-[var(--muted)] mx-auto mb-2" />
                   <p className="t-card-title text-[var(--text)]">NO CLASSES SCHEDULED</p>
@@ -1870,7 +1944,7 @@ export default function Attendance() {
                     const courseKey = s.code || s.name
                     const tallyData = tally(
                       marks,
-                      courses.find((c) => c.key === courseKey)?.sessions.map((sess) => sess.id) || [s.id],
+                      courses.find((c) => c.key === courseKey)?.sessions || [s],
                       since,
                       adjustments[courseKey] || 0,
                     )

@@ -2904,7 +2904,7 @@
         "name": "Energy and Environmental Science Lab",
         "code": "CHIC101 (P)",
         "room": "Chemistry Dept",
-        "group": "4+5",
+        "group": "4+5+6",
         "instructor": "Jaibir Kharab",
         "type": "lab",
         "id": "ne3ncx"
@@ -2980,6 +2980,18 @@
         "instructor": "I N Bhatti",
         "type": "lecture",
         "id": "1n0nql2"
+      },
+      {
+        "day": "MON",
+        "start": 990,
+        "end": 1045,
+        "name": "Thought Lab",
+        "code": "",
+        "room": "",
+        "group": "1+2+3",
+        "instructor": null,
+        "type": "other",
+        "id": "2ebift"
       },
       {
         "day": "TUE",
@@ -3187,18 +3199,6 @@
       },
       {
         "day": "WED",
-        "start": 750,
-        "end": 805,
-        "name": "Audit Course (AU-II)",
-        "code": "AU-II",
-        "room": "",
-        "group": "",
-        "instructor": "Humanities Dept",
-        "type": "other",
-        "id": "mk8ek0"
-      },
-      {
-        "day": "WED",
         "start": 825,
         "end": 990,
         "name": "Problem Solving and Programming Using C Lab",
@@ -3208,6 +3208,18 @@
         "instructor": null,
         "type": "lab",
         "id": "1tp9zgd"
+      },
+      {
+        "day": "WED",
+        "start": 990,
+        "end": 1045,
+        "name": "Thought Lab",
+        "code": "",
+        "room": "",
+        "group": "4+5+6",
+        "instructor": null,
+        "type": "other",
+        "id": "fubz4z"
       },
       {
         "day": "THU",
@@ -3340,18 +3352,6 @@
         "instructor": null,
         "type": "lab",
         "id": "h7pm45"
-      },
-      {
-        "day": "FRI",
-        "start": 750,
-        "end": 805,
-        "name": "Audit Course (AU-II)",
-        "code": "AU-II",
-        "room": "",
-        "group": "",
-        "instructor": "Humanities Dept",
-        "type": "other",
-        "id": "1bf8b8j"
       },
       {
         "day": "FRI",
@@ -8783,6 +8783,18 @@
       },
       {
         "day": "TUE",
+        "start": 750,
+        "end": 805,
+        "name": "Thought Lab",
+        "code": "",
+        "room": "",
+        "group": "1+2+3",
+        "instructor": null,
+        "type": "other",
+        "id": "1xf3oyc"
+      },
+      {
+        "day": "TUE",
         "start": 880,
         "end": 935,
         "name": "Engineering Physics",
@@ -8818,6 +8830,18 @@
         "id": "6l8mp5"
       },
       {
+        "day": "TUE",
+        "start": 990,
+        "end": 1045,
+        "name": "Thought Lab",
+        "code": "",
+        "room": "",
+        "group": "4+5+6",
+        "instructor": null,
+        "type": "other",
+        "id": "zjrfym"
+      },
+      {
         "day": "WED",
         "start": 510,
         "end": 695,
@@ -8840,18 +8864,6 @@
         "instructor": "Kiran Kumar J.",
         "type": "lab",
         "id": "1q92sa1"
-      },
-      {
-        "day": "WED",
-        "start": 750,
-        "end": 805,
-        "name": "Audit Course (AU-II)",
-        "code": "AU-II",
-        "room": "",
-        "group": "",
-        "instructor": "Humanities Dept",
-        "type": "other",
-        "id": "hywyiv"
       },
       {
         "day": "WED",
@@ -9056,18 +9068,6 @@
         "instructor": null,
         "type": "lecture",
         "id": "1bgahfb"
-      },
-      {
-        "day": "FRI",
-        "start": 750,
-        "end": 805,
-        "name": "Audit Course (AU-II)",
-        "code": "AU-II",
-        "room": "",
-        "group": "",
-        "instructor": "Humanities Dept",
-        "type": "other",
-        "id": "1e4kax0"
       },
       {
         "day": "FRI",
@@ -12843,15 +12843,15 @@
       },
       {
         "day": "MON",
-        "start": 880,
-        "end": 935,
+        "start": 935,
+        "end": 990,
         "name": "Energy and Environmental Science",
         "code": "CHIC101",
         "room": "L6",
         "group": "1+2+3",
         "instructor": "R Tittal",
         "type": "lecture",
-        "id": "ftymzk"
+        "id": "kxvge3"
       },
       {
         "day": "MON",
@@ -13025,13 +13025,13 @@
         "day": "WED",
         "start": 750,
         "end": 805,
-        "name": "Audit Course (AU-II)",
-        "code": "AU-II",
+        "name": "Thought Lab",
+        "code": "",
         "room": "",
-        "group": "",
-        "instructor": "Humanities Dept",
+        "group": "1+2+3",
+        "instructor": null,
         "type": "other",
-        "id": "13n0hy4"
+        "id": "893e5d"
       },
       {
         "day": "WED",
@@ -13205,13 +13205,13 @@
         "day": "FRI",
         "start": 750,
         "end": 805,
-        "name": "Audit Course (AU-II)",
-        "code": "AU-II",
+        "name": "Thought Lab",
+        "code": "",
         "room": "",
-        "group": "",
-        "instructor": "Humanities Dept",
+        "group": "4+5+6",
+        "instructor": null,
         "type": "other",
-        "id": "ele42n"
+        "id": "1k0xipa"
       },
       {
         "day": "FRI",
@@ -16295,18 +16295,6 @@
       },
       {
         "day": "WED",
-        "start": 750,
-        "end": 805,
-        "name": "Audit Course (AU-II)",
-        "code": "AU-II",
-        "room": "",
-        "group": "",
-        "instructor": "Humanities Dept",
-        "type": "other",
-        "id": "14mg7et"
-      },
-      {
-        "day": "WED",
         "start": 880,
         "end": 935,
         "name": "Differential Calculus and Differential Equations",
@@ -16403,18 +16391,6 @@
       },
       {
         "day": "FRI",
-        "start": 750,
-        "end": 805,
-        "name": "Audit Course (AU-II)",
-        "code": "AU-II",
-        "room": "",
-        "group": "",
-        "instructor": "Humanities Dept",
-        "type": "other",
-        "id": "eu84vi"
-      },
-      {
-        "day": "FRI",
         "start": 880,
         "end": 990,
         "name": "Problem Solving and Programming Using C Lab",
@@ -16424,6 +16400,18 @@
         "instructor": null,
         "type": "lab",
         "id": "1wqb12y"
+      },
+      {
+        "day": "FRI",
+        "start": 990,
+        "end": 1045,
+        "name": "Thought Lab",
+        "code": "",
+        "room": "",
+        "group": "",
+        "instructor": null,
+        "type": "other",
+        "id": "16ydvmh"
       }
     ],
     "2": [
@@ -17373,18 +17361,6 @@
       },
       {
         "day": "WED",
-        "start": 750,
-        "end": 805,
-        "name": "Audit Course (AU-II)",
-        "code": "AU-II",
-        "room": "",
-        "group": "",
-        "instructor": "Humanities Dept",
-        "type": "other",
-        "id": "1jrhzm4"
-      },
-      {
-        "day": "WED",
         "start": 880,
         "end": 990,
         "name": "Energy and Environmental Science Lab",
@@ -17468,6 +17444,18 @@
         "id": "t2x9sx"
       },
       {
+        "day": "THU",
+        "start": 990,
+        "end": 1045,
+        "name": "Thought Lab",
+        "code": "",
+        "room": "",
+        "group": "",
+        "instructor": null,
+        "type": "other",
+        "id": "11wy22w"
+      },
+      {
         "day": "FRI",
         "start": 510,
         "end": 565,
@@ -17502,18 +17490,6 @@
         "instructor": null,
         "type": "lecture",
         "id": "cprw9d"
-      },
-      {
-        "day": "FRI",
-        "start": 750,
-        "end": 805,
-        "name": "Audit Course (AU-II)",
-        "code": "AU-II",
-        "room": "",
-        "group": "",
-        "instructor": "Humanities Dept",
-        "type": "other",
-        "id": "1ynlphr"
       },
       {
         "day": "FRI",
@@ -18378,18 +18354,6 @@
       },
       {
         "day": "WED",
-        "start": 750,
-        "end": 805,
-        "name": "Audit Course (AU-II)",
-        "code": "AU-II",
-        "room": "",
-        "group": "",
-        "instructor": "Humanities Dept",
-        "type": "other",
-        "id": "1armq8l"
-      },
-      {
-        "day": "WED",
         "start": 880,
         "end": 990,
         "name": "Energy and Environmental Science Lab",
@@ -18498,15 +18462,15 @@
       },
       {
         "day": "FRI",
-        "start": 750,
-        "end": 805,
-        "name": "Audit Course (AU-II)",
-        "code": "AU-II",
+        "start": 990,
+        "end": 1045,
+        "name": "Thought Lab",
+        "code": "",
         "room": "",
         "group": "",
-        "instructor": "Humanities Dept",
+        "instructor": null,
         "type": "other",
-        "id": "yfps8u"
+        "id": "1bug2w9"
       }
     ],
     "2": [
@@ -19359,18 +19323,6 @@
       },
       {
         "day": "WED",
-        "start": 750,
-        "end": 805,
-        "name": "Audit Course (AU-II)",
-        "code": "AU-II",
-        "room": "",
-        "group": "",
-        "instructor": "Humanities Dept",
-        "type": "other",
-        "id": "1dmnoj3"
-      },
-      {
-        "day": "WED",
         "start": 880,
         "end": 990,
         "name": "Engineering Physics Lab",
@@ -19454,6 +19406,18 @@
         "id": "1yonuz5"
       },
       {
+        "day": "THU",
+        "start": 990,
+        "end": 1045,
+        "name": "Thought Lab",
+        "code": "",
+        "room": "",
+        "group": "",
+        "instructor": null,
+        "type": "other",
+        "id": "abl0af"
+      },
+      {
         "day": "FRI",
         "start": 510,
         "end": 565,
@@ -19500,18 +19464,6 @@
         "instructor": null,
         "type": "lecture",
         "id": "8oof0v"
-      },
-      {
-        "day": "FRI",
-        "start": 750,
-        "end": 805,
-        "name": "Audit Course (AU-II)",
-        "code": "AU-II",
-        "room": "",
-        "group": "",
-        "instructor": "Humanities Dept",
-        "type": "other",
-        "id": "1wpjz0"
       },
       {
         "day": "FRI",

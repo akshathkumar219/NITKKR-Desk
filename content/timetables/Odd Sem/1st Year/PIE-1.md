@@ -33,7 +33,6 @@ source: NIT Kurukshetra 1st Semester Time Table Session 2026-27
 | 08:30 | 10:20 | Energy and Environmental Science Lab       | CHIC101 (P)  | Chemistry Dept  | 2     |                   | lab     |
 | 10:40 | 12:30 | Energy and Environmental Science Lab       | CHIC101 (P)  | Chemistry Dept  | 1     |                   | lab     |
 | 10:40 | 12:30 | Engineering Physics Lab                    | PHIC101 (P)  | Physics Dept    | 2     |                   | lab     |
-| 12:30 | 13:25 | Audit Course (AU-II)                       | AU-II        |                 |       | Humanities Dept   | other   |
 | 14:40 | 15:35 | Differential Calculus and Differential Equations | MAIC101 | A321           |       |                   | lecture |
 | 15:35 | 16:30 | Engineering Physics                        | PHIC101      | A321            |       |                   | lecture |
 
@@ -52,5 +51,5 @@ source: NIT Kurukshetra 1st Semester Time Table Session 2026-27
 |-------|-------|--------------------------------------------|--------------|-----------------|-------|-------------------|---------|
 | 09:25 | 11:35 | Problem Solving and Programming Using C Lab | CSIC103 (P) |                 | 2     |                   | lab     |
 | 11:35 | 12:30 | Economics for Engineers / Business Studies | HSIC102/HSIC104 | L1/A210      |       |                   | lecture |
-| 12:30 | 13:25 | Audit Course (AU-II)                       | AU-II        |                 |       | Humanities Dept   | other   |
 | 14:40 | 16:30 | Problem Solving and Programming Using C Lab | CSIC103 (P) |                 | 1     |                   | lab     |
+| 16:30 | 17:25 | Thought Lab                                |              |                 |       |                   | other   |

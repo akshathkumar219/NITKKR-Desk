@@ -95,11 +95,10 @@ export default function Subjects() {
         // Attendance.jsx's Settings), not something attributable to any one
         // subject, and Attendance.jsx's own per-subject rows don't apply it
         // either. Passing it here double counted it into every subject card.
-        const sessionIds = c.sessions.map((s) => s.id);
         const manualAdj = (adjustments || {})[c.key] || 0;
         const stats = tally(
           marks || {},
-          sessionIds,
+          c.sessions,
           rollcallSettings?.trackingSince,
           manualAdj,
         );

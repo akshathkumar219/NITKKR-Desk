@@ -30,15 +30,29 @@ export function useBoard(branch, year) {
     const published = baseTimetable(branch, year)
     const removed = new Set(override.removed)
     const out = []
+
+    const withCredits = (s) => {
+      if (s.attendanceCredits != null) return s
+      const isLab =
+        s.type === 'lab' ||
+        (s.name || '').toUpperCase().includes('LAB') ||
+        (s.code || '').toUpperCase().includes('(P)') ||
+        s.category === 'LAB'
+      return {
+        ...s,
+        attendanceCredits: isLab ? 2 : 1,
+      }
+    }
+
     for (const s of published) {
       if (removed.has(s.id)) continue
       const mv = override.moved[s.id]
-      out.push(mv ? { ...s, ...mv } : s)
+      out.push(withCredits(mv ? { ...s, ...mv } : s))
     }
     for (const s of override.added) {
       if (removed.has(s.id)) continue
       const mv = override.moved[s.id]
-      out.push(mv ? { ...s, ...mv } : s)
+      out.push(withCredits(mv ? { ...s, ...mv } : s))
     }
     return out.sort((a, b) => a.start - b.start || a.day.localeCompare(b.day))
     // eslint-disable-next-line react-hooks/exhaustive-deps

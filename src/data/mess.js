@@ -9,6 +9,7 @@
 // ---------------------------------------------------------------------------
 
 import generated from './generated/mess.json'
+import { DAYS_7 } from '../lib/time'
 
 export const MEALS = [
   {
@@ -69,4 +70,30 @@ export function currentMeal(mins) {
 /** Check if current time falls within serving hours */
 export function isLiveMeal(meal, mins) {
   return mins >= meal.startMins && mins < meal.endMins
+}
+
+/**
+ * Detailed next meal resolver including real-time serving status,
+ * target day code, and next-day rollover after dinner ends.
+ */
+export function getNextMealInfo(mins, currentDayCode) {
+  const dayIdx = DAYS_7.indexOf(currentDayCode)
+  // Breakfast: 07:00 - 09:00 AM (active until 09:00 AM)
+  if (mins < 9 * 60) {
+    const isLive = isLiveMeal(MEALS[0], mins)
+    return { meal: MEALS[0], isLive, dayCode: currentDayCode, isTomorrow: false }
+  }
+  // Lunch: 12:30 - 02:00 PM (active until 02:00 PM)
+  if (mins < 14 * 60) {
+    const isLive = isLiveMeal(MEALS[1], mins)
+    return { meal: MEALS[1], isLive, dayCode: currentDayCode, isTomorrow: false }
+  }
+  // Dinner: 07:30 - 09:00 PM (active until 09:00 PM)
+  if (mins < 21 * 60) {
+    const isLive = isLiveMeal(MEALS[2], mins)
+    return { meal: MEALS[2], isLive, dayCode: currentDayCode, isTomorrow: false }
+  }
+  // After 09:00 PM: next meal is Tomorrow's Breakfast
+  const nextDayCode = dayIdx !== -1 ? DAYS_7[(dayIdx + 1) % 7] : currentDayCode
+  return { meal: MEALS[0], isLive: false, dayCode: nextDayCode, isTomorrow: true }
 }

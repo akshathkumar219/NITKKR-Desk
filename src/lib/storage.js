@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import { DEFAULT_BRANCH, DEFAULT_HOSTEL, DEFAULT_YEAR } from '../data/campus.js'
 import { baseTimetable, groupsFor } from '../data/timetables.js'
 import { NOTIFICATIONS } from '../data/notifications.js'
+import { OFFICIAL_CALENDAR_EVENTS } from '../data/info.js'
 
 // Everything lives in this browser. No account, no server, no sync.
 // Keys are namespaced so a future export/import stays legible.
@@ -799,8 +800,18 @@ export function useTodos() {
 
 const DEFAULT_EVENTS = []
 
-export function useEvents() {
-  const [events, setEvents] = useStored(KEYS.events, DEFAULT_EVENTS)
+export function useEvents(filterSemester = null) {
+  const [userEvents, setUserEvents] = useStored(KEYS.events, DEFAULT_EVENTS)
+
+  // Merge official academic calendar events with user's personal events
+  const events = useMemo(() => {
+    let official = OFFICIAL_CALENDAR_EVENTS
+    if (filterSemester) {
+      const norm = filterSemester.toLowerCase()
+      official = official.filter((e) => !e.semester || e.semester === norm)
+    }
+    return [...official, ...userEvents]
+  }, [userEvents, filterSemester])
 
   const addEvent = useCallback(
     (eventData) => {
@@ -813,16 +824,16 @@ export function useEvents() {
         category: eventData.category || 'PERSONAL',
         isOfficial: false,
       }
-      setEvents((prev) => [...prev, newEvt])
+      setUserEvents((prev) => [...prev, newEvt])
     },
-    [setEvents],
+    [setUserEvents],
   )
 
   const deleteEvent = useCallback(
     (id) => {
-      setEvents((prev) => prev.filter((e) => e.id !== id))
+      setUserEvents((prev) => prev.filter((e) => e.id !== id))
     },
-    [setEvents],
+    [setUserEvents],
   )
 
   return { events, addEvent, deleteEvent }
@@ -833,15 +844,24 @@ export function useEvents() {
 // ---------------------------------------------------------------------------
 
 export const DEFAULT_EVENT_CATEGORIES = [
-  { id: 'EXAMS', label: 'EXAM', bg: 'var(--color-coral)', ink: '#111111' },
-  { id: 'CLASSES', label: 'CLASS', bg: 'var(--color-sky)', ink: '#111111' },
+  { id: 'EXAMS', label: 'EXAMS', bg: 'var(--color-coral)', ink: '#111111' },
+  { id: 'HOLIDAYS', label: 'HOLIDAYS', bg: 'var(--color-coral)', ink: '#111111' },
+  { id: 'BREAKS', label: 'BREAKS', bg: 'var(--color-acid)', ink: '#111111' },
+  { id: 'EVENTS', label: 'EVENTS', bg: 'var(--color-sky)', ink: '#111111' },
+  { id: 'ACADEMIC', label: 'ACADEMIC', bg: 'var(--color-violet)', ink: '#111111' },
+  { id: 'CLASSES', label: 'CLASSES', bg: 'var(--color-sky)', ink: '#111111' },
   { id: 'DEADLINE', label: 'DEADLINE', bg: 'var(--color-amber)', ink: '#111111' },
   { id: 'PERSONAL', label: 'PERSONAL', bg: 'var(--color-violet)', ink: '#111111' },
-  { id: 'BREAKS', label: 'BREAK', bg: 'var(--color-acid)', ink: '#111111' },
 ]
 
 export function useEventCategories() {
-  const [categories, setCategories] = useStored(KEYS.eventCategories, DEFAULT_EVENT_CATEGORIES)
+  const [storedCategories, setCategories] = useStored(KEYS.eventCategories, DEFAULT_EVENT_CATEGORIES)
+
+  const categories = useMemo(() => {
+    const existingIds = new Set(storedCategories.map((c) => c.id))
+    const missing = DEFAULT_EVENT_CATEGORIES.filter((c) => !existingIds.has(c.id))
+    return missing.length > 0 ? [...storedCategories, ...missing] : storedCategories
+  }, [storedCategories])
 
   const addCategory = useCallback(
     (label, bg = 'var(--color-amber)', ink = '#111111') => {

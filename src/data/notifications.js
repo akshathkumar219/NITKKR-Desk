@@ -1,14 +1,29 @@
 /**
  * Notification feed for NITKKR DESK.
- * Release updates (Version 1.0 to 1.4).
+ * Release updates (Version 1.0 to 1.5).
  */
 
 export const NOTIFICATIONS = [
   {
+    id: 'update-v1-5',
+    version: '1.5',
+    isNew: true,
+    title: 'Version 1.5',
+    accentColor: 'var(--color-acid)',
+    summary: 'Updated Academic Calendar, PYQs uploaded, Dashboard redesigned, and bug fixes.',
+    details: [
+      'Updated Academic Calendar',
+      'PYQs uploaded',
+      'Dashboard redesigned',
+      'Fixed minor bugs',
+    ],
+  },
+  {
     id: 'update-v1-4',
     version: '1.4',
+    isNew: false,
     title: 'Version 1.4',
-    accentColor: 'var(--color-acid)',
+    accentColor: 'var(--color-sky)',
     summary: 'Mobile notification deck, layout polish, and bug fixes.',
     details: [
       'Added mobile notifications page for app updates and version releases',
@@ -20,8 +35,9 @@ export const NOTIFICATIONS = [
   {
     id: 'update-v1-3',
     version: '1.3',
+    isNew: false,
     title: 'Version 1.3',
-    accentColor: 'var(--color-sky)',
+    accentColor: 'var(--color-amber)',
     summary: 'Timetable overhaul across all years and Hostel 7 mess menu.',
     details: [
       'Fixed timetable for 1st Year Civil, PIE, EE, Mechanical',
@@ -35,8 +51,9 @@ export const NOTIFICATIONS = [
   {
     id: 'update-v1-2',
     version: '1.2',
+    isNew: false,
     title: 'Version 1.2',
-    accentColor: 'var(--color-amber)',
+    accentColor: 'var(--color-violet)',
     summary: '1st Year timetables, guide page enhancements, and auto-update.',
     details: [
       'Updated Timetable for 1st Year (All Branches)',
@@ -49,6 +66,7 @@ export const NOTIFICATIONS = [
   {
     id: 'update-v1-1',
     version: '1.1',
+    isNew: false,
     title: 'Version 1.1',
     accentColor: 'var(--color-coral)',
     summary: 'IT branch academic refresh, girls hostels, and Cauvery & H4 mess menus.',
@@ -63,8 +81,9 @@ export const NOTIFICATIONS = [
   {
     id: 'update-v1-0',
     version: '1.0',
+    isNew: false,
     title: 'Version 1.0',
-    accentColor: 'var(--color-violet)',
+    accentColor: 'var(--color-teal, #35D5F0)',
     summary: 'Initial launch of the student companion for NIT Kurukshetra.',
     details: [
       'Interactive weekly timetable and classroom session tracker',

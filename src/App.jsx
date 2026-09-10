@@ -37,15 +37,11 @@ function ScrollToTop() {
 }
 
 /** First run sends you to /welcome once, then never again.
- * For phones (< 768px), the starting page is the timetable page (/home) instead of the dashboard.
+ * Starting page is the dashboard (Landing).
  */
 function RootGate() {
   const seen = read(KEYS.welcomed, false)
   if (!seen) return <Navigate to="/welcome" replace />
-  const isPhone = typeof window !== 'undefined' && window.matchMedia?.('(max-width: 767px)').matches
-  if (isPhone) {
-    return <Navigate to="/home" replace />
-  }
   return <Landing />
 }
 

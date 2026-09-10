@@ -29,8 +29,8 @@ export default function SelectHostel() {
 
   function save() {
     update({ hostel: picked, hostelPicked: true })
-    // Last step of setup — finish on the board, not the mess menu.
-    if (onboarding) navigate('/home', { replace: true })
+    // Last step of setup — finish on the dashboard, not the mess menu.
+    if (onboarding) navigate('/', { replace: true })
     else navigate(from || '/mess')
   }
 

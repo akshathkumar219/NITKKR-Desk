@@ -545,7 +545,7 @@ function WeekGrid({ sessions, editing, onEdit, onDrop, onAddDay }) {
                 <div
                   key={h}
                   className="t-meta muted absolute right-2"
-                  style={{ top: (h - from) * pxPerMin - 6 }}
+                  style={{ top: Math.max(2, (h - from) * pxPerMin - 6) }}
                 >
                   {((Math.floor(h / 60) % 12) || 12)}
                   {Math.floor(h / 60) < 12 ? 'A' : 'P'}

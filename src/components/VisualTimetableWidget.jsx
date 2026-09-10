@@ -286,8 +286,8 @@ export default function VisualTimetableWidget({ sessions = [], day = 'MON', mins
               return (
                 <div
                   key={`hour-${h}`}
-                  className="absolute right-1 text-[9px] sm:text-[10px] font-mono font-bold muted leading-none"
-                  style={{ top: (h - from) * pxPerMin - 4 }}
+                  className="absolute right-1 text-[9.5px] sm:text-[10px] font-mono font-bold text-[var(--muted)] hover:text-[var(--text)] leading-none select-none"
+                  style={{ top: Math.max(2, (h - from) * pxPerMin - 4) }}
                 >
                   {hourNum}{ampm}
                 </div>

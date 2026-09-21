@@ -57,7 +57,7 @@ function BreakCard({
   session,
   editing,
   isLive,
-  isNext,
+  _isNext,
   currentMins,
   onEdit,
   onDelete,
@@ -201,6 +201,7 @@ function SessionCard({
   const isSwipingRef = useRef(false)
   const directionRef = useRef(null) // null | 'horizontal' | 'vertical'
   const hasFiredHaptic = useRef(false)
+  const mouseCleanupRef = useRef(null)
 
   const theme = getSubjectTheme(session)
 
@@ -211,6 +212,63 @@ function SessionCard({
   const heldCount = tallyData?.held ?? 0
   const actualPercent = tallyData?.percent != null ? Math.round(tallyData.percent) : null
   const st = status(tallyData?.percent ?? null, effectiveCutoff)
+
+  // Reset all drag state whenever swipeMode, mark, editing, or session changes
+  useEffect(() => {
+    if (mouseCleanupRef.current) {
+      mouseCleanupRef.current()
+      mouseCleanupRef.current = null
+    }
+    setDragX(0)
+    dragXRef.current = 0
+    isSwipingRef.current = false
+    directionRef.current = null
+    hasFiredHaptic.current = false
+    setIsAnimating(false)
+  }, [swipeMode, mark, editing, session.id])
+
+  useEffect(() => {
+    return () => {
+      if (mouseCleanupRef.current) {
+        mouseCleanupRef.current()
+        mouseCleanupRef.current = null
+      }
+    }
+  }, [])
+
+  const finishDrag = () => {
+    if (!isSwipingRef.current) return
+    isSwipingRef.current = false
+    const THRESHOLD = 65
+    const finalX = dragXRef.current
+    const wasHorizontal = directionRef.current === 'horizontal'
+
+    dragXRef.current = 0
+    directionRef.current = null
+    hasFiredHaptic.current = false
+    setIsAnimating(true)
+    setDragX(0)
+
+    if (wasHorizontal) {
+      if (finalX >= THRESHOLD) {
+        triggerHaptic(20)
+        onMark(session.id, 'present')
+      } else if (finalX <= -THRESHOLD) {
+        triggerHaptic(20)
+        onMark(session.id, 'absent')
+      }
+    }
+  }
+
+  const cancelDrag = () => {
+    if (!isSwipingRef.current) return
+    isSwipingRef.current = false
+    dragXRef.current = 0
+    directionRef.current = null
+    hasFiredHaptic.current = false
+    setIsAnimating(true)
+    setDragX(0)
+  }
 
   // Gesture handling
   const handleTouchStart = (e) => {
@@ -262,31 +320,23 @@ function SessionCard({
   }
 
   const handleTouchEnd = () => {
-    if (!isSwipingRef.current || !swipeMode || editing) return
-    isSwipingRef.current = false
-    const THRESHOLD = 65
-    const finalX = dragXRef.current
+    finishDrag()
+  }
 
-    if (directionRef.current === 'horizontal') {
-      if (finalX >= THRESHOLD) {
-        triggerHaptic(20)
-        onMark(session.id, 'present')
-      } else if (finalX <= -THRESHOLD) {
-        triggerHaptic(20)
-        onMark(session.id, 'absent')
-      }
-    }
-
-    dragXRef.current = 0
-    directionRef.current = null
-    hasFiredHaptic.current = false
-    setIsAnimating(true)
-    setDragX(0)
+  const handleTouchCancel = () => {
+    cancelDrag()
   }
 
   const handleMouseDown = (e) => {
     if (!swipeMode || editing || e.button !== 0) return
-    if (e.target.closest('button') || e.target.closest('input')) return
+    if (e.target.closest('button') || e.target.closest('a') || e.target.closest('input')) return
+
+    if (mouseCleanupRef.current) {
+      mouseCleanupRef.current()
+      mouseCleanupRef.current = null
+    }
+
+    e.preventDefault()
     touchStartRef.current = { x: e.clientX, y: e.clientY }
     dragXRef.current = 0
     isSwipingRef.current = true
@@ -328,13 +378,30 @@ function SessionCard({
     }
 
     const onMouseUp = () => {
-      window.removeEventListener('mousemove', onMouseMove)
-      window.removeEventListener('mouseup', onMouseUp)
-      handleTouchEnd()
+      if (mouseCleanupRef.current) {
+        mouseCleanupRef.current()
+        mouseCleanupRef.current = null
+      }
+      finishDrag()
     }
 
-    window.addEventListener('mousemove', onMouseMove)
+    const onBlur = () => {
+      if (mouseCleanupRef.current) {
+        mouseCleanupRef.current()
+        mouseCleanupRef.current = null
+      }
+      cancelDrag()
+    }
+
+    window.addEventListener('mousemove', onMouseMove, { passive: true })
     window.addEventListener('mouseup', onMouseUp)
+    window.addEventListener('blur', onBlur)
+
+    mouseCleanupRef.current = () => {
+      window.removeEventListener('mousemove', onMouseMove)
+      window.removeEventListener('mouseup', onMouseUp)
+      window.removeEventListener('blur', onBlur)
+    }
   }
 
   // Bunk Simulator Ghost Percentage calculation on button hover or swipe drag
@@ -691,37 +758,31 @@ function SessionCard({
           backgroundColor: 'var(--surface)',
         }}
       >
-        {/* Green Present Underlay (Revealed on Swipe Right) */}
+        {/* Green Present Underlay (Revealed on Swipe Right) - Only the bigger icon */}
         <div
-          className="absolute inset-0 bg-[var(--color-present)] flex items-center justify-start pl-6 font-black tracking-wider text-black select-none pointer-events-none transition-opacity duration-150"
+          className="absolute inset-0 bg-[var(--color-present)] flex items-center justify-start pl-7 sm:pl-8 text-black select-none pointer-events-none transition-opacity duration-150"
           style={{ opacity: dragX > 5 ? 1 : 0 }}
         >
           <div
-            className={`flex items-center gap-2 transition-transform duration-100 ${
-              dragX >= 65 ? 'scale-110 font-extrabold' : 'scale-95 opacity-80'
+            className={`transition-all duration-150 flex items-center justify-center ${
+              dragX >= 65 ? 'scale-125 text-black' : 'scale-90 opacity-70'
             }`}
           >
-            <Check className="size-6 shrink-0 text-black" strokeWidth={3} />
-            <span className="text-xs sm:text-sm font-black tracking-widest uppercase">
-              PRESENT {dragX >= 65 ? '✓' : ''}
-            </span>
+            <Check className="size-8 sm:size-9 shrink-0" strokeWidth={3.5} />
           </div>
         </div>
 
-        {/* Red Absent Underlay (Revealed on Swipe Left) */}
+        {/* Red Absent Underlay (Revealed on Swipe Left) - Only the bigger icon */}
         <div
-          className="absolute inset-0 bg-[var(--color-absent)] flex items-center justify-end pr-6 font-black tracking-wider text-white select-none pointer-events-none transition-opacity duration-150"
+          className="absolute inset-0 bg-[var(--color-absent)] flex items-center justify-end pr-7 sm:pr-8 text-white select-none pointer-events-none transition-opacity duration-150"
           style={{ opacity: dragX < -5 ? 1 : 0 }}
         >
           <div
-            className={`flex items-center gap-2 transition-transform duration-100 ${
-              dragX <= -65 ? 'scale-110 font-extrabold' : 'scale-95 opacity-80'
+            className={`transition-all duration-150 flex items-center justify-center ${
+              dragX <= -65 ? 'scale-125 text-white' : 'scale-90 opacity-70'
             }`}
           >
-            <span className="text-xs sm:text-sm font-black tracking-widest uppercase">
-              ABSENT {dragX <= -65 ? '✗' : ''}
-            </span>
-            <X className="size-6 shrink-0 text-white" strokeWidth={3} />
+            <X className="size-8 sm:size-9 shrink-0" strokeWidth={3.5} />
           </div>
         </div>
 
@@ -730,10 +791,11 @@ function SessionCard({
           onTouchStart={handleTouchStart}
           onTouchMove={handleTouchMove}
           onTouchEnd={handleTouchEnd}
-          onTouchCancel={handleTouchEnd}
+          onTouchCancel={handleTouchCancel}
           onMouseDown={handleMouseDown}
+          onDragStart={(e) => e.preventDefault()}
           onTransitionEnd={() => setIsAnimating(false)}
-          className={`bg-[var(--surface)] pad-card flex flex-col justify-between h-full border-l-4 sm:border-l-[6px] cursor-grab active:cursor-grabbing ${
+          className={`bg-[var(--surface)] pad-card flex flex-col justify-between h-full border-l-4 sm:border-l-[6px] select-none cursor-grab active:cursor-grabbing ${
             isLive
               ? '!border-l-[var(--color-present)]'
               : isNext
@@ -747,6 +809,8 @@ function SessionCard({
             transform: `translateX(${dragX}px)`,
             transition: isAnimating ? 'transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1)' : 'none',
             touchAction: 'pan-y',
+            userSelect: 'none',
+            WebkitUserSelect: 'none',
           }}
         >
           {cardContent}
@@ -1086,7 +1150,6 @@ function CalendarView({
             const noClass = getNoClassEvent(iso)
             const isToday = iso === todayStr
             const isSelected = iso === activeIso
-            const isPast = iso < todayStr
 
             // Attendance marks summary
             let presentCount = 0
@@ -1104,8 +1167,6 @@ function CalendarView({
               }
             }
 
-            const hasUnmarked = isPast && hasClasses && !noClass && unmarkedCount > 0
-
             return (
               <button
                 key={iso}
@@ -1116,9 +1177,7 @@ function CalendarView({
                     ? '!bg-[var(--text)] !text-[var(--bg)] !border-[var(--text)] shadow-hard-sm'
                     : isToday
                       ? 'bg-[var(--surface)] border-[var(--color-present)] ring-2 ring-[var(--color-present)]/40 shadow-xs'
-                      : hasUnmarked
-                        ? 'bg-[var(--surface-2)] border-[var(--color-amber)] hover:border-[var(--text)]'
-                        : 'bg-[var(--surface-2)] border-[var(--border)] hover:bg-[var(--surface)] hover:border-[var(--text)] hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-hard-sm'
+                      : 'bg-[var(--surface-2)] border-[var(--border)] hover:bg-[var(--surface)] hover:border-[var(--text)] hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-hard-sm'
                 }`}
                 title={
                   noClass
@@ -1128,7 +1187,7 @@ function CalendarView({
                       : `${fmtDateShort(iso)}: No classes scheduled`
                 }
               >
-                {/* Day Number + Today / Unmarked Indicator */}
+                {/* Day Number */}
                 <div className="flex items-center justify-between gap-1">
                   <span
                     className={`text-xs sm:text-sm font-black font-mono leading-none ${
@@ -1137,24 +1196,6 @@ function CalendarView({
                   >
                     {dayNumber}
                   </span>
-                  {isToday ? (
-                    <span
-                      className={`text-[0.55rem] sm:text-[0.625rem] font-black uppercase px-1 py-0.2 rounded border ${
-                        isSelected
-                          ? 'bg-[var(--bg)] text-[var(--text)] border-transparent'
-                          : 'bg-[var(--color-present)]/20 text-[var(--color-present)] border-[var(--color-present)]/40'
-                      }`}
-                    >
-                      NOW
-                    </span>
-                  ) : hasUnmarked ? (
-                    <span
-                      className={`size-2 rounded-full shrink-0 ${
-                        isSelected ? 'bg-[var(--bg)]' : 'bg-[var(--color-amber)] animate-pulse'
-                      }`}
-                      title={`${unmarkedCount} unmarked classes`}
-                    />
-                  ) : null}
                 </div>
 
                 {/* Status Pills / Dots */}
@@ -1175,17 +1216,22 @@ function CalendarView({
                     </span>
                   ) : hasClasses ? (
                     <div className="flex items-center gap-1">
-                      {isPast ? (
-                        unmarkedCount === 0 ? (
-                          absentCount > 0 ? (
-                            <span className="size-2 rounded-full bg-[var(--color-absent)] shrink-0" title={`${absentCount} bunked`} />
-                          ) : (
-                            <span className="size-2 rounded-full bg-[var(--color-present)] shrink-0" title="All attended" />
-                          )
+                      {iso <= todayStr ? (
+                        unmarkedCount > 0 ? (
+                          <span
+                            className="size-2 rounded-full bg-[var(--color-amber)] shrink-0"
+                            title={`${unmarkedCount} unmarked classes`}
+                          />
+                        ) : absentCount > 0 && presentCount === 0 ? (
+                          <span
+                            className="size-2 rounded-full bg-[var(--color-absent)] shrink-0"
+                            title={`All classes bunked (${absentCount}/${teachingSessions.length})`}
+                          />
                         ) : (
-                          <span className="text-[0.55rem] sm:text-[0.625rem] font-mono font-bold text-[var(--color-amber)]">
-                            {presentCount + absentCount}/{teachingSessions.length}
-                          </span>
+                          <span
+                            className="size-2 rounded-full bg-[var(--color-present)] shrink-0"
+                            title={`All marked (${presentCount} attended${cancelledCount > 0 ? `, ${cancelledCount} cancelled` : ''})`}
+                          />
                         )
                       ) : (
                         <span className="text-[0.55rem] sm:text-[0.625rem] font-mono muted">
@@ -1214,7 +1260,7 @@ export default function Board() {
   const { profile, year, group, setBranch, setYear, setGroup } = useProfile()
   const { sessions, addSession, removeSession, moveSession, resetBoard, clearBoard, isCustomised } =
     useBoard(profile.branch, year)
-  const { marks, getMark, setMark, markBatch, unmarkBatch } = useRollcall()
+  const { marks, getMark, setMark } = useRollcall()
 
   const [searchParams] = useSearchParams()
   const today = dayCode()
@@ -1342,27 +1388,6 @@ export default function Board() {
     return nextSession(dayList, today, currentMins)
   }, [day, today, noClassEvent, dayList, currentMins])
 
-  const dayTeachingSessions = useMemo(() => {
-    return dayList.filter((s) => s.type !== 'break')
-  }, [dayList])
-
-  const handleMarkDayAllPresent = useCallback(() => {
-    triggerHaptic(15)
-    const entries = dayTeachingSessions.map((s) => ({ iso: activeIso, sessionId: s.id }))
-    markBatch(entries, 'present')
-  }, [dayTeachingSessions, activeIso, markBatch])
-
-  const handleMarkDayAllCancelled = useCallback(() => {
-    triggerHaptic(12)
-    const entries = dayTeachingSessions.map((s) => ({ iso: activeIso, sessionId: s.id }))
-    markBatch(entries, 'cancelled')
-  }, [dayTeachingSessions, activeIso, markBatch])
-
-  const handleResetDayMarks = useCallback(() => {
-    triggerHaptic(10)
-    const entries = dayTeachingSessions.map((s) => ({ iso: activeIso, sessionId: s.id }))
-    unmarkBatch(entries)
-  }, [dayTeachingSessions, activeIso, unmarkBatch])
 
   const handleSelectDate = useCallback((iso) => {
     triggerHaptic(12)
@@ -1584,7 +1609,7 @@ export default function Board() {
             {/* Edit & Preference Action Buttons + Mobile View Switcher */}
             <div className="flex items-center justify-between sm:justify-start gap-2">
               <div className="flex items-center gap-1.5 sm:gap-2">
-                {!editing && (
+                {view === 'day' && !editing && (
                   <button
                     type="button"
                     className={`btn !py-1.5 sm:!py-2 !px-2.5 sm:!px-3 text-xs sm:text-sm font-bold tracking-wider uppercase flex items-center gap-1.5 cursor-pointer transition-all border-2 border-[var(--border)] ${
@@ -1767,72 +1792,32 @@ export default function Board() {
           />
         ) : (
           <div className="flex-1 overflow-y-auto min-h-0 no-scrollbar pr-1 pb-2">
-            {/* Day View Date Context & Batch Actions Strip */}
-            <Panel className="board board-hard bg-[var(--surface)] p-2.5 sm:p-3 rounded border-2 border-[var(--border)] mb-3 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
-              <div className="flex items-center gap-2.5">
-                <CalendarDays className="icon-sm text-[var(--color-coral)] shrink-0" />
-                <div className="flex items-center gap-2 flex-wrap">
-                  <span className="text-xs sm:text-sm font-black uppercase tracking-wider text-[var(--text)]">
-                    {fmtDateShort(activeIso)}
+            {/* Return to Today banner only when custom/past date is selected from calendar */}
+            {selectedIso && (
+              <div className="board board-hard bg-[var(--surface)] p-2 sm:p-2.5 rounded border-2 border-[var(--border)] mb-3 shadow-xs flex items-center justify-between gap-2">
+                <div className="flex items-center gap-2">
+                  <CalendarDays className="icon-micro text-[var(--color-coral)]" />
+                  <span className="text-xs font-black uppercase tracking-wider text-[var(--text)]">
+                    VIEWING {fmtDateShort(selectedIso)}
                   </span>
-                  {activeIso === todayISO() ? (
-                    <span className="chip !py-0.5 !px-2 text-[0.625rem] font-bold uppercase tracking-wider bg-[var(--color-present)]/10 text-[var(--color-present)] border border-[var(--color-present)]/40">
-                      TODAY
-                    </span>
-                  ) : (
-                    <span className="chip !py-0.5 !px-2 text-[0.625rem] font-bold uppercase tracking-wider bg-[var(--surface-2)] text-[var(--muted)] border border-[var(--border)]">
-                      {activeIso < todayISO() ? 'PAST DATE' : 'UPCOMING'}
-                    </span>
-                  )}
+                  <span className="chip !py-0.2 !px-1.5 text-[0.6rem] font-bold uppercase bg-[var(--surface-2)] text-[var(--muted)]">
+                    {selectedIso < todayISO() ? 'PAST' : 'UPCOMING'}
+                  </span>
                 </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    triggerHaptic(10)
+                    setSelectedIso(null)
+                    setDay(DAYS.includes(today) ? today : 'MON')
+                  }}
+                  className="btn !py-1 !px-2 text-[0.6875rem] font-bold uppercase tracking-wider cursor-pointer bg-[var(--surface-2)] text-[var(--text)] border-2 border-[var(--border)] hover:bg-[var(--surface)]"
+                  title="Return to today"
+                >
+                  ← TODAY
+                </button>
               </div>
-
-              <div className="flex items-center gap-1.5 flex-wrap">
-                {/* Batch roll call actions for this day */}
-                {dayTeachingSessions.length > 0 && !noClassEvent && (
-                  <>
-                    <button
-                      type="button"
-                      onClick={handleMarkDayAllPresent}
-                      className="btn btn-go !py-1 !px-2.5 text-[0.6875rem] font-bold uppercase tracking-wider flex-1 sm:flex-initial cursor-pointer shadow-hard-sm"
-                    >
-                      MARK ALL PRESENT
-                    </button>
-                    <button
-                      type="button"
-                      onClick={handleMarkDayAllCancelled}
-                      className="btn !py-1 !px-2 text-[0.6875rem] font-bold uppercase tracking-wider flex-1 sm:flex-initial cursor-pointer bg-[var(--surface-2)] text-[var(--text)] border-2 border-[var(--border)] hover:border-[var(--color-cancelled)]"
-                    >
-                      CANCEL ALL
-                    </button>
-                    <button
-                      type="button"
-                      onClick={handleResetDayMarks}
-                      className="btn !py-1 !px-2 text-[0.6875rem] font-black uppercase tracking-wider cursor-pointer text-[var(--muted)] hover:text-[var(--text)] bg-[var(--surface-2)] border-2 border-[var(--border)]"
-                      title="Reset this day's marks"
-                    >
-                      <RotateCcw className="icon-micro shrink-0" strokeWidth={2.5} />
-                    </button>
-                  </>
-                )}
-
-                {/* Return to Today button if custom date selected */}
-                {selectedIso && (
-                  <button
-                    type="button"
-                    onClick={() => {
-                      triggerHaptic(10)
-                      setSelectedIso(null)
-                      setDay(DAYS.includes(today) ? today : 'MON')
-                    }}
-                    className="btn !py-1 !px-2 text-[0.6875rem] font-bold uppercase tracking-wider cursor-pointer bg-[var(--surface-2)] text-[var(--text)] border-2 border-[var(--border)] hover:bg-[var(--surface)]"
-                    title="Return to today"
-                  >
-                    ← TODAY
-                  </button>
-                )}
-              </div>
-            </Panel>
+            )}
 
             {noClassEvent && (
               <div

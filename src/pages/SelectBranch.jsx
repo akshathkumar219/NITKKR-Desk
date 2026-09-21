@@ -3,7 +3,7 @@ import { useLocation, useNavigate } from 'react-router-dom'
 import { Check } from 'lucide-react'
 import PlainShell from '../components/PlainShell'
 import { Segmented } from '../ui'
-import { BRANCHES, SORTED_BRANCHES, YEARS } from '../data/campus'
+import { SORTED_BRANCHES, YEARS } from '../data/campus'
 import { useProfile } from '../lib/storage'
 import { baseTimetable, groupsFor } from '../data/timetables'
 
@@ -39,6 +39,11 @@ export default function SelectBranch() {
       setPickedGroup(pickedGroup)
     } else {
       setPickedGroup(valid[0] || '1')
+    }
+    try {
+      window.scrollTo({ top: 0, behavior: 'smooth' })
+    } catch {
+      window.scrollTo(0, 0)
     }
   }
 

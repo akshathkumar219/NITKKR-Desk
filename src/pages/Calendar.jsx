@@ -21,6 +21,11 @@ const COLOR_PALETTE = [
   { label: 'Red', value: 'var(--disruption)', bg: 'var(--disruption)', ink: 'var(--on-accent)' },
 ]
 
+const MONTH_NAMES = [
+  'JANUARY', 'FEBRUARY', 'MARCH', 'APRIL', 'MAY', 'JUNE',
+  'JULY', 'AUGUST', 'SEPTEMBER', 'OCTOBER', 'NOVEMBER', 'DECEMBER'
+]
+
 export default function CalendarPage() {
   const { events, addEvent, deleteEvent } = useEvents()
   const { categories, addCategory, updateCategory, deleteCategory } = useEventCategories()
@@ -43,7 +48,6 @@ export default function CalendarPage() {
 
   const year = currentDate.getFullYear()
   const month = currentDate.getMonth()
-  const monthName = currentDate.toLocaleString('en-US', { month: 'long' }).toUpperCase()
   const todayStr = useMemo(() => todayISO(), [])
 
   // Map categories by ID for quick lookup
@@ -222,20 +226,55 @@ export default function CalendarPage() {
           </div>
         </header>
 
-        {/* MAIN BODY: 2-COLUMN FULL-HEIGHT VIEWPORT GRID */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-3 sm:gap-4 flex-1 min-h-0 items-start lg:items-stretch">
-          {/* LEFT: CALENDAR + FILTERS STRIP */}
-          <div className="lg:col-span-6 xl:col-span-6 flex flex-col gap-2.5 sm:gap-3 min-h-0">
-            {/* MAIN CALENDAR (simpler, shorter, dashboard style) */}
+        {/* MAIN BODY: 2-COLUMN VIEWPORT (600px CALENDAR ON DESKTOP + FLEX AGENDA) */}
+        <div className="flex flex-col lg:flex-row gap-3 sm:gap-4 flex-1 min-h-0 items-start lg:items-stretch overflow-y-auto lg:overflow-hidden">
+          {/* LEFT: CALENDAR (600px WIDTH ON DESKTOP) + FILTERS */}
+          <div className="w-full lg:w-[600px] lg:shrink-0 flex flex-col gap-2.5 sm:gap-3 min-h-0">
+            {/* MAIN CALENDAR CARD */}
             <section className="board board-hard bg-[var(--surface)] p-3 sm:p-4 flex flex-col border-l-4 border-l-[var(--color-acid)] shrink-0 shadow-xs">
-              {/* MONTH TITLE & SWITCHER */}
-              <div className="flex items-center justify-between border-b border-[var(--border)] pb-2 mb-2 shrink-0">
+              {/* MONTH TITLE, SELECTOR DROPDOWNS & SWITCHER */}
+              <div className="flex items-center justify-between border-b border-[var(--border)] pb-2 mb-2 shrink-0 gap-2">
                 <div className="flex items-center gap-2 min-w-0">
-                  <CalendarIcon size={16} className="text-[var(--color-acid)] shrink-0" />
-                  <h2 className="heading text-sm sm:text-base font-black text-[var(--color-acid)] truncate">
-                    {monthName} {year}
-                  </h2>
+                  <CalendarIcon size={18} className="text-[var(--color-acid)] shrink-0" />
+                  <div className="flex items-center gap-1.5">
+                    {/* Month Dropdown Menu */}
+                    <select
+                      aria-label="Select month"
+                      className="bg-[var(--surface-2)] border-2 border-[var(--border)] rounded px-2 py-1 text-xs sm:text-sm font-black uppercase text-[var(--color-acid)] cursor-pointer outline-none shadow-2xs hover:border-[var(--color-acid)] transition-colors"
+                      value={month}
+                      onChange={(e) => {
+                        const newMonth = Number(e.target.value)
+                        setCurrentDate(new Date(year, newMonth, 1))
+                        setSelectedDate(null)
+                      }}
+                    >
+                      {MONTH_NAMES.map((m, idx) => (
+                        <option key={m} value={idx} className="bg-[var(--surface)] text-[var(--text)]">
+                          {m}
+                        </option>
+                      ))}
+                    </select>
+
+                    {/* Year Dropdown Menu */}
+                    <select
+                      aria-label="Select year"
+                      className="bg-[var(--surface-2)] border-2 border-[var(--border)] rounded px-2 py-1 text-xs sm:text-sm font-black uppercase text-[var(--color-acid)] cursor-pointer outline-none shadow-2xs hover:border-[var(--color-acid)] transition-colors"
+                      value={year}
+                      onChange={(e) => {
+                        const newYear = Number(e.target.value)
+                        setCurrentDate(new Date(newYear, month, 1))
+                        setSelectedDate(null)
+                      }}
+                    >
+                      {[2025, 2026, 2027, 2028].map((y) => (
+                        <option key={y} value={y} className="bg-[var(--surface)] text-[var(--text)]">
+                          {y}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
                 </div>
+
                 <div className="flex items-center gap-1.5 shrink-0">
                   <button
                     type="button"
@@ -268,15 +307,15 @@ export default function CalendarPage() {
                 </div>
               </div>
 
-              {/* WEEKDAY LABELS (M T W T F S S) */}
+              {/* WEEKDAY LABELS (MON TUE WED THU FRI SAT SUN) */}
               <div className="grid grid-cols-7 text-center label text-xs font-bold py-1 border-b border-[var(--border)] mb-1.5 shrink-0">
-                <span>M</span>
-                <span>T</span>
-                <span>W</span>
-                <span>T</span>
-                <span>F</span>
-                <span className="text-[var(--color-acid)]">S</span>
-                <span className="text-[var(--color-acid)]">S</span>
+                <span>MON</span>
+                <span>TUE</span>
+                <span>WED</span>
+                <span>THU</span>
+                <span>FRI</span>
+                <span className="text-[var(--color-acid)]">SAT</span>
+                <span className="text-[var(--color-acid)]">SUN</span>
               </div>
 
               {/* MONTH DAY CELLS GRID */}
@@ -286,7 +325,7 @@ export default function CalendarPage() {
                     return (
                       <div
                         key={`empty-${idx}`}
-                        className="min-h-[28px] sm:min-h-[32px] rounded bg-transparent"
+                        className="min-h-[44px] sm:min-h-[52px] rounded bg-transparent opacity-20 border border-dashed border-[var(--border)]"
                       />
                     )
                   }
@@ -326,7 +365,7 @@ export default function CalendarPage() {
                                 }
                               : undefined
                       }
-                      className={`min-h-[28px] sm:min-h-[32px] text-xs sm:text-[0.8125rem] font-bold rounded border transition-all grid place-items-center relative cursor-pointer ${
+                      className={`min-h-[44px] sm:min-h-[52px] p-1 sm:p-1.5 text-xs sm:text-[0.8125rem] font-bold rounded border transition-all flex flex-col justify-between items-start relative cursor-pointer ${
                         isSelected
                           ? 'ring-2 ring-[var(--color-acid)] shadow-hard-sm font-black'
                           : isToday
@@ -341,20 +380,45 @@ export default function CalendarPage() {
                           : `${item.dayNumber}`
                       }
                     >
-                      <span className="leading-none">{item.dayNumber}</span>
+                      <div className="w-full flex items-center justify-between pointer-events-none">
+                        <span className="leading-none text-xs sm:text-[0.8125rem]">{item.dayNumber}</span>
+                        {hasEvent && (
+                          <span className="flex items-center gap-0.5">
+                            {visibleEvts.slice(0, 3).map((ev) => {
+                              const catStyle = getCatStyle(ev.category)
+                              return (
+                                <span
+                                  key={ev.id}
+                                  className="size-1.5 rounded-full border border-black/30 shrink-0"
+                                  style={{ background: isToday ? 'var(--on-accent)' : catStyle.bg }}
+                                />
+                              )
+                            })}
+                          </span>
+                        )}
+                      </div>
+
                       {hasEvent && (
-                        <span className="absolute bottom-0.5 sm:bottom-1 flex items-center justify-center gap-0.5 pointer-events-none">
-                          {visibleEvts.slice(0, 3).map((ev) => {
+                        <div className="w-full mt-1 space-y-0.5 overflow-hidden text-left pointer-events-none">
+                          {visibleEvts.slice(0, 1).map((ev) => {
                             const catStyle = getCatStyle(ev.category)
                             return (
-                              <span
+                              <div
                                 key={ev.id}
-                                className="size-1 sm:size-1.5 rounded-full border border-black/30"
-                                style={{ background: isToday ? 'var(--on-accent)' : catStyle.bg }}
-                              />
+                                className="text-[0.6rem] font-bold px-1 py-0.5 rounded truncate border border-black/20 leading-tight w-full"
+                                style={{ background: catStyle.bg, color: 'var(--on-accent)' }}
+                                title={ev.title}
+                              >
+                                {ev.title}
+                              </div>
                             )
                           })}
-                        </span>
+                          {visibleEvts.length > 1 && (
+                            <span className="text-[0.55rem] font-bold text-[var(--color-acid)] block text-right leading-none">
+                              +{visibleEvts.length - 1} MORE
+                            </span>
+                          )}
+                        </div>
                       )}
                     </button>
                   )
@@ -362,60 +426,52 @@ export default function CalendarPage() {
               </div>
             </section>
 
-            {/* FILTERS PART (visible directly below calendar) */}
-            <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5 shrink-0">
-              <span className="label text-xs font-bold muted mr-0.5 flex items-center gap-1 shrink-0">
-                <Tag size={13} className="text-[var(--color-acid)]" /> FILTERS:
-              </span>
-
-              <button
-                type="button"
-                onClick={() => setSelectedCategory('ALL')}
-                className={`btn !py-1 !px-2.5 !text-xs font-bold transition-all cursor-pointer shrink-0 ${
-                  selectedCategory === 'ALL'
-                    ? 'ring-2 ring-black dark:ring-white scale-105 shadow-hard-sm'
-                    : 'opacity-80 hover:opacity-100'
-                }`}
-                style={
-                  selectedCategory === 'ALL'
-                    ? { background: 'var(--text)', color: 'var(--bg)' }
-                    : undefined
-                }
-              >
-                UPCOMING ({upcomingEvents.length})
-              </button>
-
-              {categories.map((cat) => {
-                const active = selectedCategory === cat.id
-                const count = upcomingEvents.filter((e) => e.category === cat.id).length
-                return (
-                  <button
-                    key={cat.id}
-                    type="button"
-                    onClick={() => setSelectedCategory(cat.id)}
-                    className={`btn !py-1 !px-2.5 !text-xs font-bold transition-all cursor-pointer shrink-0 ${
-                      active
-                        ? 'ring-2 ring-black dark:ring-white scale-105 shadow-hard-sm'
-                        : 'opacity-80 hover:opacity-100'
-                    }`}
-                    style={
-                      active
-                        ? { background: cat.bg, color: 'var(--on-accent)', borderColor: cat.bg }
-                        : undefined
-                    }
+            {/* FILTERS / CATEGORY DROPDOWN MENU STRIP (adjusted to 600px) */}
+            <div className="flex flex-wrap sm:flex-nowrap items-center justify-between gap-2 bg-[var(--surface)] border-2 border-[var(--border)] rounded p-2 sm:px-3 sm:py-2 shadow-hard-sm shrink-0">
+              <div className="flex items-center gap-2 min-w-0 flex-1">
+                <div className="flex items-center bg-[var(--surface-2)] border-2 border-[var(--border-strong)] rounded px-2.5 py-1.5 shadow-2xs transition-colors flex-1 sm:flex-initial">
+                  <Tag size={13} className="text-[var(--color-acid)] mr-1.5 shrink-0" />
+                  <span className="t-meta muted mr-1.5 shrink-0">CATEGORY</span>
+                  <select
+                    aria-label="Filter events by category"
+                    className="bg-transparent text-xs sm:text-sm font-bold uppercase outline-none cursor-pointer text-[var(--text)] w-full"
+                    value={selectedCategory}
+                    onChange={(e) => setSelectedCategory(e.target.value)}
                   >
-                    {cat.label} ({count})
+                    <option value="ALL" className="bg-[var(--surface)] text-[var(--text)]">
+                      ALL UPCOMING ({upcomingEvents.length})
+                    </option>
+                    {categories.map((cat) => {
+                      const count = upcomingEvents.filter((e) => e.category === cat.id).length
+                      return (
+                        <option key={cat.id} value={cat.id} className="bg-[var(--surface)] text-[var(--text)]">
+                          {cat.label} ({count})
+                        </option>
+                      )
+                    })}
+                  </select>
+                </div>
+
+                {selectedCategory !== 'ALL' && (
+                  <button
+                    type="button"
+                    onClick={() => setSelectedCategory('ALL')}
+                    className="btn !py-1 !px-2 text-xs font-bold cursor-pointer shrink-0"
+                    title="Reset category filter"
+                  >
+                    RESET
                   </button>
-                )
-              })}
+                )}
+              </div>
 
               {selectedDate && (
                 <button
                   type="button"
                   onClick={() => setSelectedDate(null)}
-                  className="chip !py-1 !px-2 text-xs font-bold bg-[var(--color-coral)] text-black border-2 border-black/20 flex items-center gap-1.5 cursor-pointer shrink-0 ml-auto"
+                  className="chip !py-1 !px-2 text-xs font-bold bg-[var(--color-coral)] text-white border border-black/20 flex items-center gap-1.5 cursor-pointer shrink-0 shadow-2xs"
+                  title="Clear date filter"
                 >
-                  <span>FILTER: {fmtDateDDMMYYYY(selectedDate)}</span>
+                  <span>DATE: {fmtDateDDMMYYYY(selectedDate)}</span>
                   <X size={12} strokeWidth={2.5} />
                 </button>
               )}
@@ -423,7 +479,7 @@ export default function CalendarPage() {
           </div>
 
           {/* RIGHT: AGENDA FEED & EVENTS LIST */}
-          <div className="lg:col-span-6 xl:col-span-6 flex flex-col flex-1 h-full min-h-0">
+          <div className="w-full flex-1 min-w-0 flex flex-col h-full min-h-0">
             <section className="board board-hard bg-[var(--surface)] p-3.5 sm:p-4 flex flex-col min-h-[350px] lg:min-h-0 flex-1 lg:h-full border-l-4 border-l-[var(--color-acid)] justify-between space-y-3">
               <div className="flex h-7 items-center justify-between border-b border-[var(--border)] pb-2.5 shrink-0">
                 <div className="flex items-center gap-2">

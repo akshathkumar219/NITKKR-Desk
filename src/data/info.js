@@ -413,11 +413,10 @@ export const INSPIRED_BY = {
 // --------------------------------------------------------------- version --
 
 export const VERSION = {
-  number: '1.5',
+  number: '1.6',
   changes: [
-    'Updated Academic Calendar',
-    'PYQs uploaded',
-    'Dashboard redesigned',
-    'Fixed minor bugs',
+    'Swipe feature in attendance',
+    'Fix a day is now on timetable page itself',
+    'New mess menu for H10',
   ],
 }

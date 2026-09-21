@@ -1,9 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useLocation, useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import {
-
   Calculator,
-  Calendar,
   CalendarClock,
   Check,
   CheckCheck,
@@ -39,12 +37,10 @@ import {
   simulateSkip,
   status,
   tally,
-  unmarkedSince,
   useRollcall,
 } from '../lib/rollcall'
 import {
   DAY_NAMES,
-  DAYS,
   dayCode,
   fmtDateShort,
   fmtRange,
@@ -368,8 +364,6 @@ function AttendanceRow({ session, mark, tallyData, required, onMark, onReset, on
 function resolveTab(raw) {
   if (!raw) return 'SUBJECTS'
   const clean = decodeURIComponent(raw).trim().toLowerCase().replace(/[\s_-]+/g, '')
-  if (clean.includes('subject')) return 'SUBJECTS'
-  if (clean.includes('fix') || clean.includes('backfill') || clean.includes('day')) return 'BACKFILL'
   if (clean.includes('today') || clean.includes('daily')) return 'TODAY'
   return 'SUBJECTS'
 }
@@ -392,22 +386,22 @@ export default function Attendance() {
 
   const [tab, setTab] = useState(initialTab)
 
-  // Sync tab with URL when route or query parameter changes
+  // Sync tab with URL when route or query parameter changes; redirect legacy fix-a-day routes
   useEffect(() => {
     if (rawRouteTab) {
+      const clean = decodeURIComponent(rawRouteTab).trim().toLowerCase().replace(/[\s_-]+/g, '')
+      if (clean.includes('fix') || clean.includes('backfill')) {
+        navigate('/timetable?view=calendar', { replace: true })
+        return
+      }
       setTab(resolveTab(rawRouteTab))
     }
-  }, [rawRouteTab])
+  }, [rawRouteTab, navigate])
 
   const handleTabChange = (nextKey) => {
     triggerHaptic(8)
     setTab(nextKey)
-    const targetPath =
-      nextKey === 'TODAY'
-        ? '/attendance/today'
-        : nextKey === 'BACKFILL'
-          ? '/attendance/fix-a-day'
-          : '/attendance'
+    const targetPath = nextKey === 'TODAY' ? '/attendance/today' : '/attendance'
     if (location.pathname !== targetPath) {
       navigate(targetPath)
     }
@@ -418,7 +412,6 @@ export default function Attendance() {
   const [showSummaryModal, setShowSummaryModal] = useState(false)
   const [copiedSummary, setCopiedSummary] = useState(false)
 
-  const [fixDate, setFixDate] = useState(todayISO())
   const [requiredDraft, setRequiredDraft] = useState(String(settings.required))
 
   // Mid-semester base attendance drafts
@@ -486,11 +479,6 @@ export default function Attendance() {
     return sessionsForDay(effectiveSessions, today).filter((s) => s.type !== 'break')
   }, [effectiveSessions, today, todayNoClass])
 
-  // Unmarked sessions in tracking window
-  const pending = useMemo(() => {
-    return unmarkedSince(effectiveSessions, marks, since, iso)
-  }, [effectiveSessions, marks, since, iso])
-
   // Today's Detailed Marks Breakdown
   const todayMarks = useMemo(() => {
     let present = 0
@@ -552,16 +540,6 @@ export default function Attendance() {
     else if (subjectFilter === 'SAFE') base = base.filter((c) => c.status === 'safe')
     return [...base].sort((a, b) => (a.name || '').localeCompare(b.name || ''))
   }, [subjectStats, subjectFilter])
-
-  // Sessions for Fix-a-day tab
-  const fixDay = DAYS[(isoToDate(fixDate).getDay() + 6) % 7]
-  const fixNoClass = useMemo(() => getNoClassEvent(fixDate), [fixDate])
-  const fixSessions = useMemo(() => {
-    if (fixNoClass) return []
-    return DAYS.includes(fixDay)
-      ? sessionsForDay(effectiveSessions, fixDay).filter((s) => s.type !== 'break')
-      : []
-  }, [fixNoClass, effectiveSessions, fixDay])
 
   // NOTE: overall safe-skip / recovery figures were removed deliberately.
   // Attendance is enforced per subject, so pooling present/held across all
@@ -685,25 +663,6 @@ export default function Attendance() {
   function handleResetToday() {
     triggerHaptic(10)
     const entries = todaySessions.map((s) => ({ iso, sessionId: s.id }))
-    unmarkBatch(entries)
-  }
-
-  // Fix A Day batch actions
-  function handleMarkFixDatePresent() {
-    triggerHaptic(15)
-    const entries = fixSessions.map((s) => ({ iso: fixDate, sessionId: s.id }))
-    markBatch(entries, 'present')
-  }
-
-  function handleMarkFixDateCancelled() {
-    triggerHaptic(12)
-    const entries = fixSessions.map((s) => ({ iso: fixDate, sessionId: s.id }))
-    markBatch(entries, 'cancelled')
-  }
-
-  function handleResetFixDate() {
-    triggerHaptic(10)
-    const entries = fixSessions.map((s) => ({ iso: fixDate, sessionId: s.id }))
     unmarkBatch(entries)
   }
 
@@ -1408,11 +1367,10 @@ export default function Attendance() {
 
         {/* MODERN SEGMENTED PILL TABS */}
         <div className="p-1 rounded bg-[var(--surface-2)] border-2 border-[var(--border)] shrink-0 shadow-xs">
-          <div className="grid grid-cols-3 gap-1.5 sm:gap-1.5">
+          <div className="grid grid-cols-2 gap-1.5 sm:gap-1.5">
             {[
               { key: 'SUBJECTS', label: `SUBJECTS (${courses.length})` },
               { key: 'TODAY', label: todayNoClass ? 'TODAY (OFF)' : `TODAY (${todaySessions.length})` },
-              { key: 'BACKFILL', label: 'FIX A DAY' },
             ].map((t, i, arr) => {
               const active = tab === t.key
               // Hairline separator sits in the gap to the left of this tab, and
@@ -1585,6 +1543,31 @@ export default function Attendance() {
                 })}
               </div>
             )}
+
+            {/* Shortcut to Timetable Calendar */}
+            <div className="mt-4 p-3 rounded bg-[var(--surface-2)] border-2 border-[var(--border)] flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs">
+              <div className="flex items-center gap-2.5">
+                <CalendarClock className="icon-sm text-[var(--color-sky)] shrink-0" />
+                <div>
+                  <p className="text-xs sm:text-sm font-bold text-[var(--text)] uppercase tracking-wider">
+                    Need to log or fix past days?
+                  </p>
+                  <p className="t-micro muted mt-0.5">
+                    Browse your full timetable by date and backfill attendance marks directly.
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  triggerHaptic(10)
+                  navigate('/timetable?view=calendar')
+                }}
+                className="btn !py-1.5 !px-3 text-xs font-bold uppercase tracking-wider cursor-pointer bg-[var(--surface)] text-[var(--text)] border-2 border-[var(--border)] hover:bg-[var(--surface-2)] shrink-0"
+              >
+                TIMETABLE CALENDAR →
+              </button>
+            </div>
           </div>
         ) : null}
 
@@ -1842,157 +1825,6 @@ export default function Attendance() {
               </div>
             )}
           </div>
-        ) : null}
-
-        {/* TAB 3: FIX A DAY (CALENDAR & BACKFILL) */}
-        {tab === 'BACKFILL' ? (
-          <Panel className="board board-hard bg-[var(--surface)] pad-page space-y-4">
-            <div className="flex items-center gap-3">
-              <CalendarClock className="icon-md text-[var(--color-coral)] shrink-0" />
-              <div>
-                <h3 className="t-card-title text-[var(--text)]" style={{ fontSize: 20 }}>
-                  FIX A PAST DAY
-                </h3>
-                <p className="t-meta muted mt-0.5">
-                  Pick any past date on the calendar to add, verify, or correct that day's roll call.
-                </p>
-              </div>
-            </div>
-
-            {/* Date Input & Thumb-Friendly Batch Actions */}
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-1 border-b-2 border-[var(--border)] pb-3">
-              <div className="flex items-center gap-3">
-                <input
-                  id="fix-date"
-                  className="field !py-2 text-xs sm:text-sm font-bold uppercase"
-                  type="date"
-                  value={fixDate}
-                  max={iso}
-                  onChange={(e) => {
-                    triggerHaptic()
-                    setFixDate(e.target.value)
-                  }}
-                  aria-label="Pick date to fix"
-                />
-                <span className="chip !py-1.5 !px-3 text-xs sm:text-sm font-bold uppercase tracking-wider border-2 border-[var(--border)] bg-[var(--surface-2)] whitespace-nowrap shrink-0">
-                  {fmtDateShort(fixDate)}
-                </span>
-              </div>
-
-              {/* Dynamic Batch Actions for Picked Date */}
-              {fixSessions.length > 0 ? (
-                <div className="flex items-center gap-1.5 w-full sm:w-auto">
-                  <button
-                    type="button"
-                    onClick={handleMarkFixDatePresent}
-                    className="btn btn-go !py-1.5 !px-3 text-[0.6875rem] sm:text-xs font-bold uppercase tracking-wider flex-1 sm:flex-initial cursor-pointer shadow-hard-sm"
-                  >
-                    MARK ALL PRESENT
-                  </button>
-                  <button
-                    type="button"
-                    onClick={handleMarkFixDateCancelled}
-                    className="btn !py-1.5 !px-2.5 text-[0.6875rem] sm:text-xs font-bold uppercase tracking-wider flex-1 sm:flex-initial cursor-pointer hover:border-[var(--color-cancelled)]"
-                  >
-                    CANCEL ALL
-                  </button>
-                  <button
-                    type="button"
-                    onClick={handleResetFixDate}
-                    className="btn !py-1.5 !px-2 text-xs font-black uppercase tracking-wider cursor-pointer text-[var(--muted)] hover:text-[var(--text)]"
-                    title="Reset this day's marks"
-                  >
-                    <RotateCcw className="icon-micro shrink-0" strokeWidth={2.5} />
-                  </button>
-                </div>
-              ) : null}
-            </div>
-
-            {/* Sessions on Selected Date */}
-            <div className="space-y-3 pt-2">
-              {fixNoClass ? (
-                <div className="p-8 text-center rounded bg-[var(--surface-2)] border-2 border-[var(--border)] space-y-2">
-                  <span
-                    className="chip !py-1 !px-3 text-xs font-black uppercase tracking-wider"
-                    style={{
-                      background: fixNoClass.isExam
-                        ? 'var(--color-coral)'
-                        : fixNoClass.isBreak
-                          ? 'var(--color-acid)'
-                          : 'var(--color-amber)',
-                      color: '#111111',
-                    }}
-                  >
-                    {fixNoClass.category} · NO CLASSES
-                  </span>
-                  <p className="t-card-title text-[var(--text)] mt-2">{fixNoClass.label}</p>
-                  <p className="t-meta muted max-w-sm mx-auto">
-                    {fmtDateShort(fixDate)} was a non-teaching day ({fixNoClass.label}). No classes were held.
-                  </p>
-                </div>
-              ) : fixSessions.length === 0 ? (
-                <div className="p-8 text-center rounded bg-[var(--surface-2)] border-2 border-dashed border-[var(--border)]">
-                  <Calendar size={32} className="text-[var(--muted)] mx-auto mb-2" />
-                  <p className="t-card-title text-[var(--text)]">NO CLASSES SCHEDULED</p>
-                  <p className="t-meta muted mt-1">
-                    No classes exist on your timetable for {fmtDateShort(fixDate)}.
-                  </p>
-                </div>
-              ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
-                  {fixSessions.map((s) => {
-                    const courseKey = s.code || s.name
-                    const tallyData = tally(
-                      marks,
-                      courses.find((c) => c.key === courseKey)?.sessions || [s],
-                      since,
-                      adjustments[courseKey] || 0,
-                    )
-                    return (
-                      <AttendanceRow
-                        key={s.id}
-                        session={s}
-                        mark={getMark(fixDate, s.id)}
-                        tallyData={tallyData}
-                        required={required}
-                        currentMins={currentMins}
-                        isToday={fixDate === iso}
-                        onMark={(m) => setMark(fixDate, s.id, m)}
-                        onReset={() => setMark(fixDate, s.id, null)}
-                        onEditSession={() => setSessionModal({ open: true, session: s, defaultDay: s.day, prefill: null })}
-                      />
-                    )
-                  })}
-                </div>
-              )}
-            </div>
-
-            {/* Quick Unmarked Dates Jump Bar */}
-            {pending.length > 0 ? (
-              <div className="mt-5 border-t-2 border-[var(--border)] pt-4">
-                <p className="t-meta muted mb-2 font-bold uppercase tracking-wider">
-                  ⚡ {pending.length} UNMARKED CLASSES SINCE {fmtDateShort(since)} — QUICK JUMP:
-                </p>
-                <div className="flex flex-wrap gap-1.5">
-                  {[...new Set(pending.map((p) => p.iso))].slice(0, 14).map((d) => (
-                    <button
-                      key={d}
-                      type="button"
-                      className={`btn !py-1.5 sm:!py-2 !px-3 text-xs sm:text-sm uppercase tracking-wider font-bold cursor-pointer transition-all border-2 border-[var(--border)] ${
-                        fixDate === d ? '!bg-[var(--text)] !text-[var(--bg)] !border-[var(--text)] font-black shadow-hard-sm' : 'font-semibold'
-                      }`}
-                      onClick={() => {
-                        triggerHaptic()
-                        setFixDate(d)
-                      }}
-                    >
-                      {fmtDateShort(d)}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            ) : null}
-          </Panel>
         ) : null}
 
         {/* 📋 1-CLICK SHARE / COPY SUMMARY MODAL */}

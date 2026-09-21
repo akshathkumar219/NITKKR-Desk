@@ -273,34 +273,34 @@
           "Aaloo Pyaz Paratha",
           "Green Chatni",
           "Tea",
-          "Dahi",
           "Bread",
+          "Sprouts",
           "Achaar / Butter / Jam / Sauce"
         ],
-        "extra": "Hot Milk"
+        "extra": "Milk"
       },
       "lunch": {
         "items": [
           "Rajma",
-          "Petha",
+          "Allo Soyabin",
           "Jeera Rice",
           "Dahi",
           "Chapati",
           "Friers",
-          "Lemon",
-          "Salad",
-          "Achar"
+          "Achar",
+          "Salad Kheera"
         ],
-        "extra": "Milk, Chanch"
+        "extra": "Milk, Ice Cream"
       },
       "dinner": {
         "items": [
-          "Kadhai Paneer",
-          "Tandoori + Missi Roti",
-          "Urad Sabut Dal",
+          "Chana Masala",
+          "Dahi Bhalle",
+          "Chana Chilka Dal",
           "Rice",
+          "Chapati",
           "Salad",
-          "Butter"
+          "Lemon"
         ],
         "extra": "Milk"
       }
@@ -308,38 +308,36 @@
     "TUE": {
       "breakfast": {
         "items": [
-          "Poha + Upma",
-          "Chutney",
-          "Two Banana",
+          "Poha",
           "Tea",
-          "Sprouts",
+          "2 Banana",
           "Bread",
           "Butter / Jam / Sauce / Achaar"
         ],
-        "extra": "Hot Milk"
+        "extra": "Milk"
       },
       "lunch": {
         "items": [
-          "Kadi Pakoda",
-          "Sambhar",
-          "Rice",
+          "White Channa Gravy",
+          "Plain Rice",
           "Chapati",
-          "Salad",
-          "Achar"
+          "Salad Kheera",
+          "Pyaz",
+          "Achar",
+          "Boondi Rayta"
         ],
-        "extra": "Milk, Ice-Cream"
+        "extra": "Milk, Ice Cream"
       },
       "dinner": {
         "items": [
-          "Mix Veg",
-          "Malai Kofta",
+          "Kadhai Paneer",
+          "Stuffed Naan",
+          "Missi Roti",
+          "Massar Sabut Dal",
           "Rice",
-          "Chana Dal",
-          "Chapati",
-          "Salad",
-          "Achar"
+          "Salad"
         ],
-        "extra": "Milk, Milk Cake"
+        "extra": "Milk, Gulab Jamun"
       }
     },
     "WED": {
@@ -347,31 +345,27 @@
         "items": [
           "Paneer Pyaj Parantha",
           "Tea",
-          "Dahi",
-          "Bread",
-          "Butter / Jam / Sauce / Achaar"
+          "Bread with Butter / Jam / Tomato Sauce"
         ],
-        "extra": "Hot Milk"
+        "extra": "Milk"
       },
       "lunch": {
         "items": [
-          "White Chana Gravy",
-          "Moong Dal",
-          "Veg Rice",
-          "Chapati",
+          "Black Channa",
+          "Fried Rice",
           "Dahi",
-          "Salad",
-          "Friers"
+          "Chapati",
+          "Salad"
         ],
-        "extra": "Milk, Chanch"
+        "extra": "Milk, Ice Cream"
       },
       "dinner": {
         "items": [
-          "Aloo Zeera",
-          "Dal Makhni",
-          "Kheer",
-          "Chapati",
+          "Besan Gatta",
+          "Suji Halwa (Desi Ghee)",
           "Rice",
+          "Chapati",
+          "Moong Dal",
           "Salad"
         ],
         "extra": "Milk"
@@ -380,35 +374,38 @@
     "THU": {
       "breakfast": {
         "items": [
-          "Macroni",
+          "Pav Bhaji",
           "2 Banana",
-          "Tea",
+          "Coffee",
+          "Upma",
           "Sprouts",
+          "Nariyal Chatni",
           "Bread",
-          "Daliya"
+          "Achaar / Butter / Jam / Sauce"
         ],
-        "extra": "Hot Milk"
+        "extra": "Milk"
       },
       "lunch": {
         "items": [
-          "Fried Rice",
-          "Rajma",
-          "Seasonal Veg",
+          "Allu Chole",
+          "Salad",
+          "Dal Channa",
+          "Rice",
+          "Achar",
           "Dahi",
           "Chapati",
-          "Salad",
-          "Achaar",
-          "Thandai"
+          "Papad",
+          "Jal Jeera"
         ],
-        "extra": "Milk, Ice-Cream"
+        "extra": "Milk, Ice Cream"
       },
       "dinner": {
         "items": [
-          "Palak Paneer / Bhindi",
-          "Malka Masoor",
-          "Salad",
+          "Paneer Bhurji / Chili Paneer",
+          "Moong Malka Dal",
           "Chapati",
-          "Achaar"
+          "Rice",
+          "Salad"
         ],
         "extra": "Milk, Rasmalai"
       }
@@ -416,34 +413,31 @@
     "FRI": {
       "breakfast": {
         "items": [
-          "Veg Mayo Sandwich",
-          "Bread",
+          "Chhole Kulche",
+          "Sprouts",
           "Tea",
-          "Butter / Jam / Sauce / Achaar"
+          "Bread with Butter / Jam / Achaar"
         ],
-        "extra": "Hot Milk"
+        "extra": "Milk"
       },
       "lunch": {
         "items": [
-          "Aloo Zeera",
-          "Chana Chilka Dal",
-          "Fried Rice",
-          "Dahi",
+          "Allo Bhujiya",
+          "Kadhi Pakoda",
+          "Veg Rice",
           "Chapati",
-          "Papad",
-          "Salad",
-          "Achaar"
+          "Salad Kheera",
+          "Friers"
         ],
-        "extra": "Chanch, Milk"
+        "extra": "Milk, Ice Cream"
       },
       "dinner": {
         "items": [
-          "White Chana Gravy",
-          "Sabut Masoor Dal",
+          "Allo Puri",
+          "Rice",
           "Chapati",
-          "Suji / Moong Halwa",
-          "Achaar",
-          "Salad"
+          "Salad",
+          "Kheer"
         ],
         "extra": "Milk"
       }
@@ -451,75 +445,64 @@
     "SAT": {
       "breakfast": {
         "items": [
-          "Chhole Kulche",
-          "Nariyal Chutney",
-          "Daliya",
-          "Sprouts",
+          "Fruit Chat",
+          "Macroni",
           "Bread",
           "Butter / Jam / Achaar",
           "Coffee"
         ],
-        "extra": "Hot Milk"
+        "extra": "Milk"
       },
       "lunch": {
         "items": [
-          "Veg Biryani",
-          "Black Chana Dry",
-          "Arhar Dal",
-          "Dahi",
-          "Chapati",
-          "Salad",
-          "Achaar"
+          "Rajma",
+          "Matar Masroom / Ghiya",
+          "Tomato Raita",
+          "Biryani Rice",
+          "Chapati"
         ],
-        "extra": "Milk, Ice-Cream"
+        "extra": "Milk, Ice Cream"
       },
       "dinner": {
         "items": [
-          "Paneer Bhurji / Chilli Paneer",
-          "Rice",
-          "Mix Dal",
-          "Dahi Balle",
-          "Salad",
+          "Mix Veg",
           "Chapati",
-          "Achaar"
+          "Dal Makhani",
+          "Rice",
+          "Salad"
         ],
-        "extra": "Milk"
+        "extra": "Milk, Fruit Cream"
       }
     },
     "SUN": {
       "breakfast": {
         "items": [
-          "Besan Chilla / Vada Pav",
-          "Green Chutney",
-          "Green Chilli",
-          "Bread",
-          "Butter / Jam / Achaar",
-          "Tea",
-          "Dahi"
-        ],
-        "extra": "Hot Milk"
-      },
-      "lunch": {
-        "items": [
-          "Chole Bhature",
-          "Rice",
-          "Lassi (Masala + Sweet)",
-          "Salad",
-          "Achaar"
+          "Besan Chilla",
+          "Green Chatney",
+          "Red Chatney",
+          "Bread with Butter / Jam / Achaar"
         ],
         "extra": "Milk"
       },
+      "lunch": {
+        "items": [
+          "White Channa",
+          "Bhature",
+          "Rice",
+          "Boondi Raita",
+          "Salad"
+        ],
+        "extra": "Milk, Ice Cream, Chhachh"
+      },
       "dinner": {
         "items": [
-          "Mix Veg",
-          "Malai Kofta",
-          "Rice",
-          "Urad + Chana Dal",
+          "Matar Paneer",
+          "Mix Dal",
           "Chapati",
-          "Achaar",
-          "Sevya"
+          "Rice",
+          "Salad"
         ],
-        "extra": "Milk, Fruit Cream"
+        "extra": "Milk, Milk Cake"
       }
     }
   },

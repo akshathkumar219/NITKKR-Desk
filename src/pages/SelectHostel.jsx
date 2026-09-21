@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { Check } from 'lucide-react'
 import PlainShell from '../components/PlainShell'
@@ -26,12 +26,30 @@ export default function SelectHostel() {
   const location = useLocation()
   const from = location.state?.from
   const onboarding = location.state?.onboarding === true
+  const timerRef = useRef(null)
 
-  function save() {
-    update({ hostel: picked, hostelPicked: true })
-    // Last step of setup — finish on the dashboard, not the mess menu.
+  useEffect(() => {
+    return () => {
+      if (timerRef.current) clearTimeout(timerRef.current)
+    }
+  }, [])
+
+  function proceed(hostelCode) {
+    if (timerRef.current) clearTimeout(timerRef.current)
+    const target = hostelCode || picked
+    update({ hostel: target, hostelPicked: true })
     if (onboarding) navigate('/', { replace: true })
     else navigate(from || '/mess')
+  }
+
+  function handleSelectHostel(hostelCode) {
+    setPicked(hostelCode)
+    update({ hostel: hostelCode, hostelPicked: true })
+    if (timerRef.current) clearTimeout(timerRef.current)
+    timerRef.current = setTimeout(() => {
+      if (onboarding) navigate('/', { replace: true })
+      else navigate(from || '/mess')
+    }, 180)
   }
 
   const backAction =
@@ -52,7 +70,7 @@ export default function SelectHostel() {
 
         <button
           type="button"
-          onClick={save}
+          onClick={() => proceed()}
           className="btn btn-go shrink-0 !py-2 !px-5 text-sm font-bold shadow-hard-sm cursor-pointer"
         >
           <Check size={15} strokeWidth={2.75} /> SAVE
@@ -68,7 +86,7 @@ export default function SelectHostel() {
               key={h.code}
               type="button"
               aria-pressed={active}
-              onClick={() => setPicked(h.code)}
+              onClick={() => handleSelectHostel(h.code)}
               className="board board-hard p-3.5 sm:p-4 text-left transition-transform hover:-translate-y-0.5"
               style={active ? { borderColor: 'var(--color-brand)', borderWidth: 3 } : undefined}
             >

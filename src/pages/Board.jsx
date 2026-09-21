@@ -1,7 +1,12 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import {
+  ArrowLeftRight,
+  Calendar,
   CalendarDays,
   Check,
+  ChevronLeft,
+  ChevronRight,
   Clock,
   Coffee,
   GripVertical,
@@ -20,7 +25,7 @@ import { Panel } from '../ui'
 import { SORTED_BRANCHES, YEARS, branchName } from '../data/campus'
 import { baseTimetable, groupsFor } from '../data/timetables'
 import { getNoClassEvent } from '../data/info'
-import { useProfile, useRollcallSettings } from '../lib/storage'
+import { useProfile, useRollcallSettings, useSwipeRollcall } from '../lib/storage'
 import {
   coursesOf,
   filterSessionsByGroup,
@@ -31,9 +36,19 @@ import {
   sessionsForDay,
   useBoard,
 } from '../lib/board'
-import { DAYS, dayCode, fmtRange, minutesNow, todayISO } from '../lib/time'
-import { canSkip, mustAttend, status, tally, useRollcall } from '../lib/rollcall'
+import { DAYS, dayCode, fmtDateShort, fmtRange, isoToDate, minutesNow, todayISO } from '../lib/time'
+import { canSkip, markKey, mustAttend, status, tally, unmarkedSince, useRollcall } from '../lib/rollcall'
 import { getSubjectTheme } from '../lib/palette'
+
+function triggerHaptic(duration = 10) {
+  if (typeof navigator !== 'undefined' && navigator.vibrate) {
+    try {
+      navigator.vibrate(duration)
+    } catch {
+      // Ignore vibration errors
+    }
+  }
+}
 
 
 /* -------------------------------------------------------------- Break Card -- */
@@ -175,8 +190,18 @@ function SessionCard({
   isLive,
   isNext,
   currentMins,
+  swipeMode = false,
 }) {
   const [hoverSim, setHoverSim] = useState(null) // 'present' | 'absent' | null
+  const [dragX, setDragX] = useState(0)
+  const [isAnimating, setIsAnimating] = useState(false)
+
+  const touchStartRef = useRef({ x: 0, y: 0 })
+  const dragXRef = useRef(0)
+  const isSwipingRef = useRef(false)
+  const directionRef = useRef(null) // null | 'horizontal' | 'vertical'
+  const hasFiredHaptic = useRef(false)
+
   const theme = getSubjectTheme(session)
 
   // Per-subject target cutoff override (if customized) or institute default
@@ -187,7 +212,132 @@ function SessionCard({
   const actualPercent = tallyData?.percent != null ? Math.round(tallyData.percent) : null
   const st = status(tallyData?.percent ?? null, effectiveCutoff)
 
-  // Bunk Simulator Ghost Percentage calculation on button hover
+  // Gesture handling
+  const handleTouchStart = (e) => {
+    if (!swipeMode || editing) return
+    const touch = e.touches[0]
+    touchStartRef.current = { x: touch.clientX, y: touch.clientY }
+    dragXRef.current = 0
+    isSwipingRef.current = true
+    directionRef.current = null
+    hasFiredHaptic.current = false
+    setIsAnimating(false)
+  }
+
+  const handleTouchMove = (e) => {
+    if (!isSwipingRef.current || !swipeMode || editing) return
+    const touch = e.touches[0]
+    const diffX = touch.clientX - touchStartRef.current.x
+    const diffY = touch.clientY - touchStartRef.current.y
+
+    if (directionRef.current === null) {
+      if (Math.abs(diffY) > 8 && Math.abs(diffY) > Math.abs(diffX)) {
+        directionRef.current = 'vertical'
+        return
+      }
+      if (Math.abs(diffX) > 8 && Math.abs(diffX) > Math.abs(diffY)) {
+        directionRef.current = 'horizontal'
+      } else {
+        return
+      }
+    }
+
+    if (directionRef.current === 'horizontal') {
+      let nextX = diffX
+      const maxDist = 120
+      if (Math.abs(nextX) > maxDist) {
+        nextX = Math.sign(nextX) * (maxDist + (Math.abs(nextX) - maxDist) * 0.25)
+      }
+      dragXRef.current = nextX
+      setDragX(nextX)
+
+      const THRESHOLD = 65
+      if (Math.abs(nextX) >= THRESHOLD && !hasFiredHaptic.current) {
+        hasFiredHaptic.current = true
+        triggerHaptic(14)
+      } else if (Math.abs(nextX) < THRESHOLD && hasFiredHaptic.current) {
+        hasFiredHaptic.current = false
+      }
+    }
+  }
+
+  const handleTouchEnd = () => {
+    if (!isSwipingRef.current || !swipeMode || editing) return
+    isSwipingRef.current = false
+    const THRESHOLD = 65
+    const finalX = dragXRef.current
+
+    if (directionRef.current === 'horizontal') {
+      if (finalX >= THRESHOLD) {
+        triggerHaptic(20)
+        onMark(session.id, 'present')
+      } else if (finalX <= -THRESHOLD) {
+        triggerHaptic(20)
+        onMark(session.id, 'absent')
+      }
+    }
+
+    dragXRef.current = 0
+    directionRef.current = null
+    hasFiredHaptic.current = false
+    setIsAnimating(true)
+    setDragX(0)
+  }
+
+  const handleMouseDown = (e) => {
+    if (!swipeMode || editing || e.button !== 0) return
+    if (e.target.closest('button') || e.target.closest('input')) return
+    touchStartRef.current = { x: e.clientX, y: e.clientY }
+    dragXRef.current = 0
+    isSwipingRef.current = true
+    directionRef.current = null
+    hasFiredHaptic.current = false
+    setIsAnimating(false)
+
+    const onMouseMove = (moveEv) => {
+      if (!isSwipingRef.current) return
+      const diffX = moveEv.clientX - touchStartRef.current.x
+      const diffY = moveEv.clientY - touchStartRef.current.y
+
+      if (directionRef.current === null) {
+        if (Math.abs(diffX) > 6 && Math.abs(diffX) > Math.abs(diffY)) {
+          directionRef.current = 'horizontal'
+        } else if (Math.abs(diffY) > 6) {
+          directionRef.current = 'vertical'
+          return
+        }
+      }
+
+      if (directionRef.current === 'horizontal') {
+        let nextX = diffX
+        const maxDist = 120
+        if (Math.abs(nextX) > maxDist) {
+          nextX = Math.sign(nextX) * (maxDist + (Math.abs(nextX) - maxDist) * 0.25)
+        }
+        dragXRef.current = nextX
+        setDragX(nextX)
+
+        const THRESHOLD = 65
+        if (Math.abs(nextX) >= THRESHOLD && !hasFiredHaptic.current) {
+          hasFiredHaptic.current = true
+          triggerHaptic(14)
+        } else if (Math.abs(nextX) < THRESHOLD && hasFiredHaptic.current) {
+          hasFiredHaptic.current = false
+        }
+      }
+    }
+
+    const onMouseUp = () => {
+      window.removeEventListener('mousemove', onMouseMove)
+      window.removeEventListener('mouseup', onMouseUp)
+      handleTouchEnd()
+    }
+
+    window.addEventListener('mousemove', onMouseMove)
+    window.addEventListener('mouseup', onMouseUp)
+  }
+
+  // Bunk Simulator Ghost Percentage calculation on button hover or swipe drag
   let displayPercent = actualPercent
   let simDelta = 0
   let isSimulating = false
@@ -197,14 +347,17 @@ function SessionCard({
     ? Number(session.attendanceCredits)
     : (session.type === 'lab' || (session.name || '').toUpperCase().includes('LAB') ? 2 : 1)
 
-  if (hoverSim === 'present') {
+  const dragSim = swipeMode && !editing ? (dragX > 25 ? 'present' : dragX < -25 ? 'absent' : null) : null
+  const effectiveSim = hoverSim || dragSim
+
+  if (effectiveSim === 'present') {
     isSimulating = true
     const nextPresent = mark === 'present' ? presentCount : presentCount + credit
     const nextHeld = mark === 'present' ? heldCount : mark === 'absent' ? heldCount : heldCount + credit
     displayPercent = nextHeld > 0 ? Math.round((nextPresent / nextHeld) * 100) : 100
     simDelta = actualPercent != null ? displayPercent - actualPercent : 0
     simStatus = status(displayPercent, effectiveCutoff)
-  } else if (hoverSim === 'absent') {
+  } else if (effectiveSim === 'absent') {
     isSimulating = true
     const nextPresent = mark === 'present' ? Math.max(0, presentCount - credit) : presentCount
     const nextHeld = mark === 'absent' ? heldCount : mark === 'present' ? heldCount : heldCount + credit
@@ -224,21 +377,8 @@ function SessionCard({
     session.group ? `Grp ${session.group}` : null,
   ].filter(Boolean)
 
-  return (
-    <Panel
-      className={`board board-hard bg-[var(--surface)] pad-card flex flex-col justify-between transition-all hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-hard-lg border-l-4 sm:border-l-[6px] ${
-        isLive
-          ? '!border-[var(--color-present)] shadow-[0_0_18px_rgba(143,254,9,0.35)] ring-1 ring-[var(--color-present)]/60'
-          : isNext
-            ? '!border-[var(--color-amber)]/70 ring-1 ring-[var(--color-amber)]/30'
-            : ''
-      }`}
-      style={{
-        borderLeftColor: isLive ? 'var(--color-present)' : isNext ? 'var(--color-amber)' : theme.accent,
-        backgroundColor: isNext ? 'color-mix(in srgb, var(--color-amber) 10%, var(--surface))' : undefined,
-        minHeight: 200,
-      }}
-    >
+  const cardContent = (
+    <>
       <div>
         {/* Unified Top Header Row */}
         <div className="flex items-center justify-between gap-2">
@@ -399,6 +539,56 @@ function SessionCard({
             <Pencil className="icon-micro" /> EDIT
           </button>
         </div>
+      ) : swipeMode ? (
+        <div className="mt-3 flex items-center justify-between gap-2 border-t border-[var(--border)]/70 pt-2.5">
+          {/* Direction Hint */}
+          <div className="flex items-center gap-1.5 text-[0.625rem] sm:text-xs font-bold uppercase tracking-wider text-[var(--muted)] select-none">
+            <ArrowLeftRight className="icon-micro shrink-0 opacity-70" />
+            <span className="hidden xs:inline">SWIPE:</span>
+            <span className="text-[var(--color-absent)] font-black">← BUNK</span>
+            <span className="opacity-40">·</span>
+            <span className="text-[var(--color-present)] font-black">ATTEND →</span>
+          </div>
+
+          {/* Cancel button & Reset */}
+          <div className="flex items-center gap-1.5 shrink-0">
+            <button
+              type="button"
+              className={`py-1 px-2.5 text-[0.6875rem] sm:text-xs font-bold tracking-wider uppercase rounded flex items-center gap-1 transition-all active:scale-95 cursor-pointer border ${
+                mark === 'cancelled'
+                  ? '!bg-[var(--color-cancelled)] !text-[var(--on-accent)] shadow-xs border-transparent font-extrabold'
+                  : 'border-[var(--border)] bg-[var(--surface-2)] text-[var(--muted)] hover:text-[var(--text)] hover:bg-[var(--surface)]'
+              }`}
+              onClick={(e) => {
+                e.stopPropagation()
+                setHoverSim(null)
+                onMark(session.id, mark === 'cancelled' ? null : 'cancelled')
+              }}
+              title={mark === 'cancelled' ? 'Unmark cancelled' : 'Mark class cancelled'}
+            >
+              <span className="truncate">CANCELLED</span>
+            </button>
+
+            <button
+              type="button"
+              disabled={!mark}
+              className={`p-1 rounded flex items-center justify-center transition-all ${
+                mark
+                  ? 'text-[var(--muted)] hover:text-[var(--text)] hover:bg-[var(--surface-2)] cursor-pointer active:scale-95'
+                  : 'text-[var(--muted)]/30 opacity-30 cursor-not-allowed'
+              }`}
+              onClick={(e) => {
+                e.stopPropagation()
+                setHoverSim(null)
+                if (mark) onResetMark(session.id)
+              }}
+              title={mark ? 'Reset attendance mark' : 'No mark recorded yet'}
+              aria-label="Reset attendance mark"
+            >
+              <RotateCcw className="icon-micro shrink-0" strokeWidth={2.5} />
+            </button>
+          </div>
+        </div>
       ) : (
         <div className="mt-3 flex items-center rounded border-2 border-[var(--border-strong)] bg-[var(--surface-2)] p-0.5 shadow-xs overflow-hidden">
           <button
@@ -482,6 +672,105 @@ function SessionCard({
           </button>
         </div>
       )}
+    </>
+  )
+
+  if (swipeMode && !editing) {
+    return (
+      <div
+        className={`board board-hard relative overflow-hidden rounded select-none ${
+          isLive
+            ? '!border-[var(--color-present)] shadow-[0_0_18px_rgba(143,254,9,0.35)] ring-1 ring-[var(--color-present)]/60'
+            : isNext
+              ? '!border-[var(--color-amber)]/70 ring-1 ring-[var(--color-amber)]/30'
+              : ''
+        }`}
+        style={{
+          minHeight: 200,
+          borderLeftColor: isLive ? 'var(--color-present)' : isNext ? 'var(--color-amber)' : theme.accent,
+          backgroundColor: 'var(--surface)',
+        }}
+      >
+        {/* Green Present Underlay (Revealed on Swipe Right) */}
+        <div
+          className="absolute inset-0 bg-[var(--color-present)] flex items-center justify-start pl-6 font-black tracking-wider text-black select-none pointer-events-none transition-opacity duration-150"
+          style={{ opacity: dragX > 5 ? 1 : 0 }}
+        >
+          <div
+            className={`flex items-center gap-2 transition-transform duration-100 ${
+              dragX >= 65 ? 'scale-110 font-extrabold' : 'scale-95 opacity-80'
+            }`}
+          >
+            <Check className="size-6 shrink-0 text-black" strokeWidth={3} />
+            <span className="text-xs sm:text-sm font-black tracking-widest uppercase">
+              PRESENT {dragX >= 65 ? '✓' : ''}
+            </span>
+          </div>
+        </div>
+
+        {/* Red Absent Underlay (Revealed on Swipe Left) */}
+        <div
+          className="absolute inset-0 bg-[var(--color-absent)] flex items-center justify-end pr-6 font-black tracking-wider text-white select-none pointer-events-none transition-opacity duration-150"
+          style={{ opacity: dragX < -5 ? 1 : 0 }}
+        >
+          <div
+            className={`flex items-center gap-2 transition-transform duration-100 ${
+              dragX <= -65 ? 'scale-110 font-extrabold' : 'scale-95 opacity-80'
+            }`}
+          >
+            <span className="text-xs sm:text-sm font-black tracking-widest uppercase">
+              ABSENT {dragX <= -65 ? '✗' : ''}
+            </span>
+            <X className="size-6 shrink-0 text-white" strokeWidth={3} />
+          </div>
+        </div>
+
+        {/* Front Sliding Card Face */}
+        <div
+          onTouchStart={handleTouchStart}
+          onTouchMove={handleTouchMove}
+          onTouchEnd={handleTouchEnd}
+          onTouchCancel={handleTouchEnd}
+          onMouseDown={handleMouseDown}
+          onTransitionEnd={() => setIsAnimating(false)}
+          className={`bg-[var(--surface)] pad-card flex flex-col justify-between h-full border-l-4 sm:border-l-[6px] cursor-grab active:cursor-grabbing ${
+            isLive
+              ? '!border-l-[var(--color-present)]'
+              : isNext
+                ? '!border-l-[var(--color-amber)]'
+                : ''
+          }`}
+          style={{
+            borderLeftColor: isLive ? 'var(--color-present)' : isNext ? 'var(--color-amber)' : theme.accent,
+            backgroundColor: isNext ? 'color-mix(in srgb, var(--color-amber) 10%, var(--surface))' : 'var(--surface)',
+            minHeight: 200,
+            transform: `translateX(${dragX}px)`,
+            transition: isAnimating ? 'transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1)' : 'none',
+            touchAction: 'pan-y',
+          }}
+        >
+          {cardContent}
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <Panel
+      className={`board board-hard bg-[var(--surface)] pad-card flex flex-col justify-between transition-all hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-hard-lg border-l-4 sm:border-l-[6px] ${
+        isLive
+          ? '!border-[var(--color-present)] shadow-[0_0_18px_rgba(143,254,9,0.35)] ring-1 ring-[var(--color-present)]/60'
+          : isNext
+            ? '!border-[var(--color-amber)]/70 ring-1 ring-[var(--color-amber)]/30'
+            : ''
+      }`}
+      style={{
+        borderLeftColor: isLive ? 'var(--color-present)' : isNext ? 'var(--color-amber)' : theme.accent,
+        backgroundColor: isNext ? 'color-mix(in srgb, var(--color-amber) 10%, var(--surface))' : undefined,
+        minHeight: 200,
+      }}
+    >
+      {cardContent}
     </Panel>
   )
 }
@@ -633,22 +922,330 @@ function WeekGrid({ sessions, editing, onEdit, onDrop, onAddDay }) {
   )
 }
 
+/* ----------------------------------------------------------- Calendar View -- */
+
+const MONTH_NAMES = [
+  'JANUARY', 'FEBRUARY', 'MARCH', 'APRIL', 'MAY', 'JUNE',
+  'JULY', 'AUGUST', 'SEPTEMBER', 'OCTOBER', 'NOVEMBER', 'DECEMBER'
+]
+const CALENDAR_WEEKDAYS = ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN']
+
+function CalendarView({
+  sessions,
+  marks,
+  since,
+  activeIso,
+  onSelectDate,
+}) {
+  const [currentMonth, setCurrentMonth] = useState(() => new Date())
+  const todayStr = useMemo(() => todayISO(), [])
+
+  const year = currentMonth.getFullYear()
+  const month = currentMonth.getMonth()
+
+  // Generate calendar matrix for month
+  const daysInMonth = new Date(year, month + 1, 0).getDate()
+  const firstDayIndex = (new Date(year, month, 1).getDay() + 6) % 7 // MON = 0
+  const totalWeeks = Math.ceil((firstDayIndex + daysInMonth) / 7)
+  const totalCells = totalWeeks * 7
+
+  const daysArray = useMemo(() => {
+    const days = []
+    for (let i = 0; i < firstDayIndex; i++) {
+      days.push(null)
+    }
+    for (let d = 1; d <= daysInMonth; d++) {
+      const formattedMonth = String(month + 1).padStart(2, '0')
+      const formattedDay = String(d).padStart(2, '0')
+      const iso = `${year}-${formattedMonth}-${formattedDay}`
+      days.push({ dayNumber: d, iso })
+    }
+    while (days.length < totalCells) {
+      days.push(null)
+    }
+    return days
+  }, [year, month, daysInMonth, firstDayIndex, totalCells])
+
+  // Unmarked sessions in tracking window up to today
+  const pendingUnmarked = useMemo(() => {
+    return unmarkedSince(sessions, marks, since, todayStr)
+  }, [sessions, marks, since, todayStr])
+
+  const pendingDates = useMemo(() => {
+    return [...new Set(pendingUnmarked.map((p) => p.iso))].slice(0, 14)
+  }, [pendingUnmarked])
+
+  const handlePrevMonth = () => {
+    triggerHaptic(8)
+    setCurrentMonth(new Date(year, month - 1, 1))
+  }
+
+  const handleNextMonth = () => {
+    triggerHaptic(8)
+    setCurrentMonth(new Date(year, month + 1, 1))
+  }
+
+  const handleGoToday = () => {
+    triggerHaptic(10)
+    setCurrentMonth(new Date())
+  }
+
+  return (
+    <div className="flex-1 overflow-y-auto min-h-0 no-scrollbar space-y-3 pb-4">
+      {/* Top Month Navigation Bar */}
+      <Panel className="board board-hard bg-[var(--surface)] pad-card flex items-center justify-between gap-2 shadow-xs">
+        <div className="flex items-center gap-1.5 sm:gap-2">
+          <button
+            type="button"
+            onClick={handlePrevMonth}
+            className="btn !p-1.5 sm:!p-2 cursor-pointer transition-all border-2 border-[var(--border)] bg-[var(--surface-2)] text-[var(--text)] hover:-translate-x-0.5 hover:shadow-hard-sm"
+            aria-label="Previous month"
+            title="Previous month"
+          >
+            <ChevronLeft className="icon-sm" strokeWidth={2.5} />
+          </button>
+          <span className="text-xs sm:text-base font-black tracking-wider uppercase px-2 text-[var(--text)]">
+            {MONTH_NAMES[month]} {year}
+          </span>
+          <button
+            type="button"
+            onClick={handleNextMonth}
+            className="btn !p-1.5 sm:!p-2 cursor-pointer transition-all border-2 border-[var(--border)] bg-[var(--surface-2)] text-[var(--text)] hover:translate-x-0.5 hover:shadow-hard-sm"
+            aria-label="Next month"
+            title="Next month"
+          >
+            <ChevronRight className="icon-sm" strokeWidth={2.5} />
+          </button>
+        </div>
+
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={handleGoToday}
+            className="btn !py-1 sm:!py-1.5 !px-2.5 sm:!px-3 text-[0.6875rem] sm:text-xs font-bold uppercase tracking-wider cursor-pointer border-2 border-[var(--border)] bg-[var(--surface-2)] text-[var(--text)] hover:bg-[var(--surface)] hover:shadow-hard-sm"
+          >
+            THIS MONTH
+          </button>
+        </div>
+      </Panel>
+
+      {/* Quick Unmarked Backfill Strip */}
+      {pendingDates.length > 0 && (
+        <Panel className="board board-hard bg-[var(--surface)] pad-card border-l-4 border-l-[var(--color-amber)] shadow-xs">
+          <div className="flex items-center gap-2 mb-2">
+            <span className="text-xs font-black uppercase tracking-wider text-[var(--color-amber)]">
+              ⚡ {pendingDates.length} UNMARKED DAYS
+            </span>
+            <span className="t-micro muted font-semibold">Tap to jump & fix attendance:</span>
+          </div>
+          <div className="flex flex-wrap gap-1.5">
+            {pendingDates.map((d) => (
+              <button
+                key={d}
+                type="button"
+                onClick={() => onSelectDate(d)}
+                className="btn !py-1 !px-2 text-[0.6875rem] sm:text-xs font-bold uppercase tracking-wider cursor-pointer border-2 border-[var(--border)] bg-[var(--surface-2)] text-[var(--text)] hover:border-[var(--color-amber)] hover:-translate-y-0.5 hover:shadow-hard-sm"
+              >
+                {fmtDateShort(d)}
+              </button>
+            ))}
+          </div>
+        </Panel>
+      )}
+
+      {/* Calendar Matrix Card */}
+      <Panel className="board board-hard bg-[var(--surface)] p-2 sm:p-4 shadow-xs">
+        {/* Weekday Header Columns */}
+        <div className="grid grid-cols-7 gap-1 sm:gap-2 mb-1.5">
+          {CALENDAR_WEEKDAYS.map((wd) => (
+            <div
+              key={wd}
+              className="text-center py-1 text-[0.625rem] sm:text-xs font-black uppercase tracking-wider text-[var(--muted)]"
+            >
+              {wd}
+            </div>
+          ))}
+        </div>
+
+        {/* Calendar Day Cells */}
+        <div className="grid grid-cols-7 gap-1 sm:gap-2">
+          {daysArray.map((cell, idx) => {
+            if (!cell) {
+              return (
+                <div
+                  key={`empty-${idx}`}
+                  className="min-h-[58px] sm:min-h-[76px] rounded bg-[var(--surface-2)]/30 border border-dashed border-[var(--border)]/30 opacity-30 pointer-events-none"
+                />
+              )
+            }
+
+            const { dayNumber, iso } = cell
+            const dCode = dayCode(isoToDate(iso))
+            const teachingSessions = sessionsForDay(sessions, dCode).filter((s) => s.type !== 'break')
+            const hasClasses = teachingSessions.length > 0
+            const noClass = getNoClassEvent(iso)
+            const isToday = iso === todayStr
+            const isSelected = iso === activeIso
+            const isPast = iso < todayStr
+
+            // Attendance marks summary
+            let presentCount = 0
+            let absentCount = 0
+            let cancelledCount = 0
+            let unmarkedCount = 0
+
+            if (hasClasses && !noClass && iso <= todayStr) {
+              for (const s of teachingSessions) {
+                const m = marks[markKey(iso, s.id)]
+                if (m === 'present') presentCount += 1
+                else if (m === 'absent') absentCount += 1
+                else if (m === 'cancelled') cancelledCount += 1
+                else unmarkedCount += 1
+              }
+            }
+
+            const hasUnmarked = isPast && hasClasses && !noClass && unmarkedCount > 0
+
+            return (
+              <button
+                key={iso}
+                type="button"
+                onClick={() => onSelectDate(iso)}
+                className={`min-h-[58px] sm:min-h-[76px] p-1.5 sm:p-2 rounded border-2 text-left flex flex-col justify-between transition-all cursor-pointer relative overflow-hidden group ${
+                  isSelected
+                    ? '!bg-[var(--text)] !text-[var(--bg)] !border-[var(--text)] shadow-hard-sm'
+                    : isToday
+                      ? 'bg-[var(--surface)] border-[var(--color-present)] ring-2 ring-[var(--color-present)]/40 shadow-xs'
+                      : hasUnmarked
+                        ? 'bg-[var(--surface-2)] border-[var(--color-amber)] hover:border-[var(--text)]'
+                        : 'bg-[var(--surface-2)] border-[var(--border)] hover:bg-[var(--surface)] hover:border-[var(--text)] hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-hard-sm'
+                }`}
+                title={
+                  noClass
+                    ? `${fmtDateShort(iso)}: ${noClass.label} (No Classes)`
+                    : hasClasses
+                      ? `${fmtDateShort(iso)}: ${teachingSessions.length} classes scheduled`
+                      : `${fmtDateShort(iso)}: No classes scheduled`
+                }
+              >
+                {/* Day Number + Today / Unmarked Indicator */}
+                <div className="flex items-center justify-between gap-1">
+                  <span
+                    className={`text-xs sm:text-sm font-black font-mono leading-none ${
+                      isSelected ? 'text-[var(--bg)]' : isToday ? 'text-[var(--color-present)]' : 'text-[var(--text)]'
+                    }`}
+                  >
+                    {dayNumber}
+                  </span>
+                  {isToday ? (
+                    <span
+                      className={`text-[0.55rem] sm:text-[0.625rem] font-black uppercase px-1 py-0.2 rounded border ${
+                        isSelected
+                          ? 'bg-[var(--bg)] text-[var(--text)] border-transparent'
+                          : 'bg-[var(--color-present)]/20 text-[var(--color-present)] border-[var(--color-present)]/40'
+                      }`}
+                    >
+                      NOW
+                    </span>
+                  ) : hasUnmarked ? (
+                    <span
+                      className={`size-2 rounded-full shrink-0 ${
+                        isSelected ? 'bg-[var(--bg)]' : 'bg-[var(--color-amber)] animate-pulse'
+                      }`}
+                      title={`${unmarkedCount} unmarked classes`}
+                    />
+                  ) : null}
+                </div>
+
+                {/* Status Pills / Dots */}
+                <div className="mt-1 flex items-center gap-1 flex-wrap">
+                  {noClass ? (
+                    <span
+                      className={`text-[0.55rem] sm:text-[0.625rem] font-bold uppercase truncate max-w-full px-1 py-0.2 rounded ${
+                        isSelected
+                          ? 'bg-[var(--bg)] text-[var(--text)]'
+                          : noClass.isExam
+                            ? 'bg-[var(--color-coral)] text-white'
+                            : noClass.isBreak
+                              ? 'bg-[var(--color-acid)] text-black'
+                              : 'bg-[var(--color-amber)] text-black'
+                      }`}
+                    >
+                      {noClass.category || 'OFF'}
+                    </span>
+                  ) : hasClasses ? (
+                    <div className="flex items-center gap-1">
+                      {isPast ? (
+                        unmarkedCount === 0 ? (
+                          absentCount > 0 ? (
+                            <span className="size-2 rounded-full bg-[var(--color-absent)] shrink-0" title={`${absentCount} bunked`} />
+                          ) : (
+                            <span className="size-2 rounded-full bg-[var(--color-present)] shrink-0" title="All attended" />
+                          )
+                        ) : (
+                          <span className="text-[0.55rem] sm:text-[0.625rem] font-mono font-bold text-[var(--color-amber)]">
+                            {presentCount + absentCount}/{teachingSessions.length}
+                          </span>
+                        )
+                      ) : (
+                        <span className="text-[0.55rem] sm:text-[0.625rem] font-mono muted">
+                          {teachingSessions.length}C
+                        </span>
+                      )}
+                    </div>
+                  ) : (
+                    <span className="text-[0.55rem] sm:text-[0.625rem] font-mono muted opacity-40">
+                      —
+                    </span>
+                  )}
+                </div>
+              </button>
+            )
+          })}
+        </div>
+      </Panel>
+    </div>
+  )
+}
+
 /* ------------------------------------------------------------- Main Page -- */
 
 export default function Board() {
   const { profile, year, group, setBranch, setYear, setGroup } = useProfile()
   const { sessions, addSession, removeSession, moveSession, resetBoard, clearBoard, isCustomised } =
     useBoard(profile.branch, year)
-  const { marks, getMark, setMark } = useRollcall()
+  const { marks, getMark, setMark, markBatch, unmarkBatch } = useRollcall()
 
+  const [searchParams] = useSearchParams()
   const today = dayCode()
-  const [day, setDay] = useState(DAYS.includes(today) ? today : 'MON')
-  const [view, setView] = useState('day')
+  const initialView = searchParams.get('view') === 'calendar' ? 'calendar' : (searchParams.get('view') === 'week' ? 'week' : 'day')
+  const [view, setView] = useState(initialView)
+  const [selectedIso, setSelectedIso] = useState(searchParams.get('date') || null)
+
+  const [day, setDay] = useState(() => {
+    const dParam = searchParams.get('date')
+    if (dParam) {
+      return dayCode(isoToDate(dParam))
+    }
+    return DAYS.includes(today) ? today : 'MON'
+  })
   const [query, setQuery] = useState('')
   const [editing, setEditing] = useState(false)
-  const [hideBreaks, setHideBreaks] = useState(false)
   const [modal, setModal] = useState({ open: false, session: null, day: null })
   const [resetModalOpen, setResetModalOpen] = useState(false)
+
+  // React to URL query param updates
+  useEffect(() => {
+    const v = searchParams.get('view')
+    if (v === 'calendar' || v === 'week' || v === 'day') {
+      setView(v)
+    }
+    const d = searchParams.get('date')
+    if (d) {
+      setSelectedIso(d)
+      setDay(dayCode(isoToDate(d)))
+    }
+  }, [searchParams])
 
   useEffect(() => {
     if (!resetModalOpen) return
@@ -660,6 +1257,7 @@ export default function Board() {
   }, [resetModalOpen])
 
   const [settings] = useRollcallSettings()
+  const [swipeMode, setSwipeMode] = useSwipeRollcall()
   const required = settings?.required ?? 65
   const since = settings?.trackingSince
 
@@ -683,8 +1281,11 @@ export default function Board() {
     return todayISO(targetDate)
   }, [])
 
-  // Computes the ISO calendar date for the selected weekday in the current week
-  const activeIso = useMemo(() => getIsoForWeekday(day), [day, getIsoForWeekday])
+  // Computes the ISO calendar date for the selected weekday in the current week (or returns selectedIso if set)
+  const activeIso = useMemo(() => {
+    if (selectedIso) return selectedIso
+    return getIsoForWeekday(day)
+  }, [selectedIso, day, getIsoForWeekday])
 
   const noClassEvent = useMemo(() => getNoClassEvent(activeIso), [activeIso])
 
@@ -714,36 +1315,70 @@ export default function Board() {
     return filterSessionsByGroup(sessions, group)
   }, [sessions, group])
 
-  // Filter by search query & hideBreaks
+  // Filter by search query
   const filtered = useMemo(() => {
-    let list = groupFiltered
-    if (hideBreaks) {
-      list = list.filter((s) => s.type !== 'break')
-    }
     const q = query.trim().toLowerCase()
-    if (!q) return list
-    return list.filter((s) =>
+    if (!q) return groupFiltered
+    return groupFiltered.filter((s) =>
       [s.name, s.code, s.room, s.group, s.instructor, s.note]
         .filter(Boolean)
         .join(' ')
         .toLowerCase()
         .includes(q),
     )
-  }, [groupFiltered, hideBreaks, query])
+  }, [groupFiltered, query])
 
   const dayList = useMemo(() => {
     const list = sessionsForDay(filtered, day)
-    if (!hideBreaks && !query.trim()) {
+    if (!query.trim()) {
       return insertAutoBreaks(list)
     }
     return list
-  }, [filtered, day, hideBreaks, query])
+  }, [filtered, day, query])
 
   // Next upcoming session today (suppressed on no-class days such as mid-sems or holidays)
   const nextSess = useMemo(() => {
     if (day !== today || noClassEvent) return null
     return nextSession(dayList, today, currentMins)
   }, [day, today, noClassEvent, dayList, currentMins])
+
+  const dayTeachingSessions = useMemo(() => {
+    return dayList.filter((s) => s.type !== 'break')
+  }, [dayList])
+
+  const handleMarkDayAllPresent = useCallback(() => {
+    triggerHaptic(15)
+    const entries = dayTeachingSessions.map((s) => ({ iso: activeIso, sessionId: s.id }))
+    markBatch(entries, 'present')
+  }, [dayTeachingSessions, activeIso, markBatch])
+
+  const handleMarkDayAllCancelled = useCallback(() => {
+    triggerHaptic(12)
+    const entries = dayTeachingSessions.map((s) => ({ iso: activeIso, sessionId: s.id }))
+    markBatch(entries, 'cancelled')
+  }, [dayTeachingSessions, activeIso, markBatch])
+
+  const handleResetDayMarks = useCallback(() => {
+    triggerHaptic(10)
+    const entries = dayTeachingSessions.map((s) => ({ iso: activeIso, sessionId: s.id }))
+    unmarkBatch(entries)
+  }, [dayTeachingSessions, activeIso, unmarkBatch])
+
+  const handleSelectDate = useCallback((iso) => {
+    triggerHaptic(12)
+    setSelectedIso(iso)
+    const targetDay = dayCode(isoToDate(iso))
+    setDay(targetDay)
+    setView('day')
+  }, [])
+
+  const displayDays = useMemo(() => {
+    if (selectedIso) {
+      const d = dayCode(isoToDate(selectedIso))
+      if (!DAYS.includes(d)) return [...DAYS, d]
+    }
+    return DAYS
+  }, [selectedIso])
 
   return (
     <Shell>
@@ -827,15 +1462,21 @@ export default function Board() {
           {/* Controls Sub-Bar: Day Switcher & View Switcher */}
           <div className="pt-3.5 border-t-2 border-[var(--border)] flex flex-wrap items-center justify-between gap-3">
             <div className="flex flex-wrap items-center gap-1.5">
-              {DAYS.map((d) => {
+              {displayDays.map((d) => {
                 const isActive = day === d
-                const isTodayDot = d === today
-                const dNoClass = getNoClassEvent(getIsoForWeekday(d))
+                const isTodayDot = d === today && !selectedIso
+                const dIso = getIsoForWeekday(d)
+                const dNoClass = getNoClassEvent(dIso)
                 return (
                   <button
                     key={d}
                     type="button"
-                    onClick={() => setDay(d)}
+                    onClick={() => {
+                      triggerHaptic(8)
+                      setSelectedIso(null)
+                      setDay(d)
+                      if (view === 'calendar') setView('day')
+                    }}
                     title={dNoClass ? `${d}: ${dNoClass.label} (No classes scheduled)` : d}
                     className={`btn !px-3 !py-1.5 text-xs sm:text-sm font-bold uppercase flex items-center gap-1.5 cursor-pointer transition-all ${
                       isActive
@@ -867,7 +1508,7 @@ export default function Board() {
               })}
             </div>
 
-            {/* View Switcher: List vs Week Grid (DESKTOP ONLY) */}
+            {/* View Switcher: List vs Week Grid vs Calendar (DESKTOP ONLY) */}
             <div className="hidden sm:flex items-center gap-1.5">
               <button
                 type="button"
@@ -876,7 +1517,10 @@ export default function Board() {
                     ? '!bg-[var(--text)] !text-[var(--bg)] !border-[var(--text)] shadow-hard-sm'
                     : 'bg-[var(--surface-2)] text-[var(--text)] hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-hard-sm'
                 }`}
-                onClick={() => setView('day')}
+                onClick={() => {
+                  triggerHaptic(8)
+                  setView('day')
+                }}
                 aria-label="Day view"
                 title="Day List View"
               >
@@ -889,11 +1533,30 @@ export default function Board() {
                     ? '!bg-[var(--text)] !text-[var(--bg)] !border-[var(--text)] shadow-hard-sm'
                     : 'bg-[var(--surface-2)] text-[var(--text)] hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-hard-sm'
                 }`}
-                onClick={() => setView('week')}
+                onClick={() => {
+                  triggerHaptic(8)
+                  setView('week')
+                }}
                 aria-label="Week view"
                 title="Week Matrix Grid"
               >
                 <LayoutGrid className="icon-sm" strokeWidth={2.5} />
+              </button>
+              <button
+                type="button"
+                className={`btn !px-2.5 !py-1.5 cursor-pointer transition-all border-2 border-[var(--border)] ${
+                  view === 'calendar'
+                    ? '!bg-[var(--text)] !text-[var(--bg)] !border-[var(--text)] shadow-hard-sm'
+                    : 'bg-[var(--surface-2)] text-[var(--text)] hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-hard-sm'
+                }`}
+                onClick={() => {
+                  triggerHaptic(8)
+                  setView('calendar')
+                }}
+                aria-label="Calendar view"
+                title="Calendar & History"
+              >
+                <Calendar className="icon-sm" strokeWidth={2.5} />
               </button>
             </div>
           </div>
@@ -921,21 +1584,29 @@ export default function Board() {
             {/* Edit & Preference Action Buttons + Mobile View Switcher */}
             <div className="flex items-center justify-between sm:justify-start gap-2">
               <div className="flex items-center gap-1.5 sm:gap-2">
-                {/* Hide Breaks Toggle */}
-                <button
-                  type="button"
-                  className={`btn !py-1.5 sm:!py-2 !px-2.5 sm:!px-3 text-xs sm:text-sm font-bold tracking-wider uppercase flex items-center gap-1.5 cursor-pointer transition-all border-2 border-[var(--border)] ${
-                    hideBreaks
-                      ? '!bg-[var(--text)] !text-[var(--bg)] !border-[var(--text)] shadow-hard-sm'
-                      : 'bg-[var(--surface-2)] text-[var(--text)] hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-hard-sm'
-                  }`}
-                  onClick={() => setHideBreaks(!hideBreaks)}
-                  title={hideBreaks ? 'Showing teaching classes only' : 'Showing all sessions'}
-                >
-                  <Coffee className="icon-micro" />
-                  <span>{hideBreaks ? 'NO BREAKS' : 'ALL'}</span>
-                </button>
-
+                {!editing && (
+                  <button
+                    type="button"
+                    className={`btn !py-1.5 sm:!py-2 !px-2.5 sm:!px-3 text-xs sm:text-sm font-bold tracking-wider uppercase flex items-center gap-1.5 cursor-pointer transition-all border-2 border-[var(--border)] ${
+                      swipeMode
+                        ? '!bg-[var(--text)] !text-[var(--bg)] !border-[var(--text)] shadow-hard-sm'
+                        : 'bg-[var(--surface-2)] text-[var(--text)] hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-hard-sm'
+                    }`}
+                    onClick={() => {
+                      triggerHaptic(10)
+                      setSwipeMode((v) => !v)
+                    }}
+                    aria-label={swipeMode ? 'Disable swipe rollcall mode' : 'Enable swipe rollcall mode'}
+                    title={
+                      swipeMode
+                        ? 'Swipe mode enabled: Swipe card right for Present, left for Absent. Tap to switch to 3-button mode.'
+                        : 'Switch to Swipe mode: Swipe cards to mark attendance.'
+                    }
+                  >
+                    <ArrowLeftRight className="icon-sm" strokeWidth={2.5} />
+                    <span>SWIPE</span>
+                  </button>
+                )}
                 {editing ? (
                   <>
                     {/* Sequence: tick, +, reset */}
@@ -982,21 +1653,24 @@ export default function Board() {
                     className="btn !py-1.5 sm:!py-2 !px-2.5 sm:!px-3.5 text-xs sm:text-sm font-bold tracking-wider uppercase cursor-pointer hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-hard-sm"
                     onClick={() => setEditing(true)}
                   >
-                    EDIT TIMETABLE
+                    EDIT
                   </button>
                 )}
               </div>
 
-              {/* View Switcher: List vs Week Grid (MOBILE ONLY - in space on right side of ALL, EDIT TIMETABLE buttons) */}
-              <div className="flex sm:hidden items-center gap-1.5">
+              {/* View Switcher: List vs Week Grid vs Calendar (MOBILE ONLY) */}
+              <div className="flex sm:hidden items-center gap-1">
                 <button
                   type="button"
-                  className={`btn !px-2.5 !py-1.5 cursor-pointer transition-all border-2 border-[var(--border)] ${
+                  className={`btn !px-2 !py-1.5 cursor-pointer transition-all border-2 border-[var(--border)] ${
                     view === 'day'
                       ? '!bg-[var(--text)] !text-[var(--bg)] !border-[var(--text)] shadow-hard-sm'
                       : 'bg-[var(--surface-2)] text-[var(--text)] hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-hard-sm'
                   }`}
-                  onClick={() => setView('day')}
+                  onClick={() => {
+                    triggerHaptic(8)
+                    setView('day')
+                  }}
                   aria-label="Day view"
                   title="Day List View"
                 >
@@ -1004,16 +1678,35 @@ export default function Board() {
                 </button>
                 <button
                   type="button"
-                  className={`btn !px-2.5 !py-1.5 cursor-pointer transition-all border-2 border-[var(--border)] ${
+                  className={`btn !px-2 !py-1.5 cursor-pointer transition-all border-2 border-[var(--border)] ${
                     view === 'week'
                       ? '!bg-[var(--text)] !text-[var(--bg)] !border-[var(--text)] shadow-hard-sm'
                       : 'bg-[var(--surface-2)] text-[var(--text)] hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-hard-sm'
                   }`}
-                  onClick={() => setView('week')}
+                  onClick={() => {
+                    triggerHaptic(8)
+                    setView('week')
+                  }}
                   aria-label="Week view"
                   title="Week Matrix Grid"
                 >
                   <LayoutGrid className="icon-sm" strokeWidth={2.5} />
+                </button>
+                <button
+                  type="button"
+                  className={`btn !px-2 !py-1.5 cursor-pointer transition-all border-2 border-[var(--border)] ${
+                    view === 'calendar'
+                      ? '!bg-[var(--text)] !text-[var(--bg)] !border-[var(--text)] shadow-hard-sm'
+                      : 'bg-[var(--surface-2)] text-[var(--text)] hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-hard-sm'
+                  }`}
+                  onClick={() => {
+                    triggerHaptic(8)
+                    setView('calendar')
+                  }}
+                  aria-label="Calendar view"
+                  title="Calendar & History"
+                >
+                  <Calendar className="icon-sm" strokeWidth={2.5} />
                 </button>
               </div>
             </div>
@@ -1052,6 +1745,14 @@ export default function Board() {
               )}
             </div>
           </div>
+        ) : view === 'calendar' ? (
+          <CalendarView
+            sessions={groupFiltered}
+            marks={marks}
+            since={since}
+            activeIso={activeIso}
+            onSelectDate={handleSelectDate}
+          />
         ) : view === 'week' ? (
           <WeekGrid
             sessions={filtered}
@@ -1066,6 +1767,73 @@ export default function Board() {
           />
         ) : (
           <div className="flex-1 overflow-y-auto min-h-0 no-scrollbar pr-1 pb-2">
+            {/* Day View Date Context & Batch Actions Strip */}
+            <Panel className="board board-hard bg-[var(--surface)] p-2.5 sm:p-3 rounded border-2 border-[var(--border)] mb-3 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+              <div className="flex items-center gap-2.5">
+                <CalendarDays className="icon-sm text-[var(--color-coral)] shrink-0" />
+                <div className="flex items-center gap-2 flex-wrap">
+                  <span className="text-xs sm:text-sm font-black uppercase tracking-wider text-[var(--text)]">
+                    {fmtDateShort(activeIso)}
+                  </span>
+                  {activeIso === todayISO() ? (
+                    <span className="chip !py-0.5 !px-2 text-[0.625rem] font-bold uppercase tracking-wider bg-[var(--color-present)]/10 text-[var(--color-present)] border border-[var(--color-present)]/40">
+                      TODAY
+                    </span>
+                  ) : (
+                    <span className="chip !py-0.5 !px-2 text-[0.625rem] font-bold uppercase tracking-wider bg-[var(--surface-2)] text-[var(--muted)] border border-[var(--border)]">
+                      {activeIso < todayISO() ? 'PAST DATE' : 'UPCOMING'}
+                    </span>
+                  )}
+                </div>
+              </div>
+
+              <div className="flex items-center gap-1.5 flex-wrap">
+                {/* Batch roll call actions for this day */}
+                {dayTeachingSessions.length > 0 && !noClassEvent && (
+                  <>
+                    <button
+                      type="button"
+                      onClick={handleMarkDayAllPresent}
+                      className="btn btn-go !py-1 !px-2.5 text-[0.6875rem] font-bold uppercase tracking-wider flex-1 sm:flex-initial cursor-pointer shadow-hard-sm"
+                    >
+                      MARK ALL PRESENT
+                    </button>
+                    <button
+                      type="button"
+                      onClick={handleMarkDayAllCancelled}
+                      className="btn !py-1 !px-2 text-[0.6875rem] font-bold uppercase tracking-wider flex-1 sm:flex-initial cursor-pointer bg-[var(--surface-2)] text-[var(--text)] border-2 border-[var(--border)] hover:border-[var(--color-cancelled)]"
+                    >
+                      CANCEL ALL
+                    </button>
+                    <button
+                      type="button"
+                      onClick={handleResetDayMarks}
+                      className="btn !py-1 !px-2 text-[0.6875rem] font-black uppercase tracking-wider cursor-pointer text-[var(--muted)] hover:text-[var(--text)] bg-[var(--surface-2)] border-2 border-[var(--border)]"
+                      title="Reset this day's marks"
+                    >
+                      <RotateCcw className="icon-micro shrink-0" strokeWidth={2.5} />
+                    </button>
+                  </>
+                )}
+
+                {/* Return to Today button if custom date selected */}
+                {selectedIso && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      triggerHaptic(10)
+                      setSelectedIso(null)
+                      setDay(DAYS.includes(today) ? today : 'MON')
+                    }}
+                    className="btn !py-1 !px-2 text-[0.6875rem] font-bold uppercase tracking-wider cursor-pointer bg-[var(--surface-2)] text-[var(--text)] border-2 border-[var(--border)] hover:bg-[var(--surface)]"
+                    title="Return to today"
+                  >
+                    ← TODAY
+                  </button>
+                )}
+              </div>
+            </Panel>
+
             {noClassEvent && (
               <div
                 className="board board-hard mb-3 p-2.5 sm:p-3 rounded bg-[var(--surface-2)] border-2 flex flex-wrap items-center justify-between gap-2 shadow-xs"
@@ -1156,6 +1924,7 @@ export default function Board() {
                       onResetMark={(id) => setMark(activeIso, id, null)}
                       onDelete={removeSession}
                       onEdit={(sess) => setModal({ open: true, session: sess, day: sess.day })}
+                      swipeMode={swipeMode}
                     />
                   )
                 })}

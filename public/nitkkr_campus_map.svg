@@ -1,0 +1,573 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 1080" width="100%" height="100%" id="nitkkr-campus-map">
+  <defs>
+    <pattern id="arch-grid" width="40" height="40" patternUnits="userSpaceOnUse">
+      <circle cx="20" cy="20" r="1.2" fill="#cbd5e1" opacity="0.75" />
+    </pattern>
+    <pattern id="pat-trees" width="36" height="36" patternUnits="userSpaceOnUse">
+      <circle cx="18" cy="18" r="6.5" fill="#86efac" fill-opacity="0.5" />
+      <circle cx="18" cy="18" r="3.5" fill="#22c55e" fill-opacity="0.6" />
+      <circle cx="34" cy="6" r="3" fill="#86efac" fill-opacity="0.4" />
+      <circle cx="4" cy="32" r="3" fill="#22c55e" fill-opacity="0.4" />
+    </pattern>
+    <pattern id="pat-orchard" width="40" height="40" patternUnits="userSpaceOnUse">
+      <circle cx="20" cy="20" r="5" fill="#86efac" fill-opacity="0.6" />
+      <line x1="20" y1="12" x2="20" y2="28" stroke="#16a34a" stroke-width="1.2" opacity="0.4" />
+      <line x1="12" y1="20" x2="28" y2="20" stroke="#16a34a" stroke-width="1.2" opacity="0.4" />
+    </pattern>
+    <style>
+      .bldg-group {
+        cursor: pointer;
+        transition: transform 0.15s ease, filter 0.15s ease;
+      }
+      .bldg-group:hover .bldg-shape {
+        stroke-width: 2.5px !important;
+        filter: brightness(0.92);
+      }
+      .bldg-group.selected .bldg-shape {
+        stroke: #ef4444 !important;
+        stroke-width: 3.5px !important;
+        filter: drop-shadow(0 0 8px rgba(239, 68, 68, 0.85));
+      }
+      .bldg-icon {
+        pointer-events: none;
+        transition: opacity 0.2s ease, transform 0.2s ease;
+      }
+      /* Modern Google/Apple Maps Road Cartography */
+      .road-casing-major {
+        stroke: #94a3b8;
+        stroke-width: 14px;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+        fill: none;
+      }
+      .road-fill-major {
+        stroke: #ffffff;
+        stroke-width: 10px;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+        fill: none;
+      }
+      .road-casing-secondary {
+        stroke: #94a3b8;
+        stroke-width: 10px;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+        fill: none;
+      }
+      .road-fill-secondary {
+        stroke: #ffffff;
+        stroke-width: 6.5px;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+        fill: none;
+      }
+      .road-casing-lane {
+        stroke: #cbd5e1;
+        stroke-width: 7px;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+        fill: none;
+      }
+      .road-fill-lane {
+        stroke: #ffffff;
+        stroke-width: 4px;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+        fill: none;
+      }
+    </style>
+    <g id="icon-academic">
+      <path d="M12 2L2 7l10 5 10-5-10-5z" fill="#ffffff" filter="drop-shadow(0 1px 2px rgba(0,0,0,0.4))" />
+      <path d="M4.5 12.5v4.5l7.5 4 7.5-4v-4.5l-7.5 4-7.5-4z" fill="#ffffff" filter="drop-shadow(0 1px 2px rgba(0,0,0,0.4))" />
+      <line x1="22" y1="7" x2="22" y2="15" stroke="#ffffff" stroke-width="1.8" stroke-linecap="round" />
+    </g>
+    <g id="icon-admin">
+      <path d="M12 2L2 7v2.5h20V7L12 2z" fill="#ffffff" filter="drop-shadow(0 1px 2px rgba(0,0,0,0.4))" />
+      <rect x="4" y="11" width="2.5" height="7" fill="#ffffff" rx="0.5" filter="drop-shadow(0 1px 2px rgba(0,0,0,0.4))" />
+      <rect x="9" y="11" width="2.5" height="7" fill="#ffffff" rx="0.5" filter="drop-shadow(0 1px 2px rgba(0,0,0,0.4))" />
+      <rect x="13.5" y="11" width="2.5" height="7" fill="#ffffff" rx="0.5" filter="drop-shadow(0 1px 2px rgba(0,0,0,0.4))" />
+      <rect x="18" y="11" width="2.5" height="7" fill="#ffffff" rx="0.5" filter="drop-shadow(0 1px 2px rgba(0,0,0,0.4))" />
+      <rect x="2" y="19.5" width="20" height="2.5" fill="#ffffff" rx="0.5" filter="drop-shadow(0 1px 2px rgba(0,0,0,0.4))" />
+    </g>
+    <g id="icon-hostel">
+      <path d="M3 6v14" stroke="#ffffff" stroke-width="2.2" stroke-linecap="round" filter="drop-shadow(0 1px 2px rgba(0,0,0,0.4))" />
+      <path d="M3 11h18a2 2 0 0 1 2 2v7" stroke="#ffffff" stroke-width="2.2" stroke-linecap="round" filter="drop-shadow(0 1px 2px rgba(0,0,0,0.4))" />
+      <path d="M3 17h20" stroke="#ffffff" stroke-width="2.2" stroke-linecap="round" filter="drop-shadow(0 1px 2px rgba(0,0,0,0.4))" />
+      <circle cx="7" cy="8" r="2" fill="#ffffff" filter="drop-shadow(0 1px 2px rgba(0,0,0,0.4))" />
+    </g>
+    <g id="icon-sports">
+      <path d="M6 9H3a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h3m12 6h3a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2h-3M6 3h12v7a6 6 0 0 1-12 0V3z" stroke="#ffffff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" fill="none" filter="drop-shadow(0 1px 2px rgba(0,0,0,0.4))" />
+      <path d="M9 18h6m-3-5v5m-4 3h8" stroke="#ffffff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" filter="drop-shadow(0 1px 2px rgba(0,0,0,0.4))" />
+    </g>
+    <g id="icon-food">
+      <path d="M18 8h1a4 4 0 0 1 0 8h-1M2 8h16v8a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z" stroke="#ffffff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" fill="none" filter="drop-shadow(0 1px 2px rgba(0,0,0,0.4))" />
+      <line x1="6" y1="2" x2="6" y2="5" stroke="#ffffff" stroke-width="2" stroke-linecap="round" />
+      <line x1="10" y1="2" x2="10" y2="5" stroke="#ffffff" stroke-width="2" stroke-linecap="round" />
+      <line x1="14" y1="2" x2="14" y2="5" stroke="#ffffff" stroke-width="2" stroke-linecap="round" />
+    </g>
+    <g id="icon-residence">
+      <path d="M3 10.5L12 3l9 7.5V20a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1v-9.5z" stroke="#ffffff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" fill="none" filter="drop-shadow(0 1px 2px rgba(0,0,0,0.4))" />
+      <path d="M9 21v-6h6v6" stroke="#ffffff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" fill="none" />
+    </g>
+  </defs>
+  <rect width="100%" height="100%" fill="#f8fafc" />
+  <g id="bldg-forest-area" class="bldg-group" data-id="forest-area" data-name="Campus Forest &amp; Eco Zone" data-category="NATURE">
+    <path class="bldg-shape" d="M 290 80 L 90 880 L 220 780 L 250 500 L 250 100 Z" fill="#ecfdf5" stroke="#10b981" stroke-width="1.8" />
+    <path d="M 290 80 L 90 880 L 220 780 L 250 500 L 250 100 Z" fill="url(#pat-trees)" pointer-events="none" />
+  </g>
+  <g id="bldg-open-plantation" class="bldg-group" data-id="open-plantation" data-name="Open Plantation &amp; Arboretum" data-category="NATURE">
+    <rect class="bldg-shape" x="940" y="850" width="220" height="200" rx="1.5" fill="#ecfdf5" stroke="#10b981" stroke-width="1.8" />
+    <rect x="940" y="850" width="220" height="200" rx="10" fill="url(#pat-orchard)" pointer-events="none" />
+  </g>
+  <g id="bldg-playground" class="bldg-group" data-id="playground" data-name="Main Athletic Play Ground" data-category="SPORTS" data-number="39">
+    <rect class="bldg-shape" x="940" y="475" width="220" height="275" rx="1.5" fill="#dcfce7" stroke="#16a34a" stroke-width="1.8" />
+    <rect x="965" y="495" width="170" height="235" rx="85" fill="none" stroke="#f87171" stroke-width="16" pointer-events="none" />
+    <rect x="965" y="495" width="170" height="235" rx="85" fill="none" stroke="#ffffff" stroke-width="1.5" stroke-dasharray="8,8" opacity="0.9" pointer-events="none" />
+    <rect x="995" y="550" width="110" height="125" fill="#dcfce7" stroke="#16a34a" stroke-width="1.5" opacity="0.8" pointer-events="none" />
+    <circle cx="1050" cy="612" r="26" fill="none" stroke="#16a34a" stroke-width="1.5" opacity="0.8" pointer-events="none" />
+    <circle cx="1050" cy="612" r="3" fill="#16a34a" opacity="0.9" pointer-events="none" />
+  </g>
+  <path d="M 945 90 L 1150 90 L 1150 220 L 945 220 Z" fill="#dcfce7" stroke="#86efac" stroke-width="1" />
+  <rect x="680" y="200" width="230" height="30" rx="4" fill="#dcfce7" stroke="#86efac" stroke-width="1" />
+  <rect x="360" y="105" width="75" height="85" rx="6" fill="#dcfce7" stroke="#86efac" stroke-width="1" />
+  <g id="bldg-central-park" class="bldg-group" data-id="central-park" data-name="Central Lawn &amp; Park" data-category="NATURE">
+    <rect class="bldg-shape" x="600" y="420" width="55" height="80" rx="1.5" fill="#dcfce7" stroke="#16a34a" stroke-width="1.8" />
+  </g>
+  <rect x="550" y="615" width="130" height="115" rx="8" fill="#dcfce7" stroke="#86efac" stroke-width="1" />
+  <g id="road-network">
+    <g id="road-casings">
+      <path d="M 60 870 L 330 940 L 940 1060 L 1170 1070" class="road-casing-major" />
+      <path d="M 330 940 L 330 370" class="road-casing-major" />
+      <path d="M 250 370 L 1160 370" class="road-casing-major" />
+      <path d="M 330 750 L 940 750" class="road-casing-major" />
+      <path d="M 940 60 L 940 1060" class="road-casing-major" />
+      <path d="M 250 80 L 1160 60" class="road-casing-secondary" />
+      <path d="M 1160 60 L 1160 1070" class="road-casing-secondary" />
+      <path d="M 660 70 L 660 1005" class="road-casing-secondary" />
+      <path d="M 250 220 L 1160 220" class="road-casing-secondary" />
+      <path d="M 250 520 L 940 520" class="road-casing-secondary" />
+      <path d="M 90 880 L 190 770 L 250 750 L 250 80" class="road-casing-secondary" />
+      <path d="M 445 80 L 445 370" class="road-casing-secondary" />
+      <path d="M 540 80 L 540 370" class="road-casing-secondary" />
+      <path d="M 640 80 L 640 370" class="road-casing-secondary" />
+      <path d="M 775 80 L 775 370" class="road-casing-secondary" />
+      <path d="M 495 750 L 495 915" class="road-casing-lane" />
+      <path d="M 570 750 L 570 915" class="road-casing-lane" />
+      <path d="M 645 750 L 645 915" class="road-casing-lane" />
+      <path d="M 720 750 L 720 915" class="road-casing-lane" />
+      <path d="M 495 915 L 725 915" class="road-casing-lane" />
+      <path d="M 330 830 L 355 830" class="road-casing-lane" />
+    </g>
+    <g id="road-fills">
+      <path d="M 60 870 L 330 940 L 940 1060 L 1170 1070" class="road-fill-major" />
+      <path d="M 330 940 L 330 370" class="road-fill-major" />
+      <path d="M 250 370 L 1160 370" class="road-fill-major" />
+      <path d="M 330 750 L 940 750" class="road-fill-major" />
+      <path d="M 940 60 L 940 1060" class="road-fill-major" />
+      <path d="M 250 80 L 1160 60" class="road-fill-secondary" />
+      <path d="M 1160 60 L 1160 1070" class="road-fill-secondary" />
+      <path d="M 660 70 L 660 1005" class="road-fill-secondary" />
+      <path d="M 250 220 L 1160 220" class="road-fill-secondary" />
+      <path d="M 250 520 L 940 520" class="road-fill-secondary" />
+      <path d="M 90 880 L 190 770 L 250 750 L 250 80" class="road-fill-secondary" />
+      <path d="M 445 80 L 445 370" class="road-fill-secondary" />
+      <path d="M 540 80 L 540 370" class="road-fill-secondary" />
+      <path d="M 640 80 L 640 370" class="road-fill-secondary" />
+      <path d="M 775 80 L 775 370" class="road-fill-secondary" />
+      <path d="M 495 750 L 495 915" class="road-fill-lane" />
+      <path d="M 570 750 L 570 915" class="road-fill-lane" />
+      <path d="M 645 750 L 645 915" class="road-fill-lane" />
+      <path d="M 720 750 L 720 915" class="road-fill-lane" />
+      <path d="M 495 915 L 725 915" class="road-fill-lane" />
+      <path d="M 330 830 L 355 830" class="road-fill-lane" />
+    </g>
+  </g>
+  <g id="campus-buildings">
+    <g id="bldg-dept-science" class="bldg-group" data-id="dept-science" data-name="Basic Sciences &amp; Humanities Dept" data-category="ACADEMIC" data-number="2">
+      <rect class="bldg-shape" x="265" y="95" width="75" height="110" rx="1.5" fill="#eab308" stroke="#ca8a04" stroke-width="1.8" />
+      <g class="bldg-icon" transform="translate(291.5, 139.0) scale(0.917)">
+        <use href="#icon-academic" />
+      </g>
+    </g>
+    <g id="bldg-dept-electrical" class="bldg-group" data-id="dept-electrical" data-name="Electrical Engineering Department" data-category="ACADEMIC" data-number="3">
+      <rect class="bldg-shape" x="460" y="95" width="80" height="110" rx="1.5" fill="#eab308" stroke="#ca8a04" stroke-width="1.8" />
+      <g class="bldg-icon" transform="translate(489.0, 139.0) scale(0.917)">
+        <use href="#icon-academic" />
+      </g>
+    </g>
+    <g id="bldg-dept-mechanical" class="bldg-group" data-id="dept-mechanical" data-name="Mechanical Engineering Department" data-category="ACADEMIC" data-number="3">
+      <rect class="bldg-shape" x="570" y="95" width="75" height="110" rx="1.5" fill="#eab308" stroke="#ca8a04" stroke-width="1.8" />
+      <g class="bldg-icon" transform="translate(596.5, 139.0) scale(0.917)">
+        <use href="#icon-academic" />
+      </g>
+    </g>
+    <g id="bldg-dept-civil" class="bldg-group" data-id="dept-civil" data-name="Civil Engineering Department" data-category="ACADEMIC" data-number="4">
+      <rect class="bldg-shape" x="675" y="95" width="50" height="95" rx="1.5" fill="#eab308" stroke="#ca8a04" stroke-width="1.8" />
+      <g class="bldg-icon" transform="translate(689.5, 132.0) scale(0.875)">
+        <use href="#icon-academic" />
+      </g>
+    </g>
+    <g id="bldg-dept-chem-mech" class="bldg-group" data-id="dept-chem-mech" data-name="Chemical Engg &amp; Applied Mechanics" data-category="ACADEMIC" data-number="5">
+      <rect class="bldg-shape" x="735" y="95" width="40" height="95" rx="1.5" fill="#eab308" stroke="#ca8a04" stroke-width="1.8" />
+      <g class="bldg-icon" transform="translate(747.0, 134.5) scale(0.667)">
+        <use href="#icon-academic" />
+      </g>
+    </g>
+    <g id="bldg-block-ab" class="bldg-group" data-id="block-ab" data-name="AB Block" data-category="ACADEMIC" data-number="7">
+      <rect class="bldg-shape" x="785" y="95" width="35" height="95" rx="1.5" fill="#eab308" stroke="#ca8a04" stroke-width="1.8" />
+      <g class="bldg-icon" transform="translate(795.5, 135.5) scale(0.583)">
+        <use href="#icon-academic" />
+      </g>
+    </g>
+    <g id="bldg-block-ba-scoe" class="bldg-group" data-id="block-ba-scoe" data-name="BA Block / SCoE Block" data-category="ACADEMIC" data-number="8">
+      <rect class="bldg-shape" x="830" y="95" width="35" height="95" rx="1.5" fill="#eab308" stroke="#ca8a04" stroke-width="1.8" />
+      <g class="bldg-icon" transform="translate(840.5, 135.5) scale(0.583)">
+        <use href="#icon-academic" />
+      </g>
+    </g>
+    <g id="bldg-dept-mba-mca" class="bldg-group" data-id="dept-mba-mca" data-name="MBA &amp; MCA Department" data-category="ACADEMIC" data-number="9">
+      <rect class="bldg-shape" x="875" y="95" width="40" height="95" rx="1.5" fill="#eab308" stroke="#ca8a04" stroke-width="1.8" />
+      <g class="bldg-icon" transform="translate(887.0, 134.5) scale(0.667)">
+        <use href="#icon-academic" />
+      </g>
+    </g>
+    <g id="bldg-ccn" class="bldg-group" data-id="ccn" data-name="Centre of Computing &amp; Networking (CCN)" data-category="ACADEMIC" data-number="12">
+      <rect class="bldg-shape" x="675" y="200" width="240" height="20" rx="1.5" fill="#eab308" stroke="#ca8a04" stroke-width="1.8" />
+      <g class="bldg-icon" transform="translate(788.5, 203.5) scale(0.542)">
+        <use href="#icon-academic" />
+      </g>
+    </g>
+    <g id="bldg-central-library" class="bldg-group" data-id="central-library" data-name="Jawaharlal Nehru Central Library" data-category="ADMIN" data-number="13">
+      <rect class="bldg-shape" x="975" y="105" width="110" height="90" rx="1.5" fill="#a855f7" stroke="#7e22ce" stroke-width="1.8" />
+      <g class="bldg-icon" transform="translate(1019.0, 139.0) scale(0.917)">
+        <use href="#icon-admin" />
+      </g>
+    </g>
+    <g id="bldg-pwd-complex" class="bldg-group" data-id="pwd-complex" data-name="PWD Complex" data-category="ADMIN" data-number="PWD">
+      <rect class="bldg-shape" x="1100" y="95" width="50" height="85" rx="1.5" fill="#a855f7" stroke="#7e22ce" stroke-width="1.8" />
+      <g class="bldg-icon" transform="translate(1114.5, 127.0) scale(0.875)">
+        <use href="#icon-admin" />
+      </g>
+    </g>
+    <g id="bldg-workshop" class="bldg-group" data-id="workshop" data-name="Central Workshop Complex" data-category="ACADEMIC" data-number="14">
+      <rect class="bldg-shape" x="265" y="235" width="75" height="60" rx="1.5" fill="#eab308" stroke="#ca8a04" stroke-width="1.8" />
+      <g class="bldg-icon" transform="translate(291.5, 254.0) scale(0.917)">
+        <use href="#icon-academic" />
+      </g>
+    </g>
+    <g id="bldg-exam-hall" class="bldg-group" data-id="exam-hall" data-name="Examination Hall" data-category="ACADEMIC" data-number="15">
+      <rect class="bldg-shape" x="265" y="305" width="75" height="55" rx="1.5" fill="#eab308" stroke="#ca8a04" stroke-width="1.8" />
+      <g class="bldg-icon" transform="translate(291.5, 321.5) scale(0.917)">
+        <use href="#icon-academic" />
+      </g>
+    </g>
+    <g id="bldg-admin" class="bldg-group" data-id="admin" data-name="Golden Jubilee Administrative Building" data-category="ADMIN" data-number="1">
+      <rect class="bldg-shape" x="360" y="235" width="65" height="60" rx="1.5" fill="#a855f7" stroke="#7e22ce" stroke-width="1.8" />
+      <g class="bldg-icon" transform="translate(381.5, 254.0) scale(0.917)">
+        <use href="#icon-admin" />
+      </g>
+    </g>
+    <g id="bldg-senate-hall" class="bldg-group" data-id="senate-hall" data-name="Senate Hall" data-category="ADMIN" data-number="16">
+      <rect class="bldg-shape" x="360" y="305" width="65" height="55" rx="1.5" fill="#a855f7" stroke="#7e22ce" stroke-width="1.8" />
+      <g class="bldg-icon" transform="translate(381.5, 321.5) scale(0.917)">
+        <use href="#icon-admin" />
+      </g>
+    </g>
+    <g id="bldg-l-block" class="bldg-group" data-id="l-block" data-name="L-Block (ECE Department)" data-category="ACADEMIC" data-number="18">
+      <rect class="bldg-shape" x="455" y="235" width="38" height="55" rx="1.5" fill="#eab308" stroke="#ca8a04" stroke-width="1.8" />
+      <g class="bldg-icon" transform="translate(466.5, 255.0) scale(0.625)">
+        <use href="#icon-academic" />
+      </g>
+    </g>
+    <g id="bldg-lhc" class="bldg-group" data-id="lhc" data-name="Lecture Hall Complex (LHC)" data-category="ACADEMIC" data-number="19">
+      <rect class="bldg-shape" x="500" y="235" width="38" height="55" rx="1.5" fill="#eab308" stroke="#ca8a04" stroke-width="1.8" />
+      <g class="bldg-icon" transform="translate(511.5, 255.0) scale(0.625)">
+        <use href="#icon-academic" />
+      </g>
+    </g>
+    <g id="bldg-jubilee-hall" class="bldg-group" data-id="jubilee-hall" data-name="Jubilee Hall" data-category="ACADEMIC" data-number="17">
+      <rect class="bldg-shape" x="455" y="300" width="83" height="55" rx="1.5" fill="#eab308" stroke="#ca8a04" stroke-width="1.8" />
+      <g class="bldg-icon" transform="translate(485.5, 316.5) scale(0.917)">
+        <use href="#icon-academic" />
+      </g>
+    </g>
+    <g id="bldg-dept-computer" class="bldg-group" data-id="dept-computer" data-name="Computer Engineering Department" data-category="ACADEMIC" data-number="11">
+      <rect class="bldg-shape" x="550" y="235" width="85" height="55" rx="1.5" fill="#eab308" stroke="#ca8a04" stroke-width="1.8" />
+      <g class="bldg-icon" transform="translate(581.5, 251.5) scale(0.917)">
+        <use href="#icon-academic" />
+      </g>
+    </g>
+    <g id="bldg-collab-blocks" class="bldg-group" data-id="collab-blocks" data-name="Collaboration &amp; Research Labs" data-category="ACADEMIC" data-number="20">
+      <rect class="bldg-shape" x="550" y="300" width="85" height="55" rx="1.5" fill="#eab308" stroke="#ca8a04" stroke-width="1.8" />
+      <g class="bldg-icon" transform="translate(581.5, 316.5) scale(0.917)">
+        <use href="#icon-academic" />
+      </g>
+    </g>
+    <g id="bldg-sac" class="bldg-group" data-id="sac" data-name="Students Activity Centre (SAC)" data-category="FOOD" data-number="21">
+      <rect class="bldg-shape" x="650" y="235" width="45" height="55" rx="1.5" fill="#a855f7" stroke="#7e22ce" stroke-width="1.8" />
+      <g class="bldg-icon" transform="translate(663.5, 253.5) scale(0.750)">
+        <use href="#icon-food" />
+      </g>
+    </g>
+    <g id="bldg-oat" class="bldg-group" data-id="oat" data-name="Open Air Theatre (OAT)" data-category="SPORTS" data-number="22">
+      <rect class="bldg-shape" x="700" y="235" width="50" height="55" rx="1.5" fill="#a855f7" stroke="#7e22ce" stroke-width="1.8" />
+      <g class="bldg-icon" transform="translate(714.5, 252.0) scale(0.875)">
+        <use href="#icon-sports" />
+      </g>
+    </g>
+    <g id="bldg-canteen" class="bldg-group" data-id="canteen" data-name="Gol Canteen / Food Court" data-category="FOOD" data-number="23">
+      <rect class="bldg-shape" x="650" y="300" width="100" height="60" rx="1.5" fill="#a855f7" stroke="#7e22ce" stroke-width="1.8" />
+      <g class="bldg-icon" transform="translate(689.0, 319.0) scale(0.917)">
+        <use href="#icon-food" />
+      </g>
+    </g>
+    <g id="bldg-swimming-pool" class="bldg-group" data-id="swimming-pool" data-name="Swimming Pool &amp; Badminton Court" data-category="SPORTS" data-number="24">
+      <rect class="bldg-shape" x="790" y="255" width="95" height="85" rx="1.5" fill="#a855f7" stroke="#7e22ce" stroke-width="1.8" />
+      <rect x="798" y="263" width="79" height="69" rx="3" fill="#38bdf8" stroke="#0284c7" stroke-width="1" />
+      <line x1="804" y1="280" x2="871" y2="280" stroke="#ffffff" stroke-width="1.2" stroke-dasharray="4,3" opacity="0.9" />
+      <line x1="804" y1="300" x2="871" y2="300" stroke="#ffffff" stroke-width="1.2" stroke-dasharray="4,3" opacity="0.9" />
+      <line x1="804" y1="320" x2="871" y2="320" stroke="#ffffff" stroke-width="1.2" stroke-dasharray="4,3" opacity="0.9" />
+      <g class="bldg-icon" transform="translate(826.5, 286.5) scale(0.917)">
+        <use href="#icon-sports" />
+      </g>
+    </g>
+    <g id="bldg-guest-house" class="bldg-group" data-id="guest-house" data-name="Institute Guest House" data-category="HOUSING" data-number="25">
+      <rect class="bldg-shape" x="905" y="235" width="55" height="65" rx="1.5" fill="#a855f7" stroke="#7e22ce" stroke-width="1.8" />
+      <g class="bldg-icon" transform="translate(921.5, 256.5) scale(0.917)">
+        <use href="#icon-admin" />
+      </g>
+    </g>
+    <g id="bldg-health-centre" class="bldg-group" data-id="health-centre" data-name="Institute Health Centre" data-category="ADMIN" data-number="26">
+      <rect class="bldg-shape" x="905" y="310" width="55" height="50" rx="1.5" fill="#a855f7" stroke="#7e22ce" stroke-width="1.8" />
+      <g class="bldg-icon" transform="translate(922.0, 324.5) scale(0.875)">
+        <use href="#icon-admin" />
+      </g>
+    </g>
+    <g id="bldg-sports-complex" class="bldg-group" data-id="sports-complex" data-name="Sports Complex &amp; MT Labs" data-category="SPORTS" data-number="27">
+      <rect class="bldg-shape" x="265" y="385" width="75" height="65" rx="1.5" fill="#a855f7" stroke="#7e22ce" stroke-width="1.8" />
+      <g class="bldg-icon" transform="translate(291.5, 406.5) scale(0.917)">
+        <use href="#icon-sports" />
+      </g>
+    </g>
+    <g id="bldg-market" class="bldg-group" data-id="market" data-name="NIT Market &amp; Shopping Complex" data-category="FOOD" data-number="28">
+      <rect class="bldg-shape" x="360" y="385" width="65" height="65" rx="1.5" fill="#a855f7" stroke="#7e22ce" stroke-width="1.8" />
+      <g class="bldg-icon" transform="translate(381.5, 406.5) scale(0.917)">
+        <use href="#icon-food" />
+      </g>
+    </g>
+    <g id="bldg-parking" class="bldg-group" data-id="parking" data-name="Central Campus Parking" data-category="ADMIN" data-number="29">
+      <rect class="bldg-shape" x="440" y="385" width="50" height="65" rx="1.5" fill="#a855f7" stroke="#7e22ce" stroke-width="1.8" />
+      <g class="bldg-icon" transform="translate(454.5, 407.0) scale(0.875)">
+        <use href="#icon-admin" />
+      </g>
+    </g>
+    <g id="bldg-dir-residence" class="bldg-group" data-id="dir-residence" data-name="Director Residence (A-1)" data-category="HOUSING" data-number="30">
+      <rect class="bldg-shape" x="500" y="385" width="55" height="65" rx="1.5" fill="#a855f7" stroke="#7e22ce" stroke-width="1.8" />
+      <g class="bldg-icon" transform="translate(516.5, 406.5) scale(0.917)">
+        <use href="#icon-admin" />
+      </g>
+    </g>
+    <g id="bldg-res-ra" class="bldg-group" data-id="res-ra" data-name="RA Type Residences" data-category="HOUSING" data-number="31">
+      <rect class="bldg-shape" x="675" y="390" width="38" height="60" rx="1.5" fill="#a855f7" stroke="#7e22ce" stroke-width="1.8" />
+      <g class="bldg-icon" transform="translate(686.5, 412.5) scale(0.625)">
+        <use href="#icon-residence" />
+      </g>
+    </g>
+    <g id="bldg-res-bt-ct" class="bldg-group" data-id="res-bt-ct" data-name="BT &amp; CT Type Residences" data-category="HOUSING" data-number="32">
+      <rect class="bldg-shape" x="725" y="390" width="38" height="60" rx="1.5" fill="#a855f7" stroke="#7e22ce" stroke-width="1.8" />
+      <g class="bldg-icon" transform="translate(736.5, 412.5) scale(0.625)">
+        <use href="#icon-residence" />
+      </g>
+    </g>
+    <g id="bldg-res-bb" class="bldg-group" data-id="res-bb" data-name="BB Type Residences" data-category="HOUSING" data-number="33">
+      <rect class="bldg-shape" x="775" y="390" width="38" height="60" rx="1.5" fill="#a855f7" stroke="#7e22ce" stroke-width="1.8" />
+      <g class="bldg-icon" transform="translate(786.5, 412.5) scale(0.625)">
+        <use href="#icon-residence" />
+      </g>
+    </g>
+    <g id="bldg-res-ca" class="bldg-group" data-id="res-ca" data-name="CA Type Residences" data-category="HOUSING" data-number="35">
+      <rect class="bldg-shape" x="860" y="385" width="40" height="50" rx="1.5" fill="#a855f7" stroke="#7e22ce" stroke-width="1.8" />
+      <g class="bldg-icon" transform="translate(872.0, 402.0) scale(0.667)">
+        <use href="#icon-residence" />
+      </g>
+    </g>
+    <g id="bldg-res-cb" class="bldg-group" data-id="res-cb" data-name="CB Type Residences" data-category="HOUSING" data-number="36">
+      <rect class="bldg-shape" x="905" y="385" width="40" height="50" rx="1.5" fill="#a855f7" stroke="#7e22ce" stroke-width="1.8" />
+      <g class="bldg-icon" transform="translate(917.0, 402.0) scale(0.667)">
+        <use href="#icon-residence" />
+      </g>
+    </g>
+    <g id="bldg-sports-pavilion" class="bldg-group" data-id="sports-pavilion" data-name="Play Ground Grand Pavilion" data-category="SPORTS" data-number="38">
+      <rect class="bldg-shape" x="860" y="445" width="50" height="60" rx="1.5" fill="#a855f7" stroke="#7e22ce" stroke-width="1.8" />
+      <g class="bldg-icon" transform="translate(874.5, 464.5) scale(0.875)">
+        <use href="#icon-sports" />
+      </g>
+    </g>
+    <g id="bldg-playground-club" class="bldg-group" data-id="playground-club" data-name="Sports Complex &amp; Courts Pavilion" data-category="SPORTS" data-number="40">
+      <rect class="bldg-shape" x="860" y="515" width="50" height="55" rx="1.5" fill="#a855f7" stroke="#7e22ce" stroke-width="1.8" />
+      <g class="bldg-icon" transform="translate(874.5, 532.0) scale(0.875)">
+        <use href="#icon-sports" />
+      </g>
+    </g>
+    <g id="bldg-gh-3" class="bldg-group" data-id="gh-3" data-name="Girls Hostel 3 - Cauvery Bhawan" data-category="HOSTEL" data-number="48">
+      <rect class="bldg-shape" x="365" y="535" width="80" height="55" rx="1.5" fill="#ec4899" stroke="#be185d" stroke-width="1.8" />
+      <g class="bldg-icon" transform="translate(394.0, 551.5) scale(0.917)">
+        <use href="#icon-hostel" />
+      </g>
+    </g>
+    <g id="bldg-gh-4" class="bldg-group" data-id="gh-4" data-name="Girls Hostel 4 - Kalpana Chawla Bhawan" data-category="HOSTEL" data-number="49">
+      <rect class="bldg-shape" x="455" y="535" width="80" height="55" rx="1.5" fill="#ec4899" stroke="#be185d" stroke-width="1.8" />
+      <g class="bldg-icon" transform="translate(484.0, 551.5) scale(0.917)">
+        <use href="#icon-hostel" />
+      </g>
+    </g>
+    <g id="bldg-gh-1" class="bldg-group" data-id="gh-1" data-name="Girls Hostel 1 - Alaknanda Bhawan" data-category="HOSTEL" data-number="46">
+      <rect class="bldg-shape" x="365" y="600" width="80" height="55" rx="1.5" fill="#ec4899" stroke="#be185d" stroke-width="1.8" />
+      <g class="bldg-icon" transform="translate(394.0, 616.5) scale(0.917)">
+        <use href="#icon-hostel" />
+      </g>
+    </g>
+    <g id="bldg-gh-2" class="bldg-group" data-id="gh-2" data-name="Girls Hostel 2 - Bhagirathi Bhawan" data-category="HOSTEL" data-number="47">
+      <rect class="bldg-shape" x="455" y="600" width="80" height="55" rx="1.5" fill="#ec4899" stroke="#be185d" stroke-width="1.8" />
+      <g class="bldg-icon" transform="translate(484.0, 616.5) scale(0.917)">
+        <use href="#icon-hostel" />
+      </g>
+    </g>
+    <g id="bldg-amphitheatre" class="bldg-group" data-id="amphitheatre" data-name="Open Amphitheatre &amp; Central Stage" data-category="SPORTS" data-number="41">
+      <rect class="bldg-shape" x="565" y="625" width="100" height="80" rx="1.5" fill="#a855f7" stroke="#7e22ce" stroke-width="1.8" />
+      <path d="M 580 690 A 35 35 0 0 1 650 690" fill="none" stroke="#e11d48" stroke-width="1.5" />
+      <path d="M 590 690 A 25 25 0 0 1 640 690" fill="none" stroke="#e11d48" stroke-width="1.5" />
+      <g class="bldg-icon" transform="translate(604.0, 654.0) scale(0.917)">
+        <use href="#icon-sports" />
+      </g>
+    </g>
+    <g id="bldg-res-f" class="bldg-group" data-id="res-f" data-name="F Type Residences" data-category="HOUSING" data-number="42">
+      <rect class="bldg-shape" x="685" y="540" width="40" height="65" rx="1.5" fill="#a855f7" stroke="#7e22ce" stroke-width="1.8" />
+      <g class="bldg-icon" transform="translate(697.0, 564.5) scale(0.667)">
+        <use href="#icon-residence" />
+      </g>
+    </g>
+    <g id="bldg-res-g" class="bldg-group" data-id="res-g" data-name="G Type Residences" data-category="HOUSING" data-number="43">
+      <rect class="bldg-shape" x="735" y="540" width="40" height="65" rx="1.5" fill="#a855f7" stroke="#7e22ce" stroke-width="1.8" />
+      <g class="bldg-icon" transform="translate(747.0, 564.5) scale(0.667)">
+        <use href="#icon-residence" />
+      </g>
+    </g>
+    <g id="bldg-teachers-flat" class="bldg-group" data-id="teachers-flat" data-name="Faculty &amp; Teachers Flats" data-category="HOUSING" data-number="45">
+      <rect class="bldg-shape" x="685" y="620" width="90" height="85" rx="1.5" fill="#a855f7" stroke="#7e22ce" stroke-width="1.8" />
+      <g class="bldg-icon" transform="translate(719.0, 651.5) scale(0.917)">
+        <use href="#icon-residence" />
+      </g>
+    </g>
+    <g id="bldg-hostel-10" class="bldg-group" data-id="hostel-10" data-name="Hostel 10 - Visvesvaraya Bhawan (Mega)" data-category="HOSTEL" data-number="59">
+      <rect class="bldg-shape" x="275" y="510" width="65" height="110" rx="1.5" fill="#3b82f6" stroke="#1d4ed8" stroke-width="1.8" />
+      <g class="bldg-icon" transform="translate(296.5, 554.0) scale(0.917)">
+        <use href="#icon-hostel" />
+      </g>
+    </g>
+    <g id="bldg-hostel-7" class="bldg-group" data-id="hostel-7" data-name="Hostel 7 - Girivar Bhawan" data-category="HOSTEL" data-number="56">
+      <rect class="bldg-shape" x="235" y="640" width="45" height="60" rx="1.5" fill="#3b82f6" stroke="#1d4ed8" stroke-width="1.8" />
+      <g class="bldg-icon" transform="translate(248.5, 661.0) scale(0.750)">
+        <use href="#icon-hostel" />
+      </g>
+    </g>
+    <g id="bldg-sports-courts" class="bldg-group" data-id="sports-courts" data-name="Outdoor Tennis &amp; Basketball Courts" data-category="SPORTS" data-number="CRT">
+      <rect class="bldg-shape" x="260" y="710" width="60" height="70" rx="1.5" fill="#a855f7" stroke="#7e22ce" stroke-width="1.8" />
+      <line x1="270" y1="770" x2="310" y2="770" stroke="#e11d48" stroke-width="1.5" opacity="0.7" />
+      <line x1="290" y1="720" x2="290" y2="770" stroke="#e11d48" stroke-width="1.2" opacity="0.6" />
+      <g class="bldg-icon" transform="translate(279.0, 734.0) scale(0.917)">
+        <use href="#icon-sports" />
+      </g>
+    </g>
+    <g id="bldg-hostel-9" class="bldg-group" data-id="hostel-9" data-name="Hostel 9 - Indivar Bhawan" data-category="HOSTEL" data-number="58">
+      <rect class="bldg-shape" x="355" y="740" width="60" height="90" rx="1.5" fill="#3b82f6" stroke="#1d4ed8" stroke-width="1.8" />
+      <g class="bldg-icon" transform="translate(374.0, 774.0) scale(0.917)">
+        <use href="#icon-hostel" />
+      </g>
+    </g>
+    <g id="bldg-hostel-8" class="bldg-group" data-id="hostel-8" data-name="Hostel 8 - Harihar Bhawan" data-category="HOSTEL" data-number="57">
+      <rect class="bldg-shape" x="430" y="735" width="60" height="90" rx="1.5" fill="#3b82f6" stroke="#1d4ed8" stroke-width="1.8" />
+      <g class="bldg-icon" transform="translate(449.0, 769.0) scale(0.917)">
+        <use href="#icon-hostel" />
+      </g>
+    </g>
+    <g id="bldg-hostel-2" class="bldg-group" data-id="hostel-2" data-name="Hostel 2 - Bhishma Bhawan" data-category="HOSTEL" data-number="51">
+      <rect class="bldg-shape" x="500" y="735" width="65" height="80" rx="1.5" fill="#3b82f6" stroke="#1d4ed8" stroke-width="1.8" />
+      <g class="bldg-icon" transform="translate(521.5, 764.0) scale(0.917)">
+        <use href="#icon-hostel" />
+      </g>
+    </g>
+    <g id="bldg-hostel-1" class="bldg-group" data-id="hostel-1" data-name="Hostel 1 - Abhimanyu Bhawan" data-category="HOSTEL" data-number="50">
+      <rect class="bldg-shape" x="500" y="825" width="65" height="75" rx="1.5" fill="#3b82f6" stroke="#1d4ed8" stroke-width="1.8" />
+      <g class="bldg-icon" transform="translate(521.5, 851.5) scale(0.917)">
+        <use href="#icon-hostel" />
+      </g>
+    </g>
+    <g id="bldg-hostel-4" class="bldg-group" data-id="hostel-4" data-name="Hostel 4 - Dronacharya Bhawan" data-category="HOSTEL" data-number="53">
+      <rect class="bldg-shape" x="575" y="755" width="65" height="80" rx="1.5" fill="#3b82f6" stroke="#1d4ed8" stroke-width="1.8" />
+      <g class="bldg-icon" transform="translate(596.5, 784.0) scale(0.917)">
+        <use href="#icon-hostel" />
+      </g>
+    </g>
+    <g id="bldg-hostel-3" class="bldg-group" data-id="hostel-3" data-name="Hostel 3 - Chakradhar Bhawan" data-category="HOSTEL" data-number="52">
+      <rect class="bldg-shape" x="575" y="845" width="65" height="75" rx="1.5" fill="#3b82f6" stroke="#1d4ed8" stroke-width="1.8" />
+      <g class="bldg-icon" transform="translate(596.5, 871.5) scale(0.917)">
+        <use href="#icon-hostel" />
+      </g>
+    </g>
+    <g id="bldg-hostel-6" class="bldg-group" data-id="hostel-6" data-name="Hostel 6 - Fanibhushan Bhawan" data-category="HOSTEL" data-number="55">
+      <rect class="bldg-shape" x="650" y="755" width="65" height="80" rx="1.5" fill="#3b82f6" stroke="#1d4ed8" stroke-width="1.8" />
+      <g class="bldg-icon" transform="translate(671.5, 784.0) scale(0.917)">
+        <use href="#icon-hostel" />
+      </g>
+    </g>
+    <g id="bldg-hostel-5" class="bldg-group" data-id="hostel-5" data-name="Hostel 5 - Eklavya Bhawan" data-category="HOSTEL" data-number="54">
+      <rect class="bldg-shape" x="650" y="845" width="65" height="80" rx="1.5" fill="#3b82f6" stroke="#1d4ed8" stroke-width="1.8" />
+      <g class="bldg-icon" transform="translate(671.5, 874.0) scale(0.917)">
+        <use href="#icon-hostel" />
+      </g>
+    </g>
+    <g id="bldg-hostel-11" class="bldg-group" data-id="hostel-11" data-name="Hostel 11 - Vivekanand Bhawan" data-category="HOSTEL" data-number="60">
+      <rect class="bldg-shape" x="725" y="755" width="65" height="95" rx="1.5" fill="#3b82f6" stroke="#1d4ed8" stroke-width="1.8" />
+      <g class="bldg-icon" transform="translate(746.5, 791.5) scale(0.917)">
+        <use href="#icon-hostel" />
+      </g>
+    </g>
+    <g id="bldg-uhbvn-substation" class="bldg-group" data-id="uhbvn-substation" data-name="UHBVN Power Substation" data-category="ADMIN" data-number="SUB">
+      <rect class="bldg-shape" x="800" y="755" width="95" height="65" rx="1.5" fill="#a855f7" stroke="#7e22ce" stroke-width="1.8" />
+      <g class="bldg-icon" transform="translate(836.5, 776.5) scale(0.917)">
+        <use href="#icon-admin" />
+      </g>
+    </g>
+  </g>
+  <g id="gates-and-markers">
+    <g id="marker-main-gate" class="bldg-group" data-id="main-gate" data-name="Main Gate (Gate No. 1)" data-category="ENTRANCE">
+      <circle cx="90" cy="880" r="14" fill="#ef4444" stroke="#ffffff" stroke-width="3" />
+      <circle cx="90" cy="880" r="5" fill="#ffffff" />
+    </g>
+    <g id="marker-gate-2" class="bldg-group" data-id="gate-2" data-name="Kirmich Road Gate No. 2" data-category="ENTRANCE">
+      <circle cx="330" cy="940" r="14" fill="#ef4444" stroke="#ffffff" stroke-width="3" />
+      <circle cx="330" cy="940" r="5" fill="#ffffff" />
+    </g>
+    <g id="marker-kuk-gate" class="bldg-group" data-id="kuk-gate" data-name="KUK Side Gate (Kurukshetra University)" data-category="ENTRANCE">
+      <circle cx="1160" cy="370" r="14" fill="#ef4444" stroke="#ffffff" stroke-width="3" />
+      <circle cx="1160" cy="370" r="5" fill="#ffffff" />
+    </g>
+    <g id="marker-dayalpur-gate" class="bldg-group" data-id="dayalpur-gate" data-name="Dayalpur Village Gate" data-category="ENTRANCE">
+      <circle cx="280" cy="80" r="12" fill="#ef4444" stroke="#ffffff" stroke-width="2.5" />
+      <circle cx="280" cy="80" r="4" fill="#ffffff" />
+    </g>
+  </g>
+  <g transform="translate(1130, 80)" opacity="0.85" pointer-events="none">
+    <circle cx="0" cy="0" r="22" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5" />
+    <polygon points="0,-18 4,-4 0,0" fill="#ef4444" />
+    <polygon points="0,-18 -4,-4 0,0" fill="#dc2626" />
+    <polygon points="0,18 4,4 0,0" fill="#64748b" />
+    <polygon points="0,18 -4,4 0,0" fill="#475569" />
+    <polygon points="18,0 4,4 0,0" fill="#94a3b8" />
+    <polygon points="18,0 4,-4 0,0" fill="#64748b" />
+    <polygon points="-18,0 -4,4 0,0" fill="#94a3b8" />
+    <polygon points="-18,0 -4,-4 0,0" fill="#64748b" />
+    <circle cx="0" cy="0" r="2.5" fill="#ffffff" />
+  </g>
+</svg>

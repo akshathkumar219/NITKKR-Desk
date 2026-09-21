@@ -24,6 +24,7 @@ export const KEYS = {
   rollcallAdjustments: 'kkr.rollcall.adjustments',
   cgpaSemesters: 'kkr.cgpa.semesters',
   notificationsRead: 'kkr.notifications.read',
+  swipeRollcall: 'kkr.rollcall.swipe',
 }
 
 // Every key this app owns starts here. The backup walks the prefix rather
@@ -382,6 +383,10 @@ export function useRollcallSettings() {
     },
   }
   return [merged, setSettings]
+}
+
+export function useSwipeRollcall() {
+  return useStored(KEYS.swipeRollcall, false)
 }
 
 export function getCompiledActiveSubjects(

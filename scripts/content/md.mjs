@@ -57,7 +57,7 @@ function stripQuotes(v) {
  */
 export function parseSections(lines, bodyStart, file) {
   const sections = []
-  let current = { heading: null, level: 0, line: bodyStart + 1, tables: [], bullets: [] }
+  let current = { heading: null, level: 0, line: bodyStart + 1, tables: [], bullets: [], prose: [] }
 
   for (let i = bodyStart; i < lines.length; i++) {
     const line = lines[i]
@@ -70,10 +70,10 @@ export function parseSections(lines, bodyStart, file) {
       // A level-1 heading is the document title. Keep collecting into the
       // current (unnamed) section rather than opening a named one.
       if (level === 1) continue
-      if (current.tables.length || current.bullets.length || current.heading !== null) {
+      if (current.tables.length || current.bullets.length || current.prose.length || current.heading !== null) {
         sections.push(current)
       }
-      current = { heading: h[2].trim(), level, line: i + 1, tables: [], bullets: [] }
+      current = { heading: h[2].trim(), level, line: i + 1, tables: [], bullets: [], prose: [] }
       continue
     }
 
@@ -84,13 +84,13 @@ export function parseSections(lines, bodyStart, file) {
       continue
     }
 
-    const b = /^[-*]\s+(.*)$/.exec(trimmed)
+    const b = /^(?:[-*]|\d+[.)])\s+(.*)$/.exec(trimmed)
     if (b) {
       current.bullets.push({ text: b[1].trim(), line: i + 1 })
       continue
     }
-    // Anything else is prose — notes, source attributions, reminders to
-    // whoever maintains the file. Ignored on purpose.
+
+    current.prose.push({ text: trimmed, line: i + 1 })
   }
   sections.push(current)
   return sections

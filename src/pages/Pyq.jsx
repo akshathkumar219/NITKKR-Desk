@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react'
-import { FileText, Search, X, EyeOff, Eye, RotateCcw, Check } from 'lucide-react'
+import { FileText, Search, X, EyeOff, Eye, RotateCcw, Check, ExternalLink, Download } from 'lucide-react'
 import Shell from '../components/Shell'
 import { Chip, Panel } from '../ui'
 import {
@@ -14,6 +14,9 @@ import { SORTED_BRANCHES, YEARS, DEFAULT_BRANCH, DEFAULT_YEAR } from '../data/ca
 
 function Viewer({ paper, onClose }) {
   if (!paper) return null
+
+  const downloadFilename = `${paper.code}_${paper.title.replace(/[^a-zA-Z0-9_-]/g, '_')}.pdf`
+
   return (
     <div
       className="fixed inset-0 z-50 flex flex-col"
@@ -22,39 +25,100 @@ function Viewer({ paper, onClose }) {
       aria-modal="true"
       aria-label={`${paper.code} ${paper.title}`}
     >
+      {/* Viewer Header Bar */}
       <div
-        className="flex items-center justify-between gap-4 border-b-2 border-[var(--border)] px-4 py-3"
+        className="flex items-center justify-between gap-3 border-b-2 border-[var(--border)] px-3 sm:px-4 py-2.5"
         style={{ background: 'var(--color-fuchsia)' }}
       >
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 sm:gap-3 min-w-0">
           <button
             type="button"
-            className="btn !py-1.5 cursor-pointer flex items-center gap-1.5"
+            className="btn !py-1 !px-2.5 sm:!py-1.5 cursor-pointer flex items-center gap-1.5 shrink-0"
             onClick={onClose}
+            aria-label="Close viewer"
           >
             <X className="icon-micro shrink-0" strokeWidth={2.5} /> <span>CLOSE</span>
           </button>
-          <p className="t-body font-bold" style={{ color: 'var(--color-fuchsia-ink)' }}>
-            {paper.code} · {paper.title}
-          </p>
+          <div className="min-w-0">
+            <p className="t-body font-bold truncate text-xs sm:text-sm" style={{ color: 'var(--color-fuchsia-ink)' }}>
+              {paper.code} · {paper.title}
+            </p>
+          </div>
         </div>
-        <p className="t-meta" style={{ color: 'var(--color-fuchsia-ink)' }}>
-          VIEW ONLY
-        </p>
+
+        {paper.url ? (
+          <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
+            <a
+              href={paper.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="btn !py-1 !px-2 sm:!px-2.5 text-xs font-bold uppercase tracking-wider flex items-center gap-1.5 cursor-pointer bg-[var(--surface)] text-[var(--text)] border-2 border-[var(--border)] hover:bg-[var(--surface-2)] shadow-hard-xs"
+              title="Open PDF directly in a new tab"
+            >
+              <ExternalLink className="icon-micro shrink-0" />
+              <span className="hidden sm:inline">OPEN IN TAB</span>
+            </a>
+            <a
+              href={paper.url}
+              download={downloadFilename}
+              className="btn !py-1 !px-2 sm:!px-2.5 text-xs font-bold uppercase tracking-wider flex items-center gap-1.5 cursor-pointer bg-[var(--surface)] text-[var(--text)] border-2 border-[var(--border)] hover:bg-[var(--surface-2)] shadow-hard-xs"
+              title="Download PDF to your device"
+            >
+              <Download className="icon-micro shrink-0" />
+              <span className="hidden sm:inline">DOWNLOAD</span>
+            </a>
+          </div>
+        ) : (
+          <p className="t-meta shrink-0" style={{ color: 'var(--color-fuchsia-ink)' }}>
+            VIEW ONLY
+          </p>
+        )}
       </div>
 
-      <div className="grid flex-1 place-items-center p-6">
+      {/* PDF Viewport */}
+      <div className="flex-1 w-full p-2 sm:p-4 min-h-0 bg-[var(--bg)] flex flex-col items-center justify-center">
         {paper.url ? (
-          <iframe
-            title={`${paper.code} paper`}
-            src={paper.url}
-            className="h-full w-full border-0 bg-white"
-          />
+          <object
+            data={`${paper.url}#toolbar=1&view=FitH`}
+            type="application/pdf"
+            className="h-full w-full rounded border-2 border-[var(--border)] bg-white shadow-hard-sm"
+          >
+            <iframe
+              title={`${paper.code} paper`}
+              src={`${paper.url}#toolbar=1&view=FitH`}
+              className="h-full w-full border-0 rounded"
+            >
+              <div className="flex flex-col items-center justify-center p-6 text-center h-full bg-[var(--surface)] text-[var(--text)] rounded border-2 border-[var(--border)]">
+                <FileText className="icon-lg opacity-60 mb-3" />
+                <p className="t-card-title">PDF EMBED NOT SUPPORTED ON THIS BROWSER</p>
+                <p className="t-body muted mt-2 max-w-sm normal-case">
+                  Your browser or device does not support embedded PDF viewing inside web apps. You can open the paper directly or download it.
+                </p>
+                <div className="mt-4 flex flex-wrap justify-center gap-2">
+                  <a
+                    href={paper.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="btn btn-go !py-2 !px-4 text-xs font-bold uppercase flex items-center gap-1.5"
+                  >
+                    <ExternalLink className="icon-micro" /> OPEN IN TAB
+                  </a>
+                  <a
+                    href={paper.url}
+                    download={downloadFilename}
+                    className="btn !py-2 !px-4 text-xs font-bold uppercase flex items-center gap-1.5"
+                  >
+                    <Download className="icon-micro" /> DOWNLOAD PDF
+                  </a>
+                </div>
+              </div>
+            </iframe>
+          </object>
         ) : (
-          <div className="max-w-md text-center">
-            <p className="t-masthead">no file attached</p>
+          <div className="max-w-md text-center p-8 bg-[var(--surface)] border-2 border-[var(--border)] rounded shadow-hard-sm">
+            <p className="t-masthead">NO FILE ATTACHED</p>
             <p className="t-body muted mt-4 normal-case">
-              This paper has no link yet.
+              This paper has no archived PDF file yet.
             </p>
           </div>
         )}

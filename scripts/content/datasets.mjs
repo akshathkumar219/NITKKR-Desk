@@ -350,8 +350,8 @@ export function parsePyq(text, file) {
       requireColumns(table, ['code', 'title'], file)
       for (const row of table.rows) {
         const url = row.get('url')
-        if (url && !/^https?:\/\//.test(url)) {
-          row.fail(`\`url\` must start with http:// or https:// — got "${url}".`)
+        if (url && !/^https?:\/\/|^\//.test(url)) {
+          row.fail(`\`url\` must start with http://, https://, or / — got "${url}".`)
         }
         if (!url) {
           warnings.push(`${file}:${row.line}  "${row.get('title')}" has no URL — it will render as "no file attached".`)
@@ -404,4 +404,106 @@ export function parseLinks(text, file) {
     if (rows.length) groups[key] = rows
   }
   return groups
+}
+
+// ------------------------------------------------------------- curriculum --
+
+/**
+ * content/curriculum/<BRANCH>/sem-<N>.md
+ *
+ * Front matter declares branch, semester, year, totalCredits, contactHours, batch, source.
+ * ## Courses contains the table of courses.
+ * ## Syllabi contains syllabus details for each course.
+ */
+export function parseCurriculum(text, file) {
+  const { data, lines, bodyStart } = parseFrontMatter(text, file)
+  const branch = required(data, 'branch', file, 'e.g. `branch: CSE`').toUpperCase()
+  const semRaw = required(data, 'semester', file, 'e.g. `semester: 3`')
+  const semester = parseInt(semRaw, 10)
+  if (Number.isNaN(semester) || semester < 1 || semester > 10) {
+    throw new ContentError(file, 1, `\`semester: ${semRaw}\` must be an integer between 1 and 10.`)
+  }
+  const year = data.year ? parseInt(data.year, 10) : Math.ceil(semester / 2)
+  const totalCredits = data.totalCredits || data.credits || ''
+  const contactHours = data.contactHours || data.contact || ''
+  const batch = data.batch || null
+  const source = data.source || null
+
+  const courses = []
+  const syllabi = {}
+  let currentCourseCode = null
+
+  for (const section of parseSections(lines, bodyStart, file)) {
+    if (!section.heading) continue
+    const headingUpper = section.heading.toUpperCase()
+
+    if (headingUpper === 'COURSES' || headingUpper === 'SUBJECTS') {
+      for (const table of section.tables) {
+        requireColumns(table, ['code', 'title'], file)
+        for (const row of table.rows) {
+          const code = row.get('code')
+          const title = row.get('title') || row.get('name')
+          if (!code || !title) continue
+          courses.push({
+            code,
+            title,
+            name: title,
+            category: row.get('category') || 'PC',
+            type: row.get('type') || 'Theory',
+            l: row.get('l') || '0',
+            t: row.get('t') || '0',
+            p: row.get('p') || '0',
+            credits: row.get('credits') || '0',
+            contact: row.get('contact') || '',
+          })
+        }
+      }
+    } else if (section.level === 3) {
+      // e.g. "### CSPC 201: Design and Analysis of Algorithms"
+      const match = /^([A-Z]{2,4}\s*(?:IC|PC|NC|PE|OE)?\s*\d{2,3}[A-Z]?)(?:\s*[:-]\s*(.*))?$/i.exec(section.heading)
+      if (match) {
+        currentCourseCode = match[1].trim()
+        syllabi[currentCourseCode] = {
+          code: currentCourseCode,
+          title: match[2]?.trim() || '',
+          units: [],
+          objectives: [],
+          references: [],
+        }
+      }
+    } else if (section.level >= 4 && currentCourseCode && syllabi[currentCourseCode]) {
+      const subHeadingUpper = section.heading.toUpperCase()
+      if (subHeadingUpper.includes('OBJECTIVE')) {
+        syllabi[currentCourseCode].objectives = section.bullets.map((b) => b.text)
+      } else if (subHeadingUpper.includes('REFERENCE') || subHeadingUpper.includes('TEXTBOOK') || subHeadingUpper.includes('BOOKS')) {
+        syllabi[currentCourseCode].references = section.bullets.map((b) => b.text)
+      } else if (subHeadingUpper.includes('UNIT') || subHeadingUpper.includes('MODULE') || subHeadingUpper.includes('SECTION')) {
+        if (section.heading.trim().toUpperCase() === 'UNITS') {
+          continue
+        }
+        let topics = section.bullets.map((b) => b.text)
+        if (!topics.length && section.prose?.length) {
+          const rawProse = section.prose.map((p) => p.text).join(' ')
+          const parts = rawProse.split(/[,;]\s+/).map((s) => s.trim().replace(/\.$/, '')).filter(Boolean)
+          topics = parts.length > 0 ? parts : [rawProse]
+        }
+        syllabi[currentCourseCode].units.push({
+          title: section.heading,
+          topics,
+        })
+      }
+    }
+  }
+
+  return {
+    branch,
+    semester,
+    year,
+    totalCredits,
+    contactHours,
+    batch,
+    source,
+    courses,
+    syllabi,
+  }
 }

@@ -25,4 +25,5 @@ Map
 
 *.mp4
 *.pdf
+!public/pyq/pdfs/*.pdf
 *.docx

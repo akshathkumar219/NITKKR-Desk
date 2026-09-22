@@ -19,6 +19,7 @@ import {
   parseMess,
   parsePyq,
   parseTimetable,
+  parseCurriculum,
 } from './datasets.mjs'
 
 const ROOT = fileURLToPath(new URL('../../', import.meta.url))
@@ -35,7 +36,7 @@ function mdFiles(dir) {
   const out = []
   const walk = (d) => {
     for (const entry of readdirSync(d, { withFileTypes: true })) {
-      if (entry.name.startsWith('_')) continue
+      if (entry.name.startsWith('_') || entry.name.toLowerCase() === 'readme.md') continue
       const p = join(d, entry.name)
       if (entry.isDirectory()) walk(p)
       else if (entry.isFile() && entry.name.endsWith('.md')) {
@@ -155,6 +156,23 @@ export function buildContent() {
     pyq.push(parsed)
   }
 
+  // ---- curriculum ----------------------------------------------------------
+  const curriculum = {}
+  for (const { path } of mdFiles('curriculum')) {
+    const parsed = attempt(() => parseCurriculum(readOne(path), rel(path)), null)
+    if (!parsed) continue
+    if (branchCodes.size && !branchCodes.has(parsed.branch)) {
+      errors.push(
+        `${rel(path)}:1  Unknown branch "${parsed.branch}". ` +
+          `Add it to content/campus/branches.md, or fix the spelling. ` +
+          `Known: ${[...branchCodes].join(', ')}.`,
+      )
+      continue
+    }
+    curriculum[parsed.branch] ??= {}
+    curriculum[parsed.branch][parsed.semester] = parsed
+  }
+
   // ---- flat link tables ----------------------------------------------------
   const flat = {}
   for (const name of ['links', 'transport', 'helpline', 'institute', 'placements']) {
@@ -166,7 +184,7 @@ export function buildContent() {
   return {
     errors,
     warnings,
-    data: { branches, hostels, landmarks, timetables, mess, calendars, exams, pyq, flat },
+    data: { branches, hostels, landmarks, timetables, mess, calendars, exams, pyq, flat, curriculum },
   }
 }
 
@@ -181,6 +199,7 @@ export function writeContent(data) {
     'calendar.json': { calendars: data.calendars, exams: data.exams },
     'pyq.json': data.pyq,
     'links.json': data.flat,
+    'curriculum.json': data.curriculum,
   }
   const written = []
   for (const [name, value] of Object.entries(files)) {
@@ -202,9 +221,15 @@ function summarise(data) {
     (n, y) => n + Object.values(y).reduce((m, s) => m + s.length, 0),
     0,
   )
+  const curriculumBranches = Object.keys(data.curriculum || {}).length
+  const totalCourses = Object.values(data.curriculum || {}).reduce(
+    (n, sems) => n + Object.values(sems).reduce((m, sem) => m + (sem.courses?.length || 0), 0),
+    0,
+  )
   return [
-    `${data.branches.length} branches (${branchesWithData} with a timetable)`,
+    `${data.branches.length} branches (${branchesWithData} with a timetable, ${curriculumBranches} with curriculum)`,
     `${sessions} sessions`,
+    `${totalCourses} curriculum courses`,
     `${Object.keys(data.mess).length}/${data.hostels.length} hostel menus`,
     `${data.landmarks.length} landmarks`,
     `${data.pyq.reduce((n, p) => n + p.papers.length, 0)} papers`,

@@ -1,7 +1,9 @@
-import { useMemo, useState } from 'react'
-import { FileText, Search, X, EyeOff, Eye, RotateCcw, Check, ExternalLink, Download } from 'lucide-react'
+import { useMemo, useState, lazy, Suspense } from 'react'
+import { FileText, Search, X, EyeOff, Eye, RotateCcw, Check, ExternalLink, Download, Loader2 } from 'lucide-react'
 import Shell from '../components/Shell'
 import { Chip, Panel } from '../ui'
+
+const PdfCanvasViewer = lazy(() => import('../components/PdfCanvasViewer'))
 import {
   PYQ_EXAMS,
   PYQ_YEARS,
@@ -76,44 +78,26 @@ function Viewer({ paper, onClose }) {
       </div>
 
       {/* PDF Viewport */}
-      <div className="flex-1 w-full p-2 sm:p-4 min-h-0 bg-[var(--bg)] flex flex-col items-center justify-center">
+      <div className="flex-1 w-full min-h-0 bg-[var(--bg)] flex flex-col items-center justify-center overflow-hidden">
         {paper.url ? (
-          <object
-            data={`${paper.url}#toolbar=1&view=FitH`}
-            type="application/pdf"
-            className="h-full w-full rounded border-2 border-[var(--border)] bg-white shadow-hard-sm"
-          >
-            <iframe
-              title={`${paper.code} paper`}
-              src={`${paper.url}#toolbar=1&view=FitH`}
-              className="h-full w-full border-0 rounded"
-            >
-              <div className="flex flex-col items-center justify-center p-6 text-center h-full bg-[var(--surface)] text-[var(--text)] rounded border-2 border-[var(--border)]">
-                <FileText className="icon-lg opacity-60 mb-3" />
-                <p className="t-card-title">PDF EMBED NOT SUPPORTED ON THIS BROWSER</p>
-                <p className="t-body muted mt-2 max-w-sm normal-case">
-                  Your browser or device does not support embedded PDF viewing inside web apps. You can open the paper directly or download it.
-                </p>
-                <div className="mt-4 flex flex-wrap justify-center gap-2">
-                  <a
-                    href={paper.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="btn btn-go !py-2 !px-4 text-xs font-bold uppercase flex items-center gap-1.5"
-                  >
-                    <ExternalLink className="icon-micro" /> OPEN IN TAB
-                  </a>
-                  <a
-                    href={paper.url}
-                    download={downloadFilename}
-                    className="btn !py-2 !px-4 text-xs font-bold uppercase flex items-center gap-1.5"
-                  >
-                    <Download className="icon-micro" /> DOWNLOAD PDF
-                  </a>
+          <Suspense
+            fallback={
+              <div className="flex flex-col items-center justify-center p-8 sm:p-12 text-center h-full w-full">
+                <div className="relative flex items-center justify-center p-4 bg-[var(--surface-2)] border-2 border-[var(--border)] rounded shadow-hard-sm">
+                  <Loader2 className="icon-md sm:icon-lg animate-spin text-[var(--color-fuchsia)] mr-3" />
+                  <span className="t-card-title text-xs sm:text-sm uppercase tracking-wider font-extrabold text-[var(--text)]">
+                    INITIALIZING VIEWER...
+                  </span>
                 </div>
               </div>
-            </iframe>
-          </object>
+            }
+          >
+            <PdfCanvasViewer
+              url={paper.url}
+              title={`${paper.code} · ${paper.title}`}
+              downloadFilename={downloadFilename}
+            />
+          </Suspense>
         ) : (
           <div className="max-w-md text-center p-8 bg-[var(--surface)] border-2 border-[var(--border)] rounded shadow-hard-sm">
             <p className="t-masthead">NO FILE ATTACHED</p>

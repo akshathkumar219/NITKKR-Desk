@@ -78,7 +78,7 @@ const blank = {
 export default function SessionModal({ open, onClose, onSave, onDelete, session, defaultDay, prefill, courses: propCourses }) {
   const { profile, year } = useProfile()
   const { sessions } = useBoard(profile.branch, year)
-  const [allSubjectsStore] = useAllSubjectsData()
+  const allSubjectsStore = useAllSubjectsData()
 
   // Build comprehensive course list for the student's branch & year + custom subjects
   const availableCourses = useMemo(() => {
@@ -179,9 +179,10 @@ export default function SessionModal({ open, onClose, onSave, onDelete, session,
       const start = session.start != null ? session.start : 510
       const end = session.end != null ? session.end : 565
       const isLab = session.type === 'lab' || (session.name || '').toUpperCase().includes('LAB')
-      const credits = session.attendanceCredits != null
-        ? Number(session.attendanceCredits)
-        : (isLab ? 2 : 1)
+      const credits =
+        session.attendanceCredits != null && session.attendanceCredits !== 2
+          ? Number(session.attendanceCredits)
+          : 1
 
       const matchingPreset = NITKKR_PERIOD_PRESETS.find((p) => p.start === start && p.end === end)
       if (matchingPreset) {
@@ -226,7 +227,7 @@ export default function SessionModal({ open, onClose, onSave, onDelete, session,
         defaultCourse.category === 'LAB' ||
         (defaultCourse.name || '').toUpperCase().includes('LAB')
       )
-      const initialCredits = isLab ? 2 : 1
+      const initialCredits = 1
       const initialPreset = isLab ? 'lab1' : 'p1'
       const presetObj = NITKKR_PERIOD_PRESETS.find((p) => p.id === initialPreset) || NITKKR_PERIOD_PRESETS[0]
 
@@ -282,7 +283,7 @@ export default function SessionModal({ open, onClose, onSave, onDelete, session,
       (target.name || '').toUpperCase().includes('LAB')
 
     const s0 = target.sessions?.[0] || {}
-    const newCredits = isLab ? 2 : 1
+    const newCredits = 1
 
     // If switching to Lab and currently on single period, auto-switch to standard lab period
     let newStart = form.start
@@ -329,9 +330,6 @@ export default function SessionModal({ open, onClose, onSave, onDelete, session,
       set({ start: p.start, end: p.end })
       setCustomStartStr(fmtTime(p.start))
       setCustomEndStr(fmtTime(p.end))
-      if (p.type === 'lab' && form.attendanceCredits === 1) {
-        set({ attendanceCredits: 2 })
-      }
     }
   }
 
@@ -344,7 +342,7 @@ export default function SessionModal({ open, onClose, onSave, onDelete, session,
     }
 
     const startMins = Number(val)
-    const duration = form.attendanceCredits >= 2 ? 110 : 55
+    const duration = form.type === 'lab' || form.attendanceCredits >= 2 ? 110 : 55
     const suggestedEnd = startMins + duration
 
     // Find if this aligns with a standard period preset
@@ -414,12 +412,12 @@ export default function SessionModal({ open, onClose, onSave, onDelete, session,
       code: form.code.trim(),
       room: form.room.trim(),
       group: form.group.trim(),
-      type: form.type || (form.attendanceCredits >= 2 ? 'lab' : 'lecture'),
+      type: form.type || 'lecture',
       accent: form.accent || '',
       instructor: form.instructor.trim(),
       note: form.note.trim(),
       targetCutoff: form.targetCutoff ? Number(form.targetCutoff) : 65,
-      attendanceCredits: Number(form.attendanceCredits) || (form.type === 'lab' ? 2 : 1),
+      attendanceCredits: Number(form.attendanceCredits) || 1,
     })
     onClose()
   }
@@ -630,8 +628,8 @@ export default function SessionModal({ open, onClose, onSave, onDelete, session,
 
           <div className="grid grid-cols-3 gap-2">
             {[
-              { val: 1, label: '1 CREDIT', sub: 'Standard Lecture' },
-              { val: 2, label: '2 CREDITS', sub: 'Lab / Double Slot' },
+              { val: 1, label: '1 CREDIT', sub: 'Standard Class / Lab' },
+              { val: 2, label: '2 CREDITS', sub: 'Double Slot' },
               { val: 3, label: '3 CREDITS', sub: 'Workshop' },
             ].map((c) => {
               const active = form.attendanceCredits === c.val

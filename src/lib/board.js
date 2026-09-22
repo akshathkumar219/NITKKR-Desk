@@ -32,15 +32,13 @@ export function useBoard(branch, year) {
     const out = []
 
     const withCredits = (s) => {
-      if (s.attendanceCredits != null) return s
-      const isLab =
-        s.type === 'lab' ||
-        (s.name || '').toUpperCase().includes('LAB') ||
-        (s.code || '').toUpperCase().includes('(P)') ||
-        s.category === 'LAB'
+      const credits =
+        s.attendanceCredits != null && s.attendanceCredits !== 2
+          ? Number(s.attendanceCredits)
+          : 1
       return {
         ...s,
-        attendanceCredits: isLab ? 2 : 1,
+        attendanceCredits: credits,
       }
     }
 

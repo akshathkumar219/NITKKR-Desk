@@ -15,7 +15,7 @@ import { usePwa } from '../lib/pwa'
 export default function Notifications() {
   const { notifications, markAllAsRead } = useNotifications()
   const { needRefresh, updateApp, checkForUpdates, checkStatus } = usePwa()
-  const [expandedIds, setExpandedIds] = useState(() => new Set(['update-v1-5']))
+  const [expandedIds, setExpandedIds] = useState(() => new Set(['update-v1-7']))
 
   // Automatically mark notifications as seen when opening the page
   useEffect(() => {
@@ -131,8 +131,8 @@ export default function Notifications() {
                   aria-expanded={isExpanded}
                 >
                   <div className="flex items-center justify-between gap-3">
-                    <div className="flex items-center gap-2.5 min-w-0">
-                      {item.isNew || item.version === '1.5' ? (
+                    <div className="flex items-center gap-2.5 min-w-0 flex-wrap">
+                      {item.isNew ? (
                         <span
                           className="sticker !px-1.5 !py-0.5 !text-[11px] !font-black !tracking-wider select-none shrink-0"
                           style={{
@@ -151,6 +151,12 @@ export default function Notifications() {
                       >
                         {item.title}
                       </h2>
+
+                      {item.date ? (
+                        <span className="text-[11px] font-mono font-bold text-[var(--muted)] uppercase tracking-wider">
+                          ({item.date})
+                        </span>
+                      ) : null}
                     </div>
 
                     <button

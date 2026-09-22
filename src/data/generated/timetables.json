@@ -4757,18 +4757,6 @@
       },
       {
         "day": "TUE",
-        "start": 510,
-        "end": 620,
-        "name": "IoT Programming Lab",
-        "code": "CSPC-209 (P)",
-        "room": "LAB 1",
-        "group": "B4",
-        "instructor": "Mr. Rohitashwa",
-        "type": "lab",
-        "id": "b835is"
-      },
-      {
-        "day": "TUE",
         "start": 565,
         "end": 620,
         "name": "Object-Oriented Programming using Java",
@@ -4826,6 +4814,18 @@
         "instructor": "Dr. Saraswati Yadav",
         "type": "lecture",
         "id": "d2igk3"
+      },
+      {
+        "day": "TUE",
+        "start": 880,
+        "end": 990,
+        "name": "IoT Programming Lab",
+        "code": "CSPC-209 (P)",
+        "room": "LAB 1",
+        "group": "B4",
+        "instructor": "Mr. Rohitashwa",
+        "type": "lab",
+        "id": "12s3meq"
       },
       {
         "day": "WED",

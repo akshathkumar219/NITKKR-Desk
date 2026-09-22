@@ -22,6 +22,12 @@ import {
 import { useBoard, coursesOf, filterSessionsByGroup } from "../lib/board";
 import { useRollcall, tally, canSkip, mustAttend } from "../lib/rollcall";
 import { getSubjectTheme } from "../lib/palette";
+import {
+  getSemesterCourses,
+  getCourseCurriculum,
+  getDefaultSemesterForYear,
+  normalizeStr,
+} from "../data/curriculum";
 
 export default function Subjects() {
   const navigate = useNavigate();
@@ -33,6 +39,13 @@ export default function Subjects() {
   const [selectedKey, setSelectedKey] = useState(urlKey || null);
 
   const { profile, year, group } = useProfile();
+  const defaultSem = getDefaultSemesterForYear(year);
+  const [activeSemester, setActiveSemester] = useState(defaultSem);
+
+  useEffect(() => {
+    setActiveSemester(getDefaultSemesterForYear(year));
+  }, [year]);
+
   const { sessions, addSession, removeSession, moveSession } = useBoard(
     profile.branch,
     year,
@@ -57,15 +70,144 @@ export default function Subjects() {
   const [editingCourse, setEditingCourse] = useState(null);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
 
-  // Aggregate courses with extended stored metadata
+  // Aggregate courses with extended stored metadata & official curriculum
   const subjects = useMemo(() => {
     const effectiveSessions = filterSessionsByGroup(sessions, group);
     const rawCourses = coursesOf(effectiveSessions);
-    return rawCourses
+    const officialCourses = getSemesterCourses(profile.branch, activeSemester);
+
+    // Track matched raw courses
+    const matchedRawKeys = new Set();
+
+    // 1. Build course objects from official curriculum
+    const curriculumSubjects = officialCourses.map((oc) => {
+      // Find matching session in rawCourses
+      const rawMatch = rawCourses.find(
+        (rc) =>
+          (oc.code && rc.code && normalizeStr(oc.code) === normalizeStr(rc.code)) ||
+          (oc.title && rc.name && normalizeStr(oc.title) === normalizeStr(rc.name)) ||
+          (rc.key && oc.code && normalizeStr(rc.key) === normalizeStr(oc.code)),
+      );
+
+      if (rawMatch) {
+        matchedRawKeys.add(rawMatch.key);
+      }
+
+      const courseKey = rawMatch ? rawMatch.key : oc.code;
+      const courseName = oc.title || oc.name || (rawMatch ? rawMatch.name : oc.code);
+      const courseCode = oc.code || (rawMatch ? rawMatch.code : "");
+      const courseSessions = rawMatch ? rawMatch.sessions : [];
+
+      const firstSession = courseSessions[0] || {};
+      const customData =
+        allSubjectsStore[courseKey] ||
+        allSubjectsStore[courseName] ||
+        (courseCode ? allSubjectsStore[courseCode] : {}) ||
+        {};
+
+      const officialCurriculum = getCourseCurriculum(
+        profile.branch,
+        activeSemester,
+        courseCode || courseName,
+      );
+
+      const theme = getSubjectTheme({
+        ...firstSession,
+        ...customData,
+        name: courseName,
+        code: courseCode,
+        type: oc.type || firstSession.type || "theory",
+        category: customData.category || oc.category || firstSession.category,
+      });
+
+      const category = (
+        customData.category ||
+        oc.category ||
+        officialCurriculum?.category ||
+        firstSession.category ||
+        theme.label
+      ).toUpperCase();
+
+      const room = firstSession.room || customData.room || "TBD";
+      const instructor =
+        customData.instructor || firstSession.instructor || "";
+      const accent =
+        customData.accent || firstSession.accent || theme.accent;
+      const targetCutoff =
+        customData.targetCutoff || firstSession.targetCutoff || 65;
+      const credits =
+        customData.credits ||
+        oc.credits ||
+        officialCurriculum?.credits ||
+        (category === "LAB" ? "2" : "4");
+
+      const manualAdj = (adjustments || {})[courseKey] || 0;
+      const stats = tally(
+        marks || {},
+        courseSessions,
+        rollcallSettings?.trackingSince,
+        manualAdj,
+      );
+
+      const safeBunks = canSkip(stats.present, stats.held, targetCutoff);
+      const deficit = mustAttend(stats.present, stats.held, targetCutoff);
+
+      const units =
+        customData.units && customData.units.length > 0
+          ? customData.units
+          : officialCurriculum?.formattedUnits || [];
+
+      let totalTopics = 0;
+      let doneTopics = 0;
+      units.forEach((u) => {
+        (u.topics || []).forEach((t) => {
+          totalTopics += 1;
+          if (t.done) doneTopics += 1;
+        });
+      });
+      const syllabusPct =
+        totalTopics > 0 ? Math.round((doneTopics / totalTopics) * 100) : 0;
+
+      const pendingTasks = (customData.tasks || []).filter(
+        (t) => !t.done,
+      ).length;
+
+      return {
+        key: courseKey,
+        name: courseName,
+        code: courseCode,
+        category,
+        room,
+        instructor,
+        accent,
+        targetCutoff,
+        credits,
+        sessions: courseSessions,
+        stats,
+        safeBunks,
+        deficit,
+        units,
+        objectives: officialCurriculum?.objectives || [],
+        references: officialCurriculum?.references || [],
+        syllabusPct,
+        doneTopics,
+        totalTopics,
+        pendingTasks,
+      };
+    });
+
+    // 2. Add extra courses from timetable that weren't in official curriculum
+    const extraSubjects = rawCourses
+      .filter((rc) => !matchedRawKeys.has(rc.key))
       .map((c) => {
         const firstSession = c.sessions[0] || {};
         const customData =
           allSubjectsStore[c.key] || allSubjectsStore[c.name] || {};
+        const officialCurriculum = getCourseCurriculum(
+          profile.branch,
+          activeSemester,
+          c.code || c.name || c.key,
+        );
         const theme = getSubjectTheme({
           ...firstSession,
           ...customData,
@@ -76,6 +218,7 @@ export default function Subjects() {
         });
         const category = (
           customData.category ||
+          officialCurriculum?.category ||
           firstSession.category ||
           theme.label
         ).toUpperCase();
@@ -87,14 +230,11 @@ export default function Subjects() {
           customData.accent || firstSession.accent || theme.accent;
         const targetCutoff =
           customData.targetCutoff || firstSession.targetCutoff || 65;
-        const credits = customData.credits || (category === "LAB" ? "2" : "4");
+        const credits =
+          customData.credits ||
+          officialCurriculum?.credits ||
+          (category === "LAB" ? "2" : "4");
 
-
-        // Attendance stats for this subject. No baseAttendance here — that's
-        // a single semester-wide catch-up figure the student enters once (see
-        // Attendance.jsx's Settings), not something attributable to any one
-        // subject, and Attendance.jsx's own per-subject rows don't apply it
-        // either. Passing it here double counted it into every subject card.
         const manualAdj = (adjustments || {})[c.key] || 0;
         const stats = tally(
           marks || {},
@@ -106,8 +246,11 @@ export default function Subjects() {
         const safeBunks = canSkip(stats.present, stats.held, targetCutoff);
         const deficit = mustAttend(stats.present, stats.held, targetCutoff);
 
-        // Syllabus topics count
-        const units = customData.units || [];
+        const units =
+          customData.units && customData.units.length > 0
+            ? customData.units
+            : officialCurriculum?.formattedUnits || [];
+
         let totalTopics = 0;
         let doneTopics = 0;
         units.forEach((u) => {
@@ -119,7 +262,6 @@ export default function Subjects() {
         const syllabusPct =
           totalTopics > 0 ? Math.round((doneTopics / totalTopics) * 100) : 0;
 
-        // Pending tasks count
         const pendingTasks = (customData.tasks || []).filter(
           (t) => !t.done,
         ).length;
@@ -138,14 +280,29 @@ export default function Subjects() {
           stats,
           safeBunks,
           deficit,
+          units,
+          objectives: officialCurriculum?.objectives || [],
+          references: officialCurriculum?.references || [],
           syllabusPct,
           doneTopics,
           totalTopics,
           pendingTasks,
         };
-      })
-      .sort((a, b) => a.name.localeCompare(b.name));
-  }, [sessions, group, allSubjectsStore, marks, adjustments, rollcallSettings]);
+      });
+
+    return [...curriculumSubjects, ...extraSubjects].sort((a, b) =>
+      a.name.localeCompare(b.name),
+    );
+  }, [
+    sessions,
+    group,
+    allSubjectsStore,
+    marks,
+    adjustments,
+    rollcallSettings,
+    profile.branch,
+    activeSemester,
+  ]);
 
 
   // Active Selected Subject
@@ -176,18 +333,66 @@ export default function Subjects() {
       );
     }
 
-    if (index === -1) {
+    if (index !== -1) {
       return {
-        activeSubject: null,
-        isNotFound: true,
+        activeSubject: subjects[index],
+        isNotFound: false,
+      };
+    }
+
+    // Fallback: search curriculum across all semesters of this branch
+    const foundCurriculum = getCourseCurriculum(profile.branch, activeSemester, clean);
+    if (foundCurriculum) {
+      const customData =
+        allSubjectsStore[foundCurriculum.code] ||
+        allSubjectsStore[foundCurriculum.title] ||
+        {};
+      const units =
+        customData.units && customData.units.length > 0
+          ? customData.units
+          : foundCurriculum.formattedUnits || [];
+      let totalTopics = 0;
+      let doneTopics = 0;
+      units.forEach((u) => {
+        (u.topics || []).forEach((t) => {
+          totalTopics += 1;
+          if (t.done) doneTopics += 1;
+        });
+      });
+      const syllabusPct =
+        totalTopics > 0 ? Math.round((doneTopics / totalTopics) * 100) : 0;
+      return {
+        activeSubject: {
+          key: foundCurriculum.code,
+          name: foundCurriculum.title || foundCurriculum.name,
+          code: foundCurriculum.code,
+          category: foundCurriculum.category || "PC",
+          credits: foundCurriculum.credits || "4",
+          room: "TBD",
+          instructor: "",
+          accent: "var(--color-sky)",
+          targetCutoff: 65,
+          sessions: [],
+          stats: { percent: null, present: 0, held: 0 },
+          safeBunks: 0,
+          deficit: 0,
+          units,
+          objectives: foundCurriculum.objectives || [],
+          references: foundCurriculum.references || [],
+          syllabusPct,
+          doneTopics,
+          totalTopics,
+          pendingTasks: 0,
+        },
+        isNotFound: false,
       };
     }
 
     return {
-      activeSubject: subjects[index],
-      isNotFound: false,
+      activeSubject: null,
+      isNotFound: true,
     };
-  }, [subjects, selectedKey, urlKey]);
+  }, [subjects, selectedKey, urlKey, profile.branch, activeSemester, allSubjectsStore]);
 
   // Navigation handlers
   const handleSelectSubject = (courseKey) => {
@@ -330,6 +535,35 @@ export default function Subjects() {
               }
             />
 
+            {/* SEMESTER PICKER TABS */}
+            <div className="board board-hard bg-[var(--surface)] pad-tight flex flex-wrap items-center justify-between gap-2">
+              <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5">
+                {[1, 2, 3, 4, 5, 6, 7, 8].map((s) => {
+                  const isCurrentYear = s === Number(year) * 2 - 1 || s === Number(year) * 2;
+                  const isActive = activeSemester === s;
+                  return (
+                    <button
+                      key={s}
+                      type="button"
+                      onClick={() => setActiveSemester(s)}
+                      className={`btn !py-1 !px-2.5 sm:!px-3 text-xs font-black uppercase tracking-wider shrink-0 transition-all cursor-pointer ${
+                        isActive
+                          ? "!bg-[var(--color-sky)] !text-[var(--on-accent)] shadow-hard-sm"
+                          : isCurrentYear
+                            ? "!bg-[var(--surface-2)] text-[var(--text)] border border-[var(--border)]"
+                            : "opacity-60 hover:opacity-100 bg-[var(--surface)] text-[var(--muted)]"
+                      }`}
+                    >
+                      <span>SEM {s}</span>
+                    </button>
+                  );
+                })}
+              </div>
+              <div className="text-[11px] font-mono font-bold text-[var(--muted)] uppercase">
+                {profile.branch} · SEMESTER {activeSemester} · {subjects.length} SUBJECTS
+              </div>
+            </div>
+
             {/* CONTROLS BAR: SEARCH & CATEGORY CHIPS */}
             <div className="board board-hard bg-[var(--surface)] pad-tight flex flex-wrap items-center justify-between gap-3">
               {/* SEARCH INPUT */}
@@ -354,7 +588,7 @@ export default function Subjects() {
                 </p>
                 <p className="t-meta muted max-w-sm">
                   {subjects.length === 0
-                    ? `No subjects found for ${branchName(profile.branch)} Year ${year}. Timetable hasn't been uploaded yet.`
+                    ? `No subjects found for ${branchName(profile.branch)} Semester ${activeSemester}.`
                     : "Try adjusting your search query, or add a custom course row."}
                 </p>
                 {subjects.length > 0 && searchQuery ? (
@@ -385,11 +619,7 @@ export default function Subjects() {
                         : s.stats.percent >= s.targetCutoff - 10
                           ? "var(--color-amber)"
                           : "var(--color-absent)";
-                  // Placeholders are worse than nothing: an unset instructor and
-                  // an untouched syllabus bar repeat on every card and say
-                  // nothing. Show them only once they hold real data.
                   const hasInstructor = Boolean(s.instructor);
-                  const hasSyllabus = s.syllabusPct > 0;
 
                   return (
                     <div
@@ -411,14 +641,20 @@ export default function Subjects() {
                       }}
                     >
                       <div className="pad-card flex items-start gap-3">
-                        {/* Attendance leads — it is why this page gets opened. */}
-                        <Ring
-                          percent={s.stats.percent}
-                          size={56}
-                          strokeWidth={6}
-                          textSize="text-xs font-bold"
-                          color={ringColor}
-                        />
+                        {/* Attendance Ring or Syllabus Icon */}
+                        {s.sessions.length > 0 ? (
+                          <Ring
+                            percent={s.stats.percent}
+                            size={56}
+                            strokeWidth={6}
+                            textSize="text-xs font-bold"
+                            color={ringColor}
+                          />
+                        ) : (
+                          <div className="size-14 rounded-full bg-[var(--surface-2)] border-2 border-[var(--border)] grid place-items-center shrink-0">
+                            <BookOpen className="size-6 text-[var(--color-sky)]" strokeWidth={2.2} />
+                          </div>
+                        )}
 
                         <div className="min-w-0 flex-1">
                           <div className="flex items-start justify-between gap-2">
@@ -440,7 +676,11 @@ export default function Subjects() {
                           </p>
 
                           <p className="t-meta font-black mt-2">
-                            {s.stats.percent === null ? (
+                            {s.sessions.length === 0 ? (
+                              <span className="text-[var(--color-sky)]">
+                                {s.totalTopics > 0 ? `${s.totalTopics} TOPICS PRE-LOADED` : "CURRICULUM SYLLABUS"}
+                              </span>
+                            ) : s.stats.percent === null ? (
                               <span className="muted">UNTRACKED</span>
                             ) : isSafe ? (
                               <span style={{ color: "var(--present-ink)" }}>
@@ -455,12 +695,12 @@ export default function Subjects() {
                             )}
                           </p>
 
-                          {hasSyllabus ? (
+                          {s.totalTopics > 0 ? (
                             <div className="mt-3 space-y-1.5">
                               <div className="flex items-center justify-between t-micro font-bold">
-                                <span className="muted">SYLLABUS</span>
+                                <span className="muted">SYLLABUS PROGRESS</span>
                                 <span className="text-[var(--color-sky)] font-mono">
-                                  {s.syllabusPct}%
+                                  {s.syllabusPct}% ({s.doneTopics}/{s.totalTopics})
                                 </span>
                               </div>
                               <Meter
@@ -480,8 +720,10 @@ export default function Subjects() {
                               {s.pendingTasks} PENDING TO-DO
                               {s.pendingTasks > 1 ? "S" : ""}
                             </span>
-                          ) : (
+                          ) : s.sessions.length > 0 ? (
                             <span>{s.sessions.length} SLOTS / WEEK</span>
+                          ) : (
+                            <span className="text-[var(--muted)]">OFFICIAL CURRICULUM</span>
                           )}
                         </span>
 

@@ -5,11 +5,39 @@
 
 export const NOTIFICATIONS = [
   {
+    id: 'update-v1-7',
+    version: '1.7',
+    date: '22nd Sept 26',
+    isNew: true,
+    title: 'Version 1.7',
+    accentColor: 'var(--color-acid)',
+    summary: 'Fixed PYQs, redesigned Attendance page, and updated syllabus for all branches.',
+    details: [
+      'Fixed PYQs',
+      'Redesigned Attendance Page',
+      'Syllabus for all branches is now updated',
+    ],
+  },
+  {
+    id: 'update-v1-6',
+    version: '1.6',
+    date: '21st Sept 26, 8 AM',
+    isNew: false,
+    title: 'Version 1.6',
+    accentColor: 'var(--color-sky)',
+    summary: 'Swipe feature in attendance, fix a day on timetable page, and new mess menu for H10.',
+    details: [
+      'Swipe feature in attendance',
+      'Fix a day is now on timetable page itself',
+      'New mess menu for H10',
+    ],
+  },
+  {
     id: 'update-v1-5',
     version: '1.5',
-    isNew: true,
+    isNew: false,
     title: 'Version 1.5',
-    accentColor: 'var(--color-acid)',
+    accentColor: 'var(--color-amber)',
     summary: 'Updated Academic Calendar, PYQs uploaded, Dashboard redesigned, and bug fixes.',
     details: [
       'Updated Academic Calendar',

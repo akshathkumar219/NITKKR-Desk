@@ -1,4 +1,4 @@
-import { useState, useMemo, useCallback } from 'react'
+import { useState, useMemo, useCallback, useEffect } from 'react'
 import {
   Calculator,
   Plus,
@@ -17,6 +17,11 @@ import {
 import Shell from '../components/Shell'
 import { KEYS, useProfile, useStored } from '../lib/storage'
 import { coursesOf, filterSessionsByGroup, useBoard } from '../lib/board'
+import {
+  getSemesterCourses,
+  getTotalSemesterCredits,
+  getDefaultSemesterForYear,
+} from '../data/curriculum'
 
 // NIT Kurukshetra standard grading scale from CGPA.md
 const GRADE_POINTS = [
@@ -42,16 +47,44 @@ const DEFAULT_SEMESTERS = [
 
 export default function CalculatorPage() {
   const { profile, year, group } = useProfile()
+  const defaultSem = getDefaultSemesterForYear(year)
+  const [activeSemester, setActiveSemester] = useState(defaultSem)
+
+  useEffect(() => {
+    setActiveSemester(getDefaultSemesterForYear(year))
+  }, [year])
+
   const { sessions } = useBoard(profile.branch, year)
   const branchKey = `${profile.branch}-${year}`
+  const semStorageKey = `${profile.branch}-sem-${activeSemester}`
 
   const [activeTab, setActiveTab] = useState('SGPA') // 'SGPA' | 'CGPA' | 'FORECAST' | 'RULES'
 
-  // SGPA Course Rows stored in localStorage (supports per branch-year and legacy array)
+  // SGPA Course Rows stored in localStorage (supports per branch-semester, branch-year, and legacy array)
   const [allGrades, setAllGrades] = useStored(KEYS.grades, {})
 
-  // Compute default courses for active branch, year, and group
+  // Compute default courses for active branch and semester from official curriculum
   const defaultCoursesForBranch = useMemo(() => {
+    const semCourses = getSemesterCourses(profile.branch, activeSemester)
+    if (semCourses.length > 0) {
+      return semCourses
+        .filter((c) => {
+          const raw = String(c.credits || '').replace(/[^0-9.]/g, '')
+          return raw !== '' && parseFloat(raw) > 0 && c.category !== 'NC'
+        })
+        .map((c, i) => {
+          const raw = String(c.credits || '4').replace(/[^0-9.]/g, '')
+          return {
+            id: `c_${c.code || c.title}_${i}`,
+            code: c.code || 'THEORY',
+            name: c.title || c.name,
+            credits: raw || '4',
+            grade: 'A',
+            category: c.category || 'PC',
+          }
+        })
+    }
+
     const effectiveSessions = filterSessionsByGroup(sessions, group)
     const rawCourses = coursesOf(effectiveSessions)
     return rawCourses.map((c, i) => {
@@ -64,41 +97,74 @@ export default function CalculatorPage() {
         grade: 'A',
       }
     })
-  }, [sessions, group])
+  }, [profile.branch, activeSemester, sessions, group])
 
-  // Active courses for current branch & year
+  // Active courses for current branch & semester
   const courses = useMemo(() => {
-    if (allGrades && !Array.isArray(allGrades) && Array.isArray(allGrades[branchKey]) && allGrades[branchKey].length > 0) {
-      return allGrades[branchKey]
+    if (allGrades && !Array.isArray(allGrades)) {
+      if (Array.isArray(allGrades[semStorageKey]) && allGrades[semStorageKey].length > 0) {
+        return allGrades[semStorageKey]
+      }
+      if (Array.isArray(allGrades[branchKey]) && allGrades[branchKey].length > 0) {
+        return allGrades[branchKey]
+      }
     }
     // Backward compatibility if grades was stored as a flat array
     if (Array.isArray(allGrades) && allGrades.length > 0) {
       return allGrades
     }
     return defaultCoursesForBranch
-  }, [allGrades, branchKey, defaultCoursesForBranch])
+  }, [allGrades, semStorageKey, branchKey, defaultCoursesForBranch])
 
   const setCourses = useCallback(
     (updater) => {
       setAllGrades((prev) => {
         const curList =
-          (!Array.isArray(prev) && Array.isArray(prev?.[branchKey]) && prev[branchKey].length > 0)
-            ? prev[branchKey]
-            : (Array.isArray(prev) && prev.length > 0)
-              ? prev
-              : defaultCoursesForBranch
+          (!Array.isArray(prev) && Array.isArray(prev?.[semStorageKey]) && prev[semStorageKey].length > 0)
+            ? prev[semStorageKey]
+            : (!Array.isArray(prev) && Array.isArray(prev?.[branchKey]) && prev[branchKey].length > 0)
+              ? prev[branchKey]
+              : (Array.isArray(prev) && prev.length > 0)
+                ? prev
+                : defaultCoursesForBranch
         const nextList = typeof updater === 'function' ? updater(curList) : updater
         if (Array.isArray(prev)) {
-          return { [branchKey]: nextList }
+          return { [semStorageKey]: nextList }
         }
-        return { ...prev, [branchKey]: nextList }
+        return { ...prev, [semStorageKey]: nextList }
       })
     },
-    [branchKey, defaultCoursesForBranch, setAllGrades],
+    [semStorageKey, branchKey, defaultCoursesForBranch, setAllGrades],
   )
 
   // Multi-semester cumulative CGPA records stored in localStorage
   const [semesters, setSemesters] = useStored(KEYS.cgpaSemesters, DEFAULT_SEMESTERS)
+
+  // Auto-apply official scheme credits if current records still have generic 20 credits
+  useEffect(() => {
+    if (semesters && semesters.every((s) => s.credits === '20')) {
+      const hasOfficial = [1, 2, 3, 4, 5, 6, 7, 8].some(
+        (s) => getTotalSemesterCredits(profile.branch, s) !== 20,
+      )
+      if (hasOfficial) {
+        setSemesters((prev) =>
+          (prev || DEFAULT_SEMESTERS).map((s) => ({
+            ...s,
+            credits: String(getTotalSemesterCredits(profile.branch, s.sem) || 20),
+          })),
+        )
+      }
+    }
+  }, [profile.branch, semesters, setSemesters])
+
+  const applyOfficialCredits = () => {
+    setSemesters((prev) =>
+      (prev || DEFAULT_SEMESTERS).map((s) => ({
+        ...s,
+        credits: String(getTotalSemesterCredits(profile.branch, s.sem) || 20),
+      })),
+    )
+  }
 
   // CGPA Forecaster state
   const [currentCgpaInput, setCurrentCgpaInput] = useState('')
@@ -106,9 +172,26 @@ export default function CalculatorPage() {
   const [targetCgpaInput, setTargetCgpaInput] = useState('')
   const [totalDegreeSems, setTotalDegreeSems] = useState('8')
 
+  // Load official curriculum courses
+  const syncFromCurriculum = () => {
+    setCourses(defaultCoursesForBranch)
+  }
+
   // Auto-fill SGPA courses from current active timetable
   const importFromTimetable = () => {
-    setCourses(defaultCoursesForBranch)
+    const effectiveSessions = filterSessionsByGroup(sessions, group)
+    const rawCourses = coursesOf(effectiveSessions)
+    const list = rawCourses.map((c, i) => {
+      const isLab = c.category === 'LAB' || c.type === 'lab' || (c.name || '').toUpperCase().includes('LAB')
+      return {
+        id: `c_${c.key || c.name}_${i}`,
+        code: c.code || (isLab ? 'LAB' : 'THEORY'),
+        name: c.name,
+        credits: isLab ? '2' : '4',
+        grade: 'A',
+      }
+    })
+    setCourses(list.length > 0 ? list : defaultCoursesForBranch)
   }
 
   const addCourse = () => {
@@ -332,6 +415,35 @@ export default function CalculatorPage() {
               </div>
             </div>
 
+            {/* SEMESTER PICKER TABS */}
+            <div className="board board-hard bg-[var(--surface)] pad-tight flex flex-wrap items-center justify-between gap-2">
+              <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5">
+                {[1, 2, 3, 4, 5, 6, 7, 8].map((s) => {
+                  const isCurrentYear = s === Number(year) * 2 - 1 || s === Number(year) * 2
+                  const isActive = activeSemester === s
+                  return (
+                    <button
+                      key={s}
+                      type="button"
+                      onClick={() => setActiveSemester(s)}
+                      className={`btn !py-1 !px-2.5 sm:!px-3 text-xs font-black uppercase tracking-wider shrink-0 transition-all cursor-pointer ${
+                        isActive
+                          ? '!bg-[var(--color-coral)] !text-[var(--on-accent)] shadow-hard-sm'
+                          : isCurrentYear
+                            ? '!bg-[var(--surface-2)] text-[var(--text)] border border-[var(--border)]'
+                            : 'opacity-60 hover:opacity-100 bg-[var(--surface)] text-[var(--muted)]'
+                      }`}
+                    >
+                      <span>SEM {s}</span>
+                    </button>
+                  )
+                })}
+              </div>
+              <div className="text-[11px] font-mono font-bold text-[var(--muted)] uppercase">
+                {profile.branch} · SEMESTER {activeSemester} · {courses.length} COURSES
+              </div>
+            </div>
+
             {/* INTERACTIVE COURSE MATRIX */}
             <div className="board board-hard bg-[var(--surface)] pad-page flex flex-col gap-3">
               <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[var(--border)] pb-3">
@@ -345,17 +457,25 @@ export default function CalculatorPage() {
                 <div className="flex flex-wrap items-center gap-2">
                   <button
                     type="button"
+                    onClick={syncFromCurriculum}
+                    className="btn btn-go text-xs font-bold !py-1.5 !px-3 shadow-hard-sm cursor-pointer flex items-center gap-1.5"
+                    title="Load official branch curriculum courses and credits"
+                  >
+                    <BookOpen className="icon-micro shrink-0" strokeWidth={2.5} /> <span>LOAD CURRICULUM</span>
+                  </button>
+                  <button
+                    type="button"
                     onClick={importFromTimetable}
                     className="btn text-xs font-bold !py-1.5 !px-3 shadow-hard-sm cursor-pointer flex items-center gap-1.5"
                   >
-                    <BookOpen className="icon-micro shrink-0" strokeWidth={2.5} /> <span>SYNC TIMETABLE ({profile.branch})</span>
+                    <RotateCcw className="icon-micro shrink-0" strokeWidth={2.5} /> <span>SYNC TIMETABLE</span>
                   </button>
                   <button
                     type="button"
                     onClick={addCourse}
-                    className="btn btn-go text-xs font-bold !py-1.5 !px-3 shadow-hard-sm cursor-pointer flex items-center gap-1.5"
+                    className="btn text-xs font-bold !py-1.5 !px-3 shadow-hard-sm cursor-pointer flex items-center gap-1.5"
                   >
-                    <Plus className="icon-micro shrink-0" strokeWidth={2.5} /> <span>ADD COURSE ROW</span>
+                    <Plus className="icon-micro shrink-0" strokeWidth={2.5} /> <span>ADD ROW</span>
                   </button>
                   {courses.length > 0 && (
                     <button
@@ -517,6 +637,17 @@ export default function CalculatorPage() {
                   <p className="t-meta muted mt-0.5">
                     FORMULA: CGPA = Σ(SGPAk × Tk) / ΣTk · TOGGLE ACTIVE SEMESTERS
                   </p>
+                </div>
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={applyOfficialCredits}
+                    className="btn btn-go text-xs font-bold !py-1.5 !px-3 shadow-hard-sm cursor-pointer flex items-center gap-1.5"
+                    title="Pre-populate all 8 semesters with official branch scheme credits"
+                  >
+                    <BookOpen className="icon-micro shrink-0" strokeWidth={2.5} />
+                    <span>APPLY OFFICIAL SCHEME CREDITS ({profile.branch})</span>
+                  </button>
                 </div>
               </div>
 

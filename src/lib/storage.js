@@ -1038,7 +1038,8 @@ export const DEFAULT_SUBJECT_DATA = {
 }
 
 export function useAllSubjectsData() {
-  return useStored(KEYS.subjectData, {})
+  const [data] = useStored(KEYS.subjectData, {})
+  return data
 }
 
 export function useSubjectStore(courseKey, initialMeta = {}) {
@@ -1052,18 +1053,23 @@ export function useSubjectStore(courseKey, initialMeta = {}) {
         ...DEFAULT_SUBJECT_DATA,
         ...initialMeta,
         marks: { ...DEFAULT_SUBJECT_DATA.marks, ...(initialMeta.marks || {}) },
-        units: initialMeta.units || DEFAULT_SUBJECT_DATA.units,
+        units: (initialMeta.units && initialMeta.units.length > 0) ? initialMeta.units : DEFAULT_SUBJECT_DATA.units,
         tasks: initialMeta.tasks || DEFAULT_SUBJECT_DATA.tasks,
         resources: initialMeta.resources || DEFAULT_SUBJECT_DATA.resources,
+        objectives: initialMeta.objectives || [],
+        references: initialMeta.references || [],
       }
     }
     return {
       ...DEFAULT_SUBJECT_DATA,
       ...raw,
+      credits: raw.credits || initialMeta.credits || DEFAULT_SUBJECT_DATA.credits,
       marks: { ...DEFAULT_SUBJECT_DATA.marks, ...(raw.marks || {}) },
-      units: raw.units || DEFAULT_SUBJECT_DATA.units,
+      units: (raw.units && raw.units.length > 0) ? raw.units : ((initialMeta.units && initialMeta.units.length > 0) ? initialMeta.units : DEFAULT_SUBJECT_DATA.units),
       tasks: raw.tasks || DEFAULT_SUBJECT_DATA.tasks,
       resources: raw.resources || DEFAULT_SUBJECT_DATA.resources,
+      objectives: raw.objectives || initialMeta.objectives || [],
+      references: raw.references || initialMeta.references || [],
     }
   }, [raw, initialMeta])
 
@@ -1071,12 +1077,35 @@ export function useSubjectStore(courseKey, initialMeta = {}) {
     (patch) => {
       if (!courseKey) return
       setAllSubjects((prev) => {
-        const cur = prev[courseKey] || { ...DEFAULT_SUBJECT_DATA, ...initialMeta }
+        const existing = prev[courseKey] || {}
+        const curUnits =
+          existing.units && existing.units.length > 0
+            ? existing.units
+            : initialMeta.units && initialMeta.units.length > 0
+              ? initialMeta.units
+              : DEFAULT_SUBJECT_DATA.units
+        const cur = {
+          ...DEFAULT_SUBJECT_DATA,
+          ...initialMeta,
+          ...existing,
+          units: curUnits,
+          marks: { ...DEFAULT_SUBJECT_DATA.marks, ...(initialMeta.marks || {}), ...(existing.marks || {}) },
+        }
         const next = typeof patch === 'function' ? patch(cur) : { ...cur, ...patch }
         return { ...prev, [courseKey]: next }
       })
     },
     [courseKey, setAllSubjects, initialMeta],
+  )
+
+  const resolveUnits = useCallback(
+    (prevUnits) =>
+      prevUnits && prevUnits.length > 0
+        ? prevUnits
+        : initialMeta.units && initialMeta.units.length > 0
+          ? initialMeta.units
+          : DEFAULT_SUBJECT_DATA.units,
+    [initialMeta.units],
   )
 
   const updateNotes = useCallback(
@@ -1097,7 +1126,7 @@ export function useSubjectStore(courseKey, initialMeta = {}) {
   const toggleTopic = useCallback(
     (unitId, topicId) => {
       updateSubjectData((prev) => {
-        const units = (prev.units || DEFAULT_SUBJECT_DATA.units).map((u) => {
+        const units = resolveUnits(prev.units).map((u) => {
           if (u.id !== unitId) return u
           const nextTopics = (u.topics || []).map((t) =>
             t.id === topicId ? { ...t, done: !t.done } : t,
@@ -1108,7 +1137,7 @@ export function useSubjectStore(courseKey, initialMeta = {}) {
         return { ...prev, units }
       })
     },
-    [updateSubjectData],
+    [updateSubjectData, resolveUnits],
   )
 
   const addTopic = useCallback(
@@ -1116,7 +1145,7 @@ export function useSubjectStore(courseKey, initialMeta = {}) {
       const trimmed = title.trim()
       if (!trimmed) return
       updateSubjectData((prev) => {
-        const units = (prev.units || DEFAULT_SUBJECT_DATA.units).map((u) => {
+        const units = resolveUnits(prev.units).map((u) => {
           if (u.id !== unitId) return u
           const newTopic = { id: `t_${Date.now()}`, title: trimmed, done: false }
           return { ...u, topics: [...(u.topics || []), newTopic], completed: false }
@@ -1124,13 +1153,13 @@ export function useSubjectStore(courseKey, initialMeta = {}) {
         return { ...prev, units }
       })
     },
-    [updateSubjectData],
+    [updateSubjectData, resolveUnits],
   )
 
   const deleteTopic = useCallback(
     (unitId, topicId) => {
       updateSubjectData((prev) => {
-        const units = (prev.units || DEFAULT_SUBJECT_DATA.units).map((u) => {
+        const units = resolveUnits(prev.units).map((u) => {
           if (u.id !== unitId) return u
           const nextTopics = (u.topics || []).filter((t) => t.id !== topicId)
           const allDone = nextTopics.length > 0 && nextTopics.every((t) => t.done)
@@ -1139,13 +1168,13 @@ export function useSubjectStore(courseKey, initialMeta = {}) {
         return { ...prev, units }
       })
     },
-    [updateSubjectData],
+    [updateSubjectData, resolveUnits],
   )
 
   const updateUnitContent = useCallback(
     (unitId, content) => {
       updateSubjectData((prev) => {
-        const units = (prev.units || DEFAULT_SUBJECT_DATA.units).map((u) => {
+        const units = resolveUnits(prev.units).map((u) => {
           if (u.id !== unitId) return u
           const lines = content
             .split('\n')
@@ -1165,7 +1194,7 @@ export function useSubjectStore(courseKey, initialMeta = {}) {
         return { ...prev, units }
       })
     },
-    [updateSubjectData],
+    [updateSubjectData, resolveUnits],
   )
 
   const addUnit = useCallback(
@@ -1173,7 +1202,7 @@ export function useSubjectStore(courseKey, initialMeta = {}) {
       const trimmed = title.trim()
       if (!trimmed) return
       updateSubjectData((prev) => {
-        const units = prev.units || DEFAULT_SUBJECT_DATA.units
+        const units = resolveUnits(prev.units)
         const unitId = `u_${Date.now()}`
         const newUnit = {
           id: unitId,
@@ -1185,17 +1214,17 @@ export function useSubjectStore(courseKey, initialMeta = {}) {
         return { ...prev, units: [...units, newUnit] }
       })
     },
-    [updateSubjectData],
+    [updateSubjectData, resolveUnits],
   )
 
   const deleteUnit = useCallback(
     (unitId) => {
       updateSubjectData((prev) => {
-        const units = (prev.units || DEFAULT_SUBJECT_DATA.units).filter((u) => u.id !== unitId)
+        const units = resolveUnits(prev.units).filter((u) => u.id !== unitId)
         return { ...prev, units }
       })
     },
-    [updateSubjectData],
+    [updateSubjectData, resolveUnits],
   )
 
   const addTask = useCallback(

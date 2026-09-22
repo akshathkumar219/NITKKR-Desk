@@ -1,12 +1,11 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
 import {
   ArrowLeft,
   BookOpen,
   Check,
   CheckSquare,
   ChevronRight,
-  Copy,
-  Layers,
   Pencil,
   Percent,
   Target,
@@ -14,7 +13,7 @@ import {
 import { Ring } from "../ui";
 import { useSubjectStore } from "../lib/storage";
 import { canSkip, mustAttend, tally } from "../lib/rollcall";
-import { dayCode, minutesNow } from "../lib/time";
+import { DAY_NAMES, dayCode, fmtRange, minutesNow } from "../lib/time";
 import AttendancePanel from "./subject/AttendancePanel";
 import SyllabusPanel from "./subject/SyllabusPanel";
 import MarksPanel from "./subject/MarksPanel";
@@ -31,6 +30,20 @@ export default function SubjectDetail({
   rollcallSettings,
   adjustSubject,
 }) {
+  const [searchParams] = useSearchParams();
+  const rawTab = searchParams.get("tab");
+  const initialTab = useMemo(() => {
+    if (rawTab) {
+      const clean = rawTab.trim().toUpperCase();
+      if (clean === "INFO" || clean === "ALL") return "ALL";
+      if (clean === "NOTES" || clean === "TASKS_NOTES") return "TASKS_NOTES";
+      if (["ATTENDANCE", "SYLLABUS", "MARKS"].includes(clean)) {
+        return clean;
+      }
+    }
+    return "ALL";
+  }, [rawTab]);
+
   const courseKey = subject.key || subject.code || subject.name;
   const initialTheme = useMemo(() => getSubjectTheme(subject), [subject]);
 
@@ -42,20 +55,37 @@ export default function SubjectDetail({
     addUnit,
     deleteUnit,
     updateUnitContent,
+    toggleTopic,
     addTask,
     toggleTask,
     deleteTask,
     addResource,
     deleteResource,
   } = useSubjectStore(courseKey, {
-    credits: subject.category === "LAB" ? "2" : "4",
+    credits: subject.credits || (subject.category === "LAB" ? "2" : "4"),
+    category: subject.category || "PC",
     instructor: subject.instructor || "",
     accent: subject.accent || initialTheme.accent,
     targetCutoff: String(subject.targetCutoff || "65"),
+    units: subject.units || [],
+    objectives: subject.objectives || [],
+    references: subject.references || [],
   });
 
+  const [activeTab, setActiveTab] = useState(initialTab);
 
-  const [activeTab, setActiveTab] = useState("ALL"); // 'ALL' | 'ATTENDANCE' | 'SYLLABUS' | 'MARKS' | 'TASKS_NOTES'
+  useEffect(() => {
+    if (rawTab) {
+      const clean = rawTab.trim().toUpperCase();
+      if (clean === "INFO" || clean === "ALL") {
+        setActiveTab("ALL");
+      } else if (clean === "NOTES" || clean === "TASKS_NOTES") {
+        setActiveTab("TASKS_NOTES");
+      } else if (["ATTENDANCE", "SYLLABUS", "MARKS"].includes(clean)) {
+        setActiveTab(clean);
+      }
+    }
+  }, [rawTab]);
   const [syllabusSearch, setSyllabusSearch] = useState("");
   const [newUnitTitle, setNewUnitTitle] = useState("");
   const [showAddUnit, setShowAddUnit] = useState(false);
@@ -64,16 +94,6 @@ export default function SubjectDetail({
   const [newResourceUrl, setNewResourceUrl] = useState("");
   const [showAddResource, setShowAddResource] = useState(false);
   const [targetGradeGoal, setTargetGradeGoal] = useState("A+");
-  const [copiedLink, setCopiedLink] = useState(false);
-
-  // Copy direct subject URL to clipboard
-  const handleCopyLink = () => {
-    if (navigator.clipboard) {
-      navigator.clipboard.writeText(window.location.href);
-      setCopiedLink(true);
-      setTimeout(() => setCopiedLink(false), 2000);
-    }
-  };
 
   // Effective Cutoff
   const requiredCutoff =
@@ -174,6 +194,15 @@ export default function SubjectDetail({
   const accentColor = data.accent || subject.accent || initialTheme.accent || "var(--color-sky)";
   const accentHairline = "color-mix(in srgb, currentColor 22%, transparent)";
 
+  const category = (
+    data.category ||
+    subject.category ||
+    initialTheme.label ||
+    (subject.type === "lab" ? "LAB" : "THEORY")
+  ).toUpperCase();
+  const instructor = data.instructor || subject.instructor || "";
+  const sessions = subject.sessions || [];
+  const room = (sessions[0]?.room) || data.room || subject.room || "";
 
   const isSafe =
     attendanceStats.pct === null || attendanceStats.pct >= requiredCutoff;
@@ -197,125 +226,169 @@ export default function SubjectDetail({
         className="board board-hard pad-page flex flex-col gap-3"
         style={{ background: accentColor, color: "var(--on-accent)" }}
       >
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <div className="flex items-center gap-2">
-            <button
-              type="button"
-              onClick={onBack}
-              className="btn !py-1.5 !px-2.5 text-xs font-black uppercase tracking-wider flex items-center gap-1.5 cursor-pointer shadow-hard-sm hover:-translate-x-0.5"
-            >
-              <ArrowLeft className="icon-micro" strokeWidth={3} />
-              <span>ALL SUBJECTS</span>
-            </button>
-          </div>
+        <div className="flex items-center justify-between gap-2">
+          <button
+            type="button"
+            onClick={onBack}
+            className="btn !py-1.5 !px-2.5 text-xs font-black uppercase tracking-wider flex items-center gap-1.5 cursor-pointer shadow-hard-sm hover:-translate-x-0.5"
+          >
+            <ArrowLeft className="icon-micro" strokeWidth={3} />
+            <span>ALL SUBJECTS</span>
+          </button>
 
-          <div className="flex flex-wrap items-center gap-2">
+          <div className="flex items-center gap-2">
             {isLiveNow && (
               <span className="chip bg-[var(--color-present)] text-[var(--on-accent)] font-black text-xs animate-pulse">
-                🔴 LIVE IN CLASS NOW
+                🔴 LIVE
               </span>
             )}
             <button
               type="button"
-              onClick={handleCopyLink}
-              className="btn !py-1.5 !px-2.5 text-xs font-bold flex items-center gap-1.5 cursor-pointer shadow-hard-sm"
-              title="Copy direct link to this subject page"
-            >
-              {copiedLink ? (
-                <Check
-                  className="icon-micro text-[var(--color-present)]"
-                  strokeWidth={3}
-                />
-              ) : (
-                <Copy className="icon-micro" />
-              )}
-              <span>{copiedLink ? "LINK COPIED" : "SHARE"}</span>
-            </button>
-          </div>
-        </div>
-
-        {/* HERO TITLE & IDENTITY GRID — a 2×2 block of fact tiles sits opposite
-            the title: code, credits, professor, and the way to edit them. */}
-        <div
-          className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-x-4 gap-y-3 border-t pt-3"
-          style={{ borderColor: accentHairline }}
-        >
-          <div className="min-w-0">
-            <h1 className="t-masthead">
-              {subject.name}
-            </h1>
-            <p className="t-meta mt-1 opacity-75">
-              {subject.sessions?.length || 0} WEEKLY CLASS SLOTS
-            </p>
-          </div>
-
-          <div className="grid grid-cols-2 gap-2 w-full lg:w-auto lg:min-w-[20rem] shrink-0">
-            <FactTile
-              label="SUBJECT CODE"
-              value={subject.code ? `<${subject.code}>` : "—"}
-              mono
-            />
-            <FactTile label="CREDITS" value={data.credits || "4"} />
-            <FactTile
-              label="PROFESSOR"
-              value={data.instructor || subject.instructor || "NOT SET"}
-              muted={!(data.instructor || subject.instructor)}
-            />
-            <button
-              type="button"
               onClick={() => onEditSubject(subject)}
-              className="board h-full min-h-[3.5rem] px-3 py-2 flex items-center justify-center gap-1.5 cursor-pointer transition-transform hover:-translate-y-0.5"
-              style={{ background: "var(--text)", color: "var(--bg)" }}
+              className="btn !py-1.5 !px-2.5 text-xs font-black uppercase tracking-wider flex items-center gap-1.5 cursor-pointer shadow-hard-sm hover:-translate-y-0.5"
+              title="Edit subject details"
             >
               <Pencil className="icon-micro" strokeWidth={2.5} />
-              <span className="t-meta font-black">
-                EDIT SUBJECT
-              </span>
+              <span>EDIT</span>
             </button>
           </div>
         </div>
 
-        {/* WORKSPACE SECTION TABS */}
+        {/* HERO TITLE & METADATA — Vibe matches attendance cards with full info */}
         <div
-          className="flex flex-wrap items-center gap-1.5 border-t pt-3"
+          className="flex flex-col gap-2 border-t pt-3"
           style={{ borderColor: accentHairline }}
         >
-          {[
-            { id: "ALL", label: "OVERVIEW", icon: Layers },
-            { id: "ATTENDANCE", label: "ATTENDANCE", icon: Percent },
-            { id: "SYLLABUS", label: "SYLLABUS", icon: BookOpen },
-            { id: "MARKS", label: "MARKS", icon: Target },
-            { id: "TASKS_NOTES", label: "NOTES & TASKS", icon: CheckSquare },
-          ].map((tab) => {
-            const active = activeTab === tab.id;
-            return (
-              <button
-                key={tab.id}
-                type="button"
-                onClick={() => setActiveTab(tab.id)}
-                className={`btn !py-1.5 !px-3 !text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
-                  active
-                    ? "ring-2 ring-black dark:ring-white scale-105 shadow-hard-sm"
-                    : "opacity-80 hover:opacity-100"
-                }`}
-                style={
-                  active
-                    ? { background: "var(--text)", color: "var(--bg)" }
-                    : undefined
-                }
-              >
-                <tab.icon className="icon-micro" strokeWidth={2.5} />
-                <span>{tab.label}</span>
-              </button>
-            );
-          })}
+          {/* Metadata smaller text badges */}
+          <div className="flex items-center gap-1.5 flex-wrap">
+            {subject.code ? (
+              <span className="font-mono font-black text-[0.625rem] sm:text-xs px-2 py-0.5 rounded border border-current/25 bg-current/10 tracking-wider">
+                {subject.code}
+              </span>
+            ) : null}
+            <span className="font-black text-[0.6rem] sm:text-xs px-2 py-0.5 rounded border border-current/25 bg-current/10 tracking-wider uppercase">
+              {category}
+            </span>
+            <span className="font-black text-[0.6rem] sm:text-xs px-2 py-0.5 rounded border border-current/25 bg-current/10 tracking-wider uppercase">
+              {data.credits || (category === "LAB" ? "2" : "4")} CREDITS
+            </span>
+            {room && room !== "TBD" ? (
+              <span className="font-bold text-[0.6rem] sm:text-xs px-2 py-0.5 rounded border border-current/25 bg-current/10 tracking-wider uppercase">
+                ROOM {room}
+              </span>
+            ) : null}
+          </div>
+
+          {/* Subject Title & Instructor */}
+          <div className="min-w-0">
+            <h1 className="t-masthead text-3xl sm:text-4xl md:text-5xl font-black leading-tight tracking-tight uppercase break-words">
+              {subject.name}
+            </h1>
+            {instructor ? (
+              <p className="text-xs sm:text-sm font-bold uppercase tracking-wider opacity-90 mt-1">
+                {instructor}
+              </p>
+            ) : null}
+          </div>
+
+          {/* Weekly Slots labeled: e.g. "Thursday at 9–10 AM" */}
+          <div className="flex flex-col gap-1.5 pt-1">
+            <p className="text-[0.65rem] sm:text-xs font-black uppercase tracking-wider opacity-80">
+              {sessions.length} WEEKLY CLASS SLOT{sessions.length === 1 ? "" : "S"}:
+            </p>
+            <div className="flex flex-wrap items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5">
+              {sessions.length > 0 ? (
+                sessions.map((sess, idx) => {
+                  const fullDay = DAY_NAMES[sess.day] || sess.day;
+                  const timeStr = fmtRange(sess.start, sess.end);
+                  const roomStr = sess.room ? ` · Room ${sess.room}` : "";
+                  return (
+                    <span
+                      key={sess.id || idx}
+                      className="text-[0.65rem] sm:text-xs font-bold px-2 py-1 rounded border border-current/25 bg-current/10 tracking-wide inline-flex items-center shrink-0"
+                    >
+                      {fullDay} at {timeStr}{roomStr}
+                    </span>
+                  );
+                })
+              ) : (
+                <span className="text-[0.65rem] sm:text-xs opacity-75 italic">
+                  No scheduled timetable slots
+                </span>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* WORKSPACE SECTION TABS — 2 structured rows: 2 cols on row 1, 3 cols on row 2 */}
+        <div
+          className="flex flex-col gap-1.5 border-t pt-3"
+          style={{ borderColor: accentHairline }}
+        >
+          {/* Row 1: INFO (50%) & ATTENDANCE (50%) */}
+          <div className="grid grid-cols-2 gap-1.5 w-full">
+            {[
+              { id: "ALL", label: "INFO" },
+              { id: "ATTENDANCE", label: "ATTENDANCE" },
+            ].map((tab) => {
+              const active = activeTab === tab.id;
+              return (
+                <button
+                  key={tab.id}
+                  type="button"
+                  onClick={() => setActiveTab(tab.id)}
+                  className={`btn !py-2 !px-2 text-xs sm:text-sm font-black tracking-wider uppercase transition-all cursor-pointer text-center justify-center w-full ${
+                    active
+                      ? "ring-2 ring-black dark:ring-white shadow-hard-sm"
+                      : "opacity-80 hover:opacity-100"
+                  }`}
+                  style={
+                    active
+                      ? { background: "var(--text)", color: "var(--bg)" }
+                      : undefined
+                  }
+                >
+                  <span>{tab.label}</span>
+                </button>
+              );
+            })}
+          </div>
+
+          {/* Row 2: SYLLABUS (33.3%), MARKS (33.3%), NOTES (33.3%) */}
+          <div className="grid grid-cols-3 gap-1.5 w-full">
+            {[
+              { id: "SYLLABUS", label: "SYLLABUS" },
+              { id: "MARKS", label: "MARKS" },
+              { id: "TASKS_NOTES", label: "NOTES" },
+            ].map((tab) => {
+              const active = activeTab === tab.id;
+              return (
+                <button
+                  key={tab.id}
+                  type="button"
+                  onClick={() => setActiveTab(tab.id)}
+                  className={`btn !py-2 !px-2 text-xs sm:text-sm font-black tracking-wider uppercase transition-all cursor-pointer text-center justify-center w-full ${
+                    active
+                      ? "ring-2 ring-black dark:ring-white shadow-hard-sm"
+                      : "opacity-80 hover:opacity-100"
+                  }`}
+                  style={
+                    active
+                      ? { background: "var(--text)", color: "var(--bg)" }
+                      : undefined
+                  }
+                >
+                  <span>{tab.label}</span>
+                </button>
+              );
+            })}
+          </div>
         </div>
       </header>
 
-      {/* OVERVIEW — a digest, not every panel stacked. Each card states the one
-          number that matters for its area and opens the full tab. */}
+      {/* INFO / DIGEST GRID — 4 cards in a 2×2 grid (50% width each) */}
       {activeTab === "ALL" && (
-        <div className="grid gap-3 sm:gap-4 sm:grid-cols-2">
+        <div className="grid grid-cols-2 gap-2 sm:gap-3.5">
           <DigestCard
             title="ATTENDANCE"
             icon={Percent}
@@ -323,10 +396,10 @@ export default function SubjectDetail({
             visual={
               <Ring
                 percent={attendanceStats.pct}
-                size={84}
-                strokeWidth={10}
+                size={54}
+                strokeWidth={6}
                 color={statusColor}
-                textSize="text-xl"
+                textSize="text-xs sm:text-sm font-black"
               />
             }
             value={
@@ -344,8 +417,8 @@ export default function SubjectDetail({
                 : isSafe
                   ? attendanceStats.safeBunkCount === Infinity
                     ? `Perfect record across ${attendanceStats.held} classes.`
-                    : `${attendanceStats.safeBunkCount} safe skips left of ${attendanceStats.held} held.`
-                  : `Attend the next ${attendanceStats.mustAttendCount} to reach ${requiredCutoff}%.`
+                    : `${attendanceStats.safeBunkCount} safe skips left.`
+                  : `Attend next ${attendanceStats.mustAttendCount} classes.`
             }
           />
 
@@ -379,21 +452,21 @@ export default function SubjectDetail({
             }
             note={
               marksSummary.currentScored > 0
-                ? `${Math.round(marksSummary.currentPct)}% so far · targeting ${marksSummary.targetObj.grade}.`
-                : "Add mid-term and internal scores to forecast a grade."
+                ? `${Math.round(marksSummary.currentPct)}% · Target ${marksSummary.targetObj.grade}`
+                : "Add scores to forecast a grade."
             }
           />
 
           <DigestCard
-            title="NOTES & TASKS"
+            title="NOTES"
             icon={CheckSquare}
             onOpen={() => setActiveTab("TASKS_NOTES")}
             visual={<TaskStack tasks={data.tasks || []} />}
             value={`${(data.tasks || []).filter((t) => !t.done).length} OPEN`}
             note={
               (data.tasks || []).length === 0 && !(data.notes || "").trim()
-                ? "Nothing noted for this subject yet."
-                : `${(data.tasks || []).length} tasks · ${(data.resources || []).length} links saved.`
+                ? "Nothing noted yet."
+                : `${(data.tasks || []).length} tasks · ${(data.resources || []).length} links.`
             }
           />
         </div>
@@ -411,10 +484,12 @@ export default function SubjectDetail({
 
       {activeTab === "SYLLABUS" && (
         <SyllabusPanel
+          subject={subject}
           data={data}
           addUnit={addUnit}
           deleteUnit={deleteUnit}
           updateUnitContent={updateUnitContent}
+          toggleTopic={toggleTopic}
           syllabusSearch={syllabusSearch}
           setSyllabusSearch={setSyllabusSearch}
           newUnitTitle={newUnitTitle}
@@ -467,25 +542,6 @@ export default function SubjectDetail({
   );
 }
 
-/** A small fact tile in the header identity grid. */
-function FactTile({ label, value, mono, muted }) {
-  return (
-    <div className="board bg-[var(--surface-2)] text-[var(--text)] h-full min-h-[3.5rem] px-3 py-2 flex flex-col justify-center gap-1.5">
-      <p className="t-micro muted leading-none">
-        {label}
-      </p>
-      <p
-        className={`t-card-title truncate ${
-          mono ? "font-mono" : ""
-        } ${muted ? "text-[var(--muted)]" : ""}`}
-        title={value}
-      >
-        {value}
-      </p>
-    </div>
-  );
-}
-
 /** Syllabus: one hard-edged cell per topic, filled as topics are ticked off. */
 function TopicGrid({ total, done }) {
   const CAP = 20;
@@ -493,7 +549,7 @@ function TopicGrid({ total, done }) {
   const filled =
     total > 0 ? Math.round((done / total) * cells) : 0;
   return (
-    <div className="grid grid-cols-4 gap-1.5 shrink-0 w-[84px]" aria-hidden>
+    <div className="grid grid-cols-4 gap-1.5 shrink-0 w-[80px]" aria-hidden>
       {Array.from({ length: cells }).map((_, i) => (
         <span
           key={i}
@@ -523,14 +579,14 @@ function MarksBars({ s, accent }) {
         const pct =
           p.max > 0 ? Math.min(100, Math.max(0, (p.v / p.max) * 100)) : 0;
         return (
-          <div key={p.k} className="flex flex-col items-center gap-1.5">
+          <div key={p.k} className="flex flex-col items-center gap-1">
             <div
-              className="w-4 h-[62px] border-2 border-[var(--border)] flex flex-col justify-end overflow-hidden"
+              className="w-3.5 sm:w-4 h-[50px] sm:h-[58px] border-2 border-[var(--border)] flex flex-col justify-end overflow-hidden"
               style={{ borderRadius: 2 }}
             >
               <div style={{ height: `${pct}%`, background: accent }} />
             </div>
-            <span className="t-micro muted leading-none">
+            <span className="text-[0.55rem] sm:t-micro muted leading-none">
               {p.k}
             </span>
           </div>
@@ -548,7 +604,7 @@ function TaskStack({ tasks }) {
   const rows = ordered.slice(0, 4);
   const pad = Math.max(0, 4 - rows.length);
   return (
-    <div className="flex flex-col gap-2 shrink-0 w-[84px]" aria-hidden>
+    <div className="flex flex-col gap-1.5 shrink-0 w-[80px]" aria-hidden>
       {rows.map((t, i) => (
         <span key={i} className="flex items-center gap-1.5">
           <span
@@ -598,33 +654,40 @@ function DigestCard({
     <button
       type="button"
       onClick={onOpen}
-      className="board board-hard bg-[var(--surface)] text-left flex flex-col cursor-pointer transition-transform hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-hard-lg group"
+      className="board board-hard bg-[var(--surface)] text-left flex flex-col justify-between cursor-pointer transition-transform hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-hard-md group min-h-[165px] sm:min-h-[185px] w-full overflow-hidden"
     >
-      {/* Three banded rows — label, figure, action — separated by hairlines so
-          the card reads as a structure rather than four floating lines. */}
-      <div className="flex items-center gap-2 px-4 py-2.5 border-b border-[var(--border)]">
-        <Icon className="icon-micro text-[var(--muted)]" strokeWidth={2.5} />
-        <p className="t-meta muted">{title}</p>
+      {/* Card Header */}
+      <div className="flex items-center justify-between gap-1 px-2.5 py-2 sm:px-3.5 sm:py-2.5 border-b border-[var(--border)] w-full">
+        <div className="flex items-center gap-1.5 min-w-0">
+          <Icon className="size-3 sm:icon-micro text-[var(--muted)] shrink-0" strokeWidth={2.5} />
+          <p className="text-[0.65rem] sm:text-xs font-black uppercase tracking-wider truncate">{title}</p>
+        </div>
+        <ChevronRight className="size-3 text-[var(--muted)] opacity-60 group-hover:translate-x-0.5 transition-transform shrink-0" strokeWidth={3} />
       </div>
 
-      <div className="px-4 py-3.5 flex-1 flex items-center gap-4">
-        {visual}
-        <div className="min-w-0 flex-1 flex flex-col gap-1.5">
+      {/* Card Body — vertically stacked & centered on mobile 50% cards */}
+      <div className="p-2.5 sm:p-3.5 flex-1 flex flex-col items-center text-center justify-center gap-2 w-full">
+        <div className="shrink-0 grid place-items-center">
+          {visual}
+        </div>
+        <div className="min-w-0 w-full flex flex-col items-center gap-0.5">
           <p
-            className="t-stat"
+            className="text-xs sm:text-sm md:text-base font-black tracking-tight uppercase leading-tight truncate w-full"
             style={valueColor ? { color: valueColor } : undefined}
           >
             {value}
           </p>
-          <p className="t-meta muted normal-case leading-relaxed">
+          <p className="text-[0.6rem] sm:text-[0.6875rem] text-[var(--muted)] normal-case leading-snug line-clamp-2 w-full">
             {note}
           </p>
         </div>
       </div>
 
-      <span className="t-micro font-black px-4 py-2.5 border-t border-[var(--border)] bg-[var(--surface-2)] flex items-center gap-1.5 group-hover:translate-x-0.5 transition-transform">
-        OPEN <ChevronRight className="icon-micro" strokeWidth={3} />
-      </span>
+      {/* Card Footer */}
+      <div className="text-[0.55rem] sm:text-[0.65rem] font-black px-2.5 py-1.5 sm:px-3.5 sm:py-2 border-t border-[var(--border)] bg-[var(--surface-2)] flex items-center justify-between group-hover:bg-[var(--surface-muted)] transition-colors w-full">
+        <span>OPEN</span>
+        <ChevronRight className="size-3 shrink-0 group-hover:translate-x-0.5 transition-transform" strokeWidth={3} />
+      </div>
     </button>
   );
 }

@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import {
   ArrowLeftRight,
+  ArrowRight,
   Calendar,
   CalendarDays,
   Check,
@@ -12,12 +13,15 @@ import {
   GripVertical,
   LayoutGrid,
   List,
+  MapPin,
+  Pencil,
   Plus,
   RotateCcw,
   Search,
-  X,
-  Pencil,
+  Tag,
   Trash2,
+  Users,
+  X,
 } from 'lucide-react'
 import Shell from '../components/Shell'
 import SessionModal from '../components/SessionModal'
@@ -410,9 +414,10 @@ function SessionCard({
   let isSimulating = false
   let simStatus = st
 
-  const credit = session.attendanceCredits != null
-    ? Number(session.attendanceCredits)
-    : (session.type === 'lab' || (session.name || '').toUpperCase().includes('LAB') ? 2 : 1)
+  const credit =
+    session.attendanceCredits != null && session.attendanceCredits !== 2
+      ? Number(session.attendanceCredits)
+      : 1
 
   const dragSim = swipeMode && !editing ? (dragX > 25 ? 'present' : dragX < -25 ? 'absent' : null) : null
   const effectiveSim = hoverSim || dragSim
@@ -841,40 +846,258 @@ function SessionCard({
 
 /* -------------------------------------------------------------- Week Grid -- */
 
-function WeekGrid({ sessions, editing, onEdit, onDrop, onAddDay }) {
-  const { from, to } = gridBounds(sessions)
-  const hours = []
-  for (let h = from; h <= to; h += 60) hours.push(h)
+/**
+ * Computes ISO date for a weekday in the active week
+ */
+function getIsoForWeekday(targetDay) {
+  const now = new Date()
+  const currentDay = dayCode(now)
+  if (targetDay === currentDay) return todayISO(now)
+
+  const currentDayIndex = (now.getDay() + 6) % 7
+  const targetDayIndex = DAYS.indexOf(targetDay)
+  if (targetDayIndex === -1) return todayISO(now)
+
+  const targetDate = new Date(now)
+  let diff = targetDayIndex - currentDayIndex
+  // On weekends (Sat=5, Sun=6), viewing Mon-Fri refers to upcoming week
+  if (currentDayIndex >= 5 && targetDayIndex < 5) {
+    diff = 7 - currentDayIndex + targetDayIndex
+  }
+  targetDate.setDate(now.getDate() + diff)
+  return todayISO(targetDate)
+}
+
+function WeekGrid({
+  sessions,
+  editing,
+  onEdit,
+  onDrop,
+  onAddDay,
+  currentMins = 0,
+  today = 'MON',
+  activeDay = 'MON',
+  onJumpToDay,
+}) {
+  const containerRef = useRef(null)
+  const hasAutoScrolled = useRef(false)
+  const [containerWidth, setContainerWidth] = useState(0)
+  const [focusedDay, setFocusedDay] = useState(() =>
+    DAYS.includes(activeDay) ? activeDay : DAYS.includes(today) ? today : 'MON'
+  )
+  const [selectedSession, setSelectedSession] = useState(null)
+
+  // Measure container width for exact 3-column sizing on mobile
+  useEffect(() => {
+    if (!containerRef.current) return
+    const el = containerRef.current
+    const updateWidth = () => {
+      if (el) setContainerWidth(el.clientWidth)
+    }
+    updateWidth()
+
+    const ro = new ResizeObserver(updateWidth)
+    ro.observe(el)
+    return () => ro.disconnect()
+  }, [])
+
+  // Time bounds calculation (snapped 8 AM to 6 PM minimum or up to latest class)
+  const { from, to, hours } = useMemo(() => {
+    const minFrom = 8 * 60 // 8:00 AM
+    const minTo = 18 * 60 // 6:00 PM
+    if (!sessions.length) {
+      const hrs = []
+      for (let h = minFrom; h <= minTo; h += 60) hrs.push(h)
+      return { from: minFrom, to: minTo, hours: hrs }
+    }
+    const maxEnd = Math.max(...sessions.map((s) => s.end || 0))
+    const minStart = Math.min(...sessions.map((s) => s.start || minFrom))
+    const fromHour = Math.min(minFrom, Math.floor(minStart / 60) * 60)
+    const toHour = Math.max(minTo, Math.ceil(maxEnd / 60) * 60)
+    const hrs = []
+    for (let h = fromHour; h <= toHour; h += 60) hrs.push(h)
+    return { from: fromHour, to: toHour, hours: hrs }
+  }, [sessions])
+
+  const isDesktop = typeof window !== 'undefined' && window.innerWidth >= 1024
+  const visibleCols = isDesktop || containerWidth >= 480 ? 5 : 3
+  const pxPerMin = isDesktop ? 0.72 : 0.8
   const span = Math.max(to - from, 60)
-  const pxPerMin = 1.1
+  const gridHeight = span * pxPerMin + 16
+  const hourRailWidth = 38
+
+  const colWidth = useMemo(() => {
+    if (!containerWidth) return 112
+    return Math.max(80, Math.floor((containerWidth - hourRailWidth) / visibleCols))
+  }, [containerWidth, hourRailWidth, visibleCols])
+
+  // Center on a given day column
+  const scrollToDay = useCallback(
+    (targetDay, smooth = true) => {
+      if (!containerRef.current || !containerWidth) return
+      const targetIdx = DAYS.indexOf(targetDay)
+      if (targetIdx === -1) return
+
+      if (visibleCols === 5) {
+        containerRef.current.scrollTo({ left: 0, behavior: smooth ? 'smooth' : 'auto' })
+        return
+      }
+
+      const clampIndex = Math.max(0, Math.min(2, targetIdx - 1))
+      const targetScrollLeft = clampIndex * colWidth
+
+      containerRef.current.scrollTo({
+        left: targetScrollLeft,
+        behavior: smooth ? 'smooth' : 'auto',
+      })
+      setFocusedDay(targetDay)
+    },
+    [containerWidth, colWidth, visibleCols],
+  )
+
+  // Track scroll position to update focused day pill
+  const handleScroll = () => {
+    if (!containerRef.current || visibleCols === 5) return
+    const scrollLeft = containerRef.current.scrollLeft
+    const centerOffset = scrollLeft + colWidth * 1.5
+    const idx = Math.max(0, Math.min(4, Math.floor(centerOffset / colWidth)))
+    if (DAYS[idx] && DAYS[idx] !== focusedDay) {
+      setFocusedDay(DAYS[idx])
+    }
+  }
+
+  // Initial Auto-scroll: today in the center and scrolled to top only
+  useEffect(() => {
+    if (containerWidth > 0 && !hasAutoScrolled.current) {
+      hasAutoScrolled.current = true
+      const initialDay = DAYS.includes(today) ? today : DAYS.includes(activeDay) ? activeDay : 'MON'
+      scrollToDay(initialDay, false)
+
+      if (containerRef.current) {
+        containerRef.current.scrollTop = 0
+      }
+    }
+  }, [containerWidth, today, activeDay, scrollToDay])
+
+  // Pre-calculate sessions for each day (with auto-breaks only when not editing)
+  const daySessionsMap = useMemo(() => {
+    const map = {}
+    for (const d of DAYS) {
+      const list = sessionsForDay(sessions, d)
+      map[d] = editing ? list : insertAutoBreaks(list)
+    }
+    return map
+  }, [sessions, editing])
+
+  const todayNoClass = useMemo(() => getNoClassEvent(todayISO()), [])
 
   return (
     <Panel className="board board-hard bg-[var(--surface)] overflow-hidden flex flex-col flex-1 min-h-0">
-      <div className="t-meta muted border-b-2 border-[var(--border)] px-4 py-2.5 flex items-center justify-between shrink-0">
-        <span>
+      {/* Top Header Bar */}
+      <div className="t-meta muted border-b-2 border-[var(--border)] px-3 sm:px-4 py-2 sm:py-2.5 flex items-center justify-between shrink-0">
+        <span className="truncate">
           WEEK GRID · {sessions.length} BLOCKS ·{' '}
-          {editing ? 'DRAG A BLOCK TO ANOTHER DAY' : 'BATCH SCHEDULE VIEW'}
+          {editing ? 'DRAG A BLOCK TO RESCHEDULE' : 'TAP A CLASS FOR DETAILS'}
         </span>
       </div>
 
-      <div className="overflow-auto no-scrollbar flex-1">
-        <div className="min-w-[720px] p-2">
-          <div
-            className="grid border-b-2 border-[var(--border)]"
-            style={{ gridTemplateColumns: `56px repeat(${DAYS.length}, 1fr)` }}
+      {/* Holiday / Exam Notice Banner */}
+      {todayNoClass && (
+        <div className="mx-2 mt-2 px-2.5 py-1 text-[0.6875rem] font-bold rounded border flex items-center justify-between shrink-0 bg-[var(--surface-2)] border-[var(--border)]">
+          <span className="truncate">
+            TODAY: <span className="font-extrabold">{todayNoClass.label}</span>
+          </span>
+          <span
+            className="chip !py-0.2 !px-1.5 text-[0.6rem] font-black uppercase shrink-0"
+            style={{
+              background: todayNoClass.isExam
+                ? 'var(--color-coral)'
+                : todayNoClass.isBreak
+                  ? 'var(--color-acid)'
+                  : 'var(--color-amber)',
+              color: '#111111',
+            }}
           >
-            <div />
-            {DAYS.map((d) => (
+            {todayNoClass.category}
+          </span>
+        </div>
+      )}
+
+      {/* Matrix Container */}
+      <div
+        ref={containerRef}
+        onScroll={handleScroll}
+        className="relative flex-1 overflow-auto bg-[var(--surface)] min-h-0 select-none touch-pan-x touch-pan-y no-scrollbar"
+        style={{
+          scrollSnapType: visibleCols === 3 ? 'x proximity' : 'none',
+          scrollPaddingLeft: `${hourRailWidth}px`,
+        }}
+      >
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns:
+              visibleCols === 5
+                ? `${hourRailWidth}px repeat(5, minmax(0, 1fr))`
+                : `${hourRailWidth}px repeat(5, ${colWidth}px)`,
+            width: visibleCols === 5 ? '100%' : `${hourRailWidth + colWidth * 5}px`,
+            minHeight: `${gridHeight + 32}px`,
+          }}
+        >
+          {/* Top-Left Corner Cell */}
+          <div
+            className="sticky top-0 left-0 z-40 bg-[var(--surface-2)] border-b-2 border-r-2 border-[var(--border)] flex items-center justify-center h-8"
+            aria-hidden="true"
+          >
+            <Clock size={12} className="muted opacity-70" />
+          </div>
+
+          {/* Sticky Day Column Headers */}
+          {DAYS.map((d) => {
+            const isToday = d === today
+            const isFocused = d === focusedDay
+            const dNoClass = getNoClassEvent(getIsoForWeekday(d))
+
+            return (
               <div
-                key={d}
-                className="t-meta flex items-center justify-center gap-2 border-l-2 border-[var(--border)] py-2"
+                key={`header-${d}`}
+                onClick={() => scrollToDay(d, true)}
+                className={`sticky top-0 z-20 h-8 bg-[var(--surface-2)] border-b-2 border-r-2 border-[var(--border)] flex items-center justify-center gap-1.5 px-1 cursor-pointer transition-colors ${
+                  isToday
+                    ? 'bg-[var(--color-present)]/10 font-black'
+                    : isFocused
+                      ? 'bg-[var(--surface)] font-extrabold'
+                      : 'font-bold'
+                }`}
+                style={{ scrollSnapAlign: 'start' }}
               >
-                {d}
+                <span className="text-xs sm:text-[0.8125rem] tracking-wider">{d}</span>
+                {isToday ? (
+                  <span className="relative flex size-1.5 shrink-0" title="Today">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[var(--color-present)] opacity-75" />
+                    <span className="relative inline-flex rounded-full size-1.5 bg-[var(--color-present)]" />
+                  </span>
+                ) : dNoClass ? (
+                  <span
+                    className="size-1.5 rounded-full shrink-0"
+                    title={dNoClass.label}
+                    style={{
+                      background: dNoClass.isExam
+                        ? 'var(--color-coral)'
+                        : dNoClass.isBreak
+                          ? 'var(--color-acid)'
+                          : 'var(--color-amber)',
+                    }}
+                  />
+                ) : null}
                 {editing ? (
                   <button
                     type="button"
-                    onClick={() => onAddDay(d)}
-                    className="grid size-5 place-items-center border-2 border-[var(--border)] cursor-pointer"
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      onAddDay(d)
+                    }}
+                    className="grid size-4 sm:size-5 place-items-center border-2 border-[var(--border)] cursor-pointer ml-0.5"
                     style={{ background: 'var(--color-acid)', borderRadius: 2, color: 'var(--on-accent)' }}
                     aria-label={`Add session on ${d}`}
                   >
@@ -882,34 +1105,45 @@ function WeekGrid({ sessions, editing, onEdit, onDrop, onAddDay }) {
                   </button>
                 ) : null}
               </div>
-            ))}
+            )
+          })}
+
+          {/* Sticky Left Hour Rail */}
+          <div
+            className="sticky left-0 z-30 bg-[var(--surface-2)] border-r-2 border-[var(--border)] relative"
+            style={{ height: gridHeight }}
+          >
+            {hours.map((h) => {
+              const hourNum = (Math.floor(h / 60) % 12) || 12
+              const ampm = Math.floor(h / 60) < 12 ? 'A' : 'P'
+              return (
+                <div
+                  key={`hour-${h}`}
+                  className="absolute right-1 text-[9.5px] sm:text-[10px] font-mono font-bold text-[var(--muted)] hover:text-[var(--text)] leading-none select-none"
+                  style={{ top: Math.max(2, (h - from) * pxPerMin - 4) }}
+                >
+                  {hourNum}{ampm}
+                </div>
+              )
+            })}
           </div>
 
-          <div
-            className="relative grid pt-2.5"
-            style={{
-              gridTemplateColumns: `56px repeat(${DAYS.length}, 1fr)`,
-              height: span * pxPerMin + 10,
-            }}
-          >
-            {/* Hour Rail */}
-            <div className="relative">
-              {hours.map((h) => (
-                <div
-                  key={h}
-                  className="t-meta muted absolute right-2"
-                  style={{ top: Math.max(2, (h - from) * pxPerMin - 6) }}
-                >
-                  {((Math.floor(h / 60) % 12) || 12)}
-                  {Math.floor(h / 60) < 12 ? 'A' : 'P'}
-                </div>
-              ))}
-            </div>
+          {/* 5 Day Columns with Session Blocks */}
+          {DAYS.map((d) => {
+            const isToday = d === today
+            const sessionsList = daySessionsMap[d] || []
+            const isCurrentMinsInDay = isToday && currentMins >= from && currentMins <= to
 
-            {DAYS.map((day) => (
+            return (
               <div
-                key={day}
-                className="relative border-l-2 border-[var(--border)]"
+                key={`col-${d}`}
+                className={`relative border-r-2 border-[var(--border)] transition-colors ${
+                  isToday ? 'bg-[var(--color-present)]/[0.03]' : ''
+                }`}
+                style={{
+                  height: gridHeight,
+                  scrollSnapAlign: 'start',
+                }}
                 onDragOver={editing ? (e) => e.preventDefault() : undefined}
                 onDrop={
                   editing
@@ -919,58 +1153,87 @@ function WeekGrid({ sessions, editing, onEdit, onDrop, onAddDay }) {
                         const rect = e.currentTarget.getBoundingClientRect()
                         const offset = e.clientY - rect.top
                         const snapped = from + Math.round(offset / pxPerMin / 30) * 30
-                        onDrop(id, day, Math.max(from, snapped))
+                        onDrop(id, d, Math.max(from, snapped))
                       }
                     : undefined
                 }
               >
+                {/* Horizontal Hour Grid Divider Lines */}
                 {hours.map((h) => (
                   <div
-                    key={h}
-                    className="absolute inset-x-0 border-t border-black/8 dark:border-white/8"
+                    key={`line-${d}-${h}`}
+                    className="absolute inset-x-0 border-t border-black/8 dark:border-white/8 pointer-events-none"
                     style={{ top: (h - from) * pxPerMin }}
-                    aria-hidden
+                    aria-hidden="true"
                   />
                 ))}
 
-                {(editing ? sessionsForDay(sessions, day) : insertAutoBreaks(sessionsForDay(sessions, day))).map((s) => {
+                {/* Real-time "NOW" Laser Line on today's column */}
+                {isCurrentMinsInDay && (
+                  <div
+                    className="absolute inset-x-0 z-20 pointer-events-none flex items-center"
+                    style={{ top: (currentMins - from) * pxPerMin }}
+                  >
+                    <div className="w-full h-0.5 bg-[var(--color-present)] shadow-[0_0_8px_var(--color-present)]" />
+                    <span className="absolute -left-1 size-2 rounded-full bg-[var(--color-present)] ring-2 ring-black" />
+                  </div>
+                )}
+
+                {/* Session Blocks */}
+                {sessionsList.map((s) => {
                   const theme = getSubjectTheme(s)
                   const isBreak = s.type === 'break'
+                  const isLive = isToday && isLiveSession(s, today, currentMins)
+                  const blockHeight = Math.max((s.end - s.start) * pxPerMin - 4, 24)
+
                   return (
                     <button
                       key={s.id}
                       type="button"
-                      draggable={editing}
+                      draggable={editing && !isBreak}
                       onDragStart={
-                        editing
+                        editing && !isBreak
                           ? (e) => e.dataTransfer.setData('text/plain', s.id)
                           : undefined
                       }
-                      onClick={editing ? () => onEdit(s) : undefined}
-                      className="absolute inset-x-1 overflow-hidden border-2 border-[var(--border)] p-1.5 text-left transition-all"
+                      onClick={() => {
+                        if (editing) {
+                          if (!isBreak) onEdit(s)
+                        } else {
+                          setSelectedSession(s)
+                        }
+                      }}
+                      className={`absolute inset-x-1 overflow-hidden border-2 p-1 text-left transition-all rounded-[3px] shadow-xs ${
+                        editing
+                          ? 'cursor-grab active:cursor-grabbing'
+                          : 'cursor-pointer active:scale-[0.98]'
+                      } ${
+                        isLive
+                          ? 'ring-2 ring-[var(--color-present)] shadow-hard-sm z-10'
+                          : 'hover:brightness-105'
+                      }`}
                       style={{
                         top: (s.start - from) * pxPerMin + 2,
-                        height: Math.max((s.end - s.start) * pxPerMin - 4, 26),
-                        background: isBreak ? (s.accent || 'var(--color-violet)') : theme.bgPill,
-                        borderRadius: 2,
+                        height: blockHeight,
+                        background: isBreak ? s.accent || 'var(--color-violet)' : theme.bgPill,
                         color: isBreak ? 'var(--on-accent)' : theme.ink,
-                        borderColor: isBreak ? 'var(--border)' : undefined,
-                        cursor: editing ? 'grab' : 'default',
-                        fontWeight: isBreak ? 700 : undefined,
+                        borderColor: isBreak ? 'var(--border)' : 'rgba(0,0,0,0.22)',
                       }}
+                      title={`${s.name} (${fmtRange(s.start, s.end)})`}
                     >
-                      <span className="t-meta flex items-start gap-1.5 leading-tight">
+                      <div className="flex items-start gap-1 leading-tight">
                         {editing ? (
-                          <GripVertical className="icon-micro mt-0.5 shrink-0" />
+                          <GripVertical className="size-3 shrink-0 mt-0.5 opacity-70" />
                         ) : isBreak ? (
-                          <Coffee className="icon-micro mt-0.5 shrink-0 text-[var(--on-accent)]" strokeWidth={2.5} />
+                          <Coffee size={10} className="shrink-0 mt-0.5" strokeWidth={2.5} />
                         ) : null}
-                        <span className="line-clamp-2 font-black">{s.name}</span>
-                      </span>
+                        <span className="text-[10px] font-black line-clamp-2 leading-tight">
+                          {s.name}
+                        </span>
+                      </div>
+
                       {s.room ? (
-                        <span
-                          className="t-micro mt-0.5 block opacity-85"
-                        >
+                        <span className="text-[9px] font-bold opacity-85 block truncate mt-0.5">
                           {s.room}
                         </span>
                       ) : null}
@@ -978,10 +1241,135 @@ function WeekGrid({ sessions, editing, onEdit, onDrop, onAddDay }) {
                   )
                 })}
               </div>
-            ))}
-          </div>
+            )
+          })}
         </div>
       </div>
+
+      {/* TAP-TO-INSPECT SESSION DETAIL MODAL */}
+      {selectedSession && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs"
+          onClick={() => setSelectedSession(null)}
+        >
+          <div
+            className="board board-hard w-full max-w-sm p-4 bg-[var(--surface)] shadow-hard-lg border-2 border-[var(--border)] space-y-3"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Modal Header */}
+            <div className="flex items-start justify-between gap-2 border-b border-[var(--border)] pb-2.5">
+              <div className="flex items-center gap-2 flex-wrap min-w-0">
+                <span
+                  className="chip !py-0.5 !px-2 text-[0.65rem] font-black uppercase"
+                  style={{
+                    background:
+                      selectedSession.type === 'break'
+                        ? 'var(--color-violet)'
+                        : getSubjectTheme(selectedSession).bgPill,
+                    color:
+                      selectedSession.type === 'break'
+                        ? 'var(--on-accent)'
+                        : getSubjectTheme(selectedSession).ink,
+                  }}
+                >
+                  {selectedSession.type === 'break'
+                    ? 'RECESS'
+                    : selectedSession.category || selectedSession.type || 'COURSE'}
+                </span>
+                {selectedSession.code ? (
+                  <span className="chip !py-0.5 !px-2 text-[0.65rem] font-bold">
+                    {selectedSession.code}
+                  </span>
+                ) : null}
+                {selectedSession.day ? (
+                  <span className="chip !py-0.5 !px-2 text-[0.65rem] font-bold bg-[var(--surface-2)]">
+                    {selectedSession.day}
+                  </span>
+                ) : null}
+              </div>
+              <button
+                type="button"
+                onClick={() => setSelectedSession(null)}
+                className="p-1 muted hover:text-[var(--text)] cursor-pointer"
+                aria-label="Close details"
+              >
+                <X size={16} />
+              </button>
+            </div>
+
+            {/* Course Name */}
+            <div>
+              <h3 className="heading text-base sm:text-lg font-black leading-snug">
+                {selectedSession.name || 'Break'}
+              </h3>
+            </div>
+
+            {/* Metadata Rows */}
+            <div className="space-y-2 text-xs font-semibold py-1">
+              <div className="flex items-center gap-2 text-[var(--text)]">
+                <Clock size={14} className="text-[var(--color-violet)] shrink-0" />
+                <span>
+                  {fmtRange(selectedSession.start, selectedSession.end)}
+                  <span className="muted font-normal ml-1">
+                    ({Math.max(0, selectedSession.end - selectedSession.start)} mins)
+                  </span>
+                </span>
+              </div>
+
+              {selectedSession.room ? (
+                <div className="flex items-center gap-2 text-[var(--text)]">
+                  <MapPin size={14} className="text-[var(--color-coral)] shrink-0" />
+                  <span>Room: {selectedSession.room}</span>
+                </div>
+              ) : null}
+
+              {selectedSession.group ? (
+                <div className="flex items-center gap-2 text-[var(--text)]">
+                  <Users size={14} className="text-[var(--color-sky)] shrink-0" />
+                  <span>Batch / Group: {selectedSession.group}</span>
+                </div>
+              ) : null}
+
+              {selectedSession.instructor ? (
+                <div className="flex items-center gap-2 text-[var(--text)]">
+                  <Tag size={14} className="text-[var(--color-acid)] shrink-0" />
+                  <span>Faculty: {selectedSession.instructor}</span>
+                </div>
+              ) : null}
+
+              {selectedSession.note ? (
+                <p className="text-[0.7rem] muted italic pt-1 border-t border-[var(--border)]">
+                  Note: {selectedSession.note}
+                </p>
+              ) : null}
+            </div>
+
+            {/* Actions */}
+            <div className="flex items-center justify-between pt-2 border-t border-[var(--border)]">
+              {onJumpToDay && selectedSession.day ? (
+                <button
+                  type="button"
+                  onClick={() => {
+                    const d = selectedSession.day
+                    setSelectedSession(null)
+                    onJumpToDay(d)
+                  }}
+                  className="label text-xs text-[var(--color-violet)] hover:underline flex items-center gap-1 font-bold cursor-pointer bg-transparent border-0 p-0"
+                >
+                  VIEW IN DAY VIEW <ArrowRight size={12} />
+                </button>
+              ) : <div />}
+              <button
+                type="button"
+                onClick={() => setSelectedSession(null)}
+                className="btn !py-1 !px-3 text-xs font-bold cursor-pointer"
+              >
+                CLOSE
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </Panel>
   )
 }
@@ -1307,31 +1695,11 @@ export default function Board() {
   const required = settings?.required ?? 65
   const since = settings?.trackingSince
 
-  // Computes the ISO calendar date for any weekday in the active week
-  const getIsoForWeekday = useCallback((targetDay) => {
-    const now = new Date()
-    const currentDay = dayCode(now)
-    if (targetDay === currentDay) return todayISO(now)
-
-    const currentDayIndex = (now.getDay() + 6) % 7
-    const targetDayIndex = DAYS.indexOf(targetDay)
-    if (targetDayIndex === -1) return todayISO(now)
-
-    const targetDate = new Date(now)
-    let diff = targetDayIndex - currentDayIndex
-    // On weekends (Sat=5, Sun=6), viewing Mon-Fri refers to upcoming week
-    if (currentDayIndex >= 5 && targetDayIndex < 5) {
-      diff = (7 - currentDayIndex) + targetDayIndex
-    }
-    targetDate.setDate(now.getDate() + diff)
-    return todayISO(targetDate)
-  }, [])
-
   // Computes the ISO calendar date for the selected weekday in the current week (or returns selectedIso if set)
   const activeIso = useMemo(() => {
     if (selectedIso) return selectedIso
     return getIsoForWeekday(day)
-  }, [selectedIso, day, getIsoForWeekday])
+  }, [selectedIso, day])
 
   const noClassEvent = useMemo(() => getNoClassEvent(activeIso), [activeIso])
 
@@ -1788,6 +2156,13 @@ export default function Board() {
               const s = sessions.find((x) => x.id === id)
               if (!s) return
               moveSession(id, { day: newDay, start: newStart, end: newStart + (s.end - s.start) })
+            }}
+            currentMins={currentMins}
+            today={today}
+            activeDay={day}
+            onJumpToDay={(targetDay) => {
+              setDay(targetDay)
+              setView('day')
             }}
           />
         ) : (

@@ -33,6 +33,10 @@ import {
   TRANSPORT,
   USEFUL_LINKS,
 } from '../data/info'
+import {
+  getSemesterCourses,
+  getDefaultSemesterForYear,
+} from '../data/curriculum'
 
 const SECTIONS = [
   { id: 'skip', label: 'SKIP GUARD', icon: ShieldCheck, accent: 'var(--color-acid)' },
@@ -105,11 +109,30 @@ function SkipGuard() {
 
 function Cgpa() {
   const { profile, year, group } = useProfile()
+  const activeSem = getDefaultSemesterForYear(year)
   const { sessions } = useBoard(profile.branch, year)
   const branchKey = `${profile.branch}-${year}`
+  const semStorageKey = `${profile.branch}-sem-${activeSem}`
   const [allGrades, setAllGrades] = useStored(KEYS.grades, {})
 
   const defaultCourses = useMemo(() => {
+    const semCourses = getSemesterCourses(profile.branch, activeSem)
+    if (semCourses.length > 0) {
+      return semCourses
+        .filter((c) => {
+          const raw = String(c.credits || '').replace(/[^0-9.]/g, '')
+          return raw !== '' && parseFloat(raw) > 0 && c.category !== 'NC'
+        })
+        .map((c, i) => {
+          const raw = String(c.credits || '4').replace(/[^0-9.]/g, '')
+          return {
+            id: `g_${c.code || c.title}_${i}`,
+            name: c.title || c.name,
+            credits: raw || '4',
+            grade: '9',
+          }
+        })
+    }
     const effectiveSessions = filterSessionsByGroup(sessions, group)
     const rawCourses = coursesOf(effectiveSessions)
     return rawCourses.map((c, i) => {
@@ -121,35 +144,42 @@ function Cgpa() {
         grade: '9',
       }
     })
-  }, [sessions, group])
+  }, [profile.branch, activeSem, sessions, group])
 
   const rows = useMemo(() => {
-    if (allGrades && !Array.isArray(allGrades) && Array.isArray(allGrades[branchKey]) && allGrades[branchKey].length > 0) {
-      return allGrades[branchKey]
+    if (allGrades && !Array.isArray(allGrades)) {
+      if (Array.isArray(allGrades[semStorageKey]) && allGrades[semStorageKey].length > 0) {
+        return allGrades[semStorageKey]
+      }
+      if (Array.isArray(allGrades[branchKey]) && allGrades[branchKey].length > 0) {
+        return allGrades[branchKey]
+      }
     }
     if (Array.isArray(allGrades) && allGrades.length > 0) {
       return allGrades
     }
     return defaultCourses
-  }, [allGrades, branchKey, defaultCourses])
+  }, [allGrades, semStorageKey, branchKey, defaultCourses])
 
   const setRows = useCallback(
     (updater) => {
       setAllGrades((prev) => {
         const curList =
-          (!Array.isArray(prev) && Array.isArray(prev?.[branchKey]) && prev[branchKey].length > 0)
-            ? prev[branchKey]
-            : (Array.isArray(prev) && prev.length > 0)
-              ? prev
-              : defaultCourses
+          (!Array.isArray(prev) && Array.isArray(prev?.[semStorageKey]) && prev[semStorageKey].length > 0)
+            ? prev[semStorageKey]
+            : (!Array.isArray(prev) && Array.isArray(prev?.[branchKey]) && prev[branchKey].length > 0)
+              ? prev[branchKey]
+              : (Array.isArray(prev) && prev.length > 0)
+                ? prev
+                : defaultCourses
         const nextList = typeof updater === 'function' ? updater(curList) : updater
         if (Array.isArray(prev)) {
-          return { [branchKey]: nextList }
+          return { [semStorageKey]: nextList }
         }
-        return { ...prev, [branchKey]: nextList }
+        return { ...prev, [semStorageKey]: nextList }
       })
     },
-    [branchKey, defaultCourses, setAllGrades],
+    [semStorageKey, branchKey, defaultCourses, setAllGrades],
   )
 
   const { credits, points, sgpa } = useMemo(() => {

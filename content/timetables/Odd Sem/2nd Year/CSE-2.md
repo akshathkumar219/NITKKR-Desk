@@ -28,12 +28,12 @@ source: Dept. of Computer Engineering Odd Sem 2026-27 Time Table
 |-------|-------|----------------------------------------|--------------|---------|-------|-----------------------|---------|
 | 08:30 | 09:25 | Discrete Mathematics & Statistical Methods | MAIC-201 | LHC 106 | A1+A2 | Dr. Pragati Sharma    | lecture |
 | 08:30 | 10:20 | Design and Analysis of Algorithms Lab  | CSPC-201 (P) | M 305   | B3    | Dr. Vijay Verma       | lab     |
-| 08:30 | 10:20 | IoT Programming Lab                    | CSPC-209 (P) | LAB 1   | B4    | Mr. Rohitashwa        | lab     |
 | 09:25 | 10:20 | Object-Oriented Programming using Java | CSPC-205     | LHC 106 | A1+A2 | Dr. Banhi Sanyal      | lecture |
 | 10:40 | 11:35 | Computer Organization and Architecture | CSPC-203     | LHC 305 |       | Dr. Vaibhav Agarwal   | lecture |
 | 11:35 | 12:30 | Software Engineering                   | CSPC-207     | LHC 305 |       | Dr. Vijay Kumar Sharma| lecture |
 | 12:30 | 13:45 | Break                                  |              |         | B3+B4 |                       | break   |
 | 13:45 | 14:40 | Discrete Mathematics & Statistical Methods | MAIC-201 | LHC 102 | B3+B4 | Dr. Saraswati Yadav   | lecture |
+| 14:40 | 16:30 | IoT Programming Lab                    | CSPC-209 (P) | LAB 1   | B4    | Mr. Rohitashwa        | lab     |
 
 ## WED
 

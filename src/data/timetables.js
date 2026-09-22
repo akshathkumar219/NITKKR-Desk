@@ -31,13 +31,9 @@ export function getSessionById(id) {
     for (const byYear of Object.values(TIMETABLES)) {
       for (const list of Object.values(byYear)) {
         for (const s of list) {
-          const isLab =
-            s.type === 'lab' ||
-            (s.name || '').toUpperCase().includes('LAB') ||
-            (s.code || '').toUpperCase().includes('(P)')
           _sessionById.set(s.id, {
             ...s,
-            attendanceCredits: s.attendanceCredits != null ? Number(s.attendanceCredits) : (isLab ? 2 : 1),
+            attendanceCredits: s.attendanceCredits != null && s.attendanceCredits !== 2 ? Number(s.attendanceCredits) : 1,
           })
         }
       }
@@ -49,17 +45,10 @@ export function getSessionById(id) {
 /** Published (non-editable-source) timetable for a branch/year. */
 export function baseTimetable(branch, year) {
   const list = TIMETABLES[branch]?.[year] ?? []
-  return list.map((s) => {
-    if (s.attendanceCredits != null) return s
-    const isLab =
-      s.type === 'lab' ||
-      (s.name || '').toUpperCase().includes('LAB') ||
-      (s.code || '').toUpperCase().includes('(P)')
-    return {
-      ...s,
-      attendanceCredits: isLab ? 2 : 1,
-    }
-  })
+  return list.map((s) => ({
+    ...s,
+    attendanceCredits: s.attendanceCredits != null && s.attendanceCredits !== 2 ? Number(s.attendanceCredits) : 1,
+  }))
 }
 
 /** Every room mentioned anywhere — used by Open Rooms. */

@@ -113,20 +113,21 @@ export function tally(
     for (const item of sessionIds) {
       if (item && typeof item === 'object') {
         ids.add(item.id)
-        if (weights[item.id] == null) {
+        if (weights[item.id] == null || weights[item.id] === 2) {
           weights[item.id] =
-            item.attendanceCredits != null
+            item.attendanceCredits != null && item.attendanceCredits !== 2
               ? Number(item.attendanceCredits)
-              : item.type === 'lab'
-                ? 2
-                : 1
+              : 1
         }
       } else if (item != null) {
         ids.add(item)
-        if (weights[item] == null) {
+        if (weights[item] == null || weights[item] === 2) {
           const sess = getSessionById(item)
           if (sess) {
-            weights[item] = sess.attendanceCredits || 1
+            weights[item] =
+              sess.attendanceCredits && sess.attendanceCredits !== 2
+                ? Number(sess.attendanceCredits)
+                : 1
           }
         }
       }
@@ -144,9 +145,12 @@ export function tally(
     if (!ids.has(sid)) continue
     if (!inWindow(iso, since)) continue
     let weight = weights[sid]
-    if (weight == null || isNaN(weight)) {
+    if (weight == null || isNaN(weight) || weight === 2) {
       const sess = getSessionById(sid)
-      weight = sess?.attendanceCredits || 1
+      weight =
+        sess?.attendanceCredits && sess.attendanceCredits !== 2
+          ? Number(sess.attendanceCredits)
+          : 1
       weights[sid] = weight
     }
     if (mark === 'present') present += weight

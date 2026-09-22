@@ -99,6 +99,7 @@ export default function App() {
           <Route path="/subjects/*" element={<RequireWelcome><Subjects /></RequireWelcome>} />
           <Route path="/subject/:subjectKey" element={<RequireWelcome><Subjects /></RequireWelcome>} />
           <Route path="/calculator" element={<RequireWelcome><CalculatorPage /></RequireWelcome>} />
+          <Route path="/calc" element={<Navigate to="/calculator" replace />} />
           <Route path="/profile" element={<RequireWelcome><Profile /></RequireWelcome>} />
           <Route path="/calendar" element={<RequireWelcome><CalendarPage /></RequireWelcome>} />
           <Route path="/guide" element={<Guide />} />

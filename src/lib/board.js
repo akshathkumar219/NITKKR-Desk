@@ -167,16 +167,23 @@ export function sessionsForDay(sessions, day, group, includeAutoBreaks = false) 
   return includeAutoBreaks ? insertAutoBreaks(dayList) : dayList
 }
 
+/** Unique course key for a session block (distinguishing Labs from Theory). */
+export function courseKeyForSession(s) {
+  if (!s) return ''
+  const isLab = s.type === 'lab' || (s.name || '').toUpperCase().includes('LAB')
+  const baseCode = s.code || s.name || ''
+  return isLab
+    ? (baseCode.toUpperCase().includes('LAB') || baseCode.includes('(P)') ? baseCode : `${baseCode} (Lab)`)
+    : baseCode
+}
+
 /** Distinct courses (excludes breaks) — the roll-call subject list. */
 export function coursesOf(sessions) {
   const map = new Map()
   for (const s of sessions) {
     if (s.type === 'break') continue
     const isLab = s.type === 'lab' || (s.name || '').toUpperCase().includes('LAB')
-    const baseCode = s.code || s.name || ''
-    const key = isLab
-      ? (baseCode.toUpperCase().includes('LAB') || baseCode.includes('(P)') ? baseCode : `${baseCode} (Lab)`)
-      : baseCode
+    const key = courseKeyForSession(s)
     if (!map.has(key)) {
       map.set(key, {
         key,

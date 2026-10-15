@@ -1,8 +1,9 @@
 import { useCallback } from 'react'
 import { KEYS, useStored } from './storage.js'
-import { DAYS, isoToDate, todayISO } from './time.js'
+import { DAYS, dayCode, isoToDate, todayISO } from './time.js'
 import { getSessionById } from '../data/timetables.js'
 import { isNoClassDay } from '../data/info.js'
+import { courseKeyForSession } from './board.js'
 
 // Attendance ("roll call") marks are keyed by `${isoDate}|${sessionId}` so a
 // session can be marked independently on each date it occurs.
@@ -309,4 +310,179 @@ export function unmarkedSince(sessions, marks, since, upto = todayISO()) {
     cursor.setDate(cursor.getDate() + 1)
   }
   return out
+}
+
+/**
+ * Calculates remaining classes from today until endDate for a set of sessions.
+ *
+ * Rules:
+ * - Iterates dates starting from todayIso up to endDateIso.
+ * - If isNoClassDay(dateIso) is true, skips that day (holiday, break, exam, fest non-teaching day).
+ * - For today (dateIso === todayIso): only counts sessions that are NOT yet marked in marks (unmarked upcoming).
+ * - For future dates: counts all sessions scheduled on that weekday.
+ * - Each session counts 1 (or its attendanceCredits if defined and !== 2).
+ */
+export function getRemainingClasses({
+  effectiveSessions = [],
+  marks = {},
+  todayIso = todayISO(),
+  endDateIso,
+}) {
+  if (!endDateIso || endDateIso < todayIso) {
+    return { overall: 0, byCourse: {}, bySession: {}, totalTeachingDays: 0 }
+  }
+
+  const byCourse = {}
+  const bySession = {}
+  let overall = 0
+  let totalTeachingDays = 0
+
+  const cur = isoToDate(todayIso)
+  const end = isoToDate(endDateIso)
+
+  for (let guard = 0; cur <= end && guard < 400; guard++) {
+    const y = cur.getFullYear()
+    const m = String(cur.getMonth() + 1).padStart(2, '0')
+    const d = String(cur.getDate()).padStart(2, '0')
+    const dateIso = `${y}-${m}-${d}`
+
+    if (!isNoClassDay(dateIso)) {
+      const dCode = dayCode(cur)
+      const daySessions = effectiveSessions.filter(
+        (s) => s.day === dCode && s.type !== 'break'
+      )
+
+      const isToday = dateIso === todayIso
+      let dayHadClasses = false
+
+      for (const s of daySessions) {
+        if (isToday) {
+          const key = markKey(dateIso, s.id)
+          const mark = marks[key]
+          // If already marked, it has already been factored into held / present tallies
+          if (mark) continue
+        }
+
+        const credit =
+          s.attendanceCredits != null && s.attendanceCredits !== 2
+            ? Number(s.attendanceCredits)
+            : 1
+
+        const cKey = courseKeyForSession(s)
+        byCourse[cKey] = (byCourse[cKey] || 0) + credit
+        bySession[s.id] = (bySession[s.id] || 0) + 1
+        overall += credit
+        dayHadClasses = true
+      }
+
+      if (dayHadClasses) {
+        totalTeachingDays += 1
+      }
+    }
+
+    cur.setDate(cur.getDate() + 1)
+  }
+
+  return { overall, byCourse, bySession, totalTeachingDays }
+}
+
+/**
+ * Calculates end-of-semester attendance requirement for a finite number of remaining classes.
+ *
+ * Given:
+ * - present: classes already attended
+ * - held: total classes held so far
+ * - remaining: classes left till teaching closes
+ * - targetPercent: desired attendance percentage (e.g. 75)
+ *
+ * Returns:
+ * - finalHeld: held + remaining
+ * - neededToAttend: classes you must attend out of remaining (0 to remaining)
+ * - skipsAllowed: classes you can safely skip out of remaining (0 to remaining)
+ * - isAchievable: boolean
+ * - maxAchievablePercent: attendance % if all remaining classes are attended
+ * - projectedPercent: attendance % if exactly neededToAttend classes are attended
+ * - deficit: how many classes short if unachievable
+ * - status: 'safe' | 'edge' | 'achievable' | 'unachievable' | 'untracked'
+ */
+export function calculateSemesterTarget({
+  present = 0,
+  held = 0,
+  remaining = 0,
+  targetPercent = 75,
+}) {
+  const p = Number(present) || 0
+  const h = Number(held) || 0
+  const r = Math.max(0, Number(remaining) || 0)
+  const target = Number(targetPercent) || 75
+
+  const finalHeld = h + r
+  if (finalHeld === 0) {
+    return {
+      finalHeld: 0,
+      neededToAttend: 0,
+      skipsAllowed: 0,
+      status: 'untracked',
+      maxAchievablePercent: 100,
+      projectedPercent: 100,
+      deficit: 0,
+      isAchievable: true,
+      requiredPresent: 0,
+    }
+  }
+
+  // Minimum classes student must have attended by semester end: ceil(target/100 * finalHeld)
+  const requiredPresent = Math.ceil((target / 100) * finalHeld)
+  const needed = requiredPresent - p
+
+  const maxPresent = p + r
+  const maxAchievablePercent = (maxPresent / finalHeld) * 100
+
+  // Case 1: Target unachievable even if student attends all remaining classes
+  if (needed > r) {
+    return {
+      finalHeld,
+      neededToAttend: r,
+      skipsAllowed: 0,
+      status: 'unachievable',
+      maxAchievablePercent,
+      projectedPercent: maxAchievablePercent,
+      deficit: needed - r,
+      isAchievable: false,
+      requiredPresent,
+    }
+  }
+
+  // Case 2: Target already satisfied even if student attends 0 more classes
+  if (needed <= 0) {
+    const projectedFinal = (p / finalHeld) * 100
+    return {
+      finalHeld,
+      neededToAttend: 0,
+      skipsAllowed: r,
+      status: 'safe',
+      maxAchievablePercent,
+      projectedPercent: projectedFinal,
+      deficit: 0,
+      isAchievable: true,
+      requiredPresent,
+    }
+  }
+
+  // Case 3: Target is achievable by attending `needed` out of `r` classes
+  const skipsAllowed = r - needed
+  const projectedPresent = p + needed
+  const projectedPercent = (projectedPresent / finalHeld) * 100
+
+  return {
+    finalHeld,
+    neededToAttend: needed,
+    skipsAllowed,
+    status: skipsAllowed === 0 ? 'edge' : 'achievable',
+    maxAchievablePercent,
+    projectedPercent,
+    deficit: 0,
+    isAchievable: true,
+    requiredPresent,
+  }
 }

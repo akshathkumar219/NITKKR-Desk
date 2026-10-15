@@ -14,7 +14,6 @@ import {
   Code2,
   Copy,
   Cpu,
-  Flame,
   FlaskConical,
   Minus,
   Pencil,
@@ -22,7 +21,6 @@ import {
   RotateCcw,
   Settings2,
   Share2,
-  ShieldCheck,
   Sparkles,
   Trash2,
   TrendingDown,
@@ -32,15 +30,17 @@ import {
 import Shell from '../components/Shell'
 import SessionModal from '../components/SessionModal'
 import SubjectModal from '../components/SubjectModal'
-import { EmptyState, Field, Meter, Modal, Panel, Ring } from '../ui'
-import { useProfile, useRollcallSettings, useAllSubjectsData } from '../lib/storage'
-import { coursesOf, filterSessionsByGroup, nextClassDay, sessionsForDay, useBoard } from '../lib/board'
-import { getNoClassEvent } from '../data/info'
+import { EmptyState, Field, Modal, Panel, Ring } from '../ui'
+import { useProfile, useRollcallSettings, useAllSubjectsData, useStored, KEYS } from '../lib/storage'
+import { coursesOf, filterSessionsByGroup, useBoard } from '../lib/board'
+import { getDefaultSemesterEndDate } from '../data/info'
 import { branchName } from '../data/campus'
 import {
   STATUS_COLOR,
   STATUS_INK,
+  calculateSemesterTarget,
   canSkip,
+  getRemainingClasses,
   mustAttend,
   simulateSkip,
   status,
@@ -48,10 +48,8 @@ import {
   useRollcall,
 } from '../lib/rollcall'
 import {
-  DAY_NAMES,
   dayCode,
   fmtDateShort,
-  fmtRange,
   isoToDate,
   minutesNow,
   todayISO,
@@ -130,6 +128,13 @@ export default function Attendance() {
   const [simSkipCount, setSimSkipCount] = useState(1)
   const [simGoalTarget, setSimGoalTarget] = useState(65)
   const [simForecastWeeks, setSimForecastWeeks] = useState(4)
+
+  // Semester End Date (Academic Calendar with manual override)
+  const defaultEndDate = useMemo(() => getDefaultSemesterEndDate(), [])
+  const [customEndDate, setCustomEndDate] = useStored(KEYS.semesterEndDate, '')
+  const semesterEndDate = customEndDate || defaultEndDate
+  const isCustomEndDate = Boolean(customEndDate && customEndDate !== defaultEndDate)
+  const [showEndDateEditor, setShowEndDateEditor] = useState(false)
 
 
   // Subject health filter in Subjects Tab
@@ -265,14 +270,51 @@ export default function Attendance() {
     return simulateSkip(activeScopeData.present, activeScopeData.held, simSkipCount, activeScopeData.targetCutoff)
   }, [activeScopeData, simSkipCount])
 
-  // Tool 2: Goal Recovery for Active Scope
-  const simGoalSkips = useMemo(() => {
-    return canSkip(activeScopeData.present, activeScopeData.held, simGoalTarget)
-  }, [activeScopeData, simGoalTarget])
 
-  const simGoalAttend = useMemo(() => {
-    return mustAttend(activeScopeData.present, activeScopeData.held, simGoalTarget)
-  }, [activeScopeData, simGoalTarget])
+  // Remaining classes calculation from today till semesterEndDate
+  const remainingData = useMemo(() => {
+    return getRemainingClasses({
+      effectiveSessions,
+      marks,
+      todayIso: iso,
+      endDateIso: semesterEndDate,
+    })
+  }, [effectiveSessions, marks, iso, semesterEndDate])
+
+  const activeRemainingClasses = useMemo(() => {
+    if (simScope === 'OVERALL') {
+      return remainingData.overall
+    }
+    return remainingData.byCourse[simScope] || 0
+  }, [simScope, remainingData])
+
+  // Enhanced Tool 2: End-of-Semester Target Roadmap for Active Scope
+  const activeRoadmap = useMemo(() => {
+    return calculateSemesterTarget({
+      present: activeScopeData.present,
+      held: activeScopeData.held,
+      remaining: activeRemainingClasses,
+      targetPercent: simGoalTarget,
+    })
+  }, [activeScopeData.present, activeScopeData.held, activeRemainingClasses, simGoalTarget])
+
+  // All Subjects End-of-Semester Roadmap
+  const allSubjectsRoadmap = useMemo(() => {
+    return subjectStats.list.map((c) => {
+      const remaining = remainingData.byCourse[c.key] || 0
+      const roadmap = calculateSemesterTarget({
+        present: c.tallyData.present,
+        held: c.tallyData.held,
+        remaining,
+        targetPercent: simGoalTarget,
+      })
+      return {
+        ...c,
+        remaining,
+        roadmap,
+      }
+    })
+  }, [subjectStats.list, remainingData.byCourse, simGoalTarget])
 
   // Tool 3: End-of-Semester Forecast
   const forecastResult = useMemo(() => {
@@ -629,70 +671,72 @@ export default function Attendance() {
             {/* Tools 1 & 2 Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {/* Tool 1: Bunk Impact Simulator */}
-              <div className="pad-card rounded bg-[var(--surface)] border-2 border-[var(--border)] space-y-3">
-                <div className="flex items-center justify-between">
-                  <span className="t-card-title text-[var(--text)] flex items-center gap-1.5">
-                    <TrendingDown className="icon-sm text-[var(--absent-ink)] shrink-0" />
-                    <span>TOOL 1: WHAT IF I BUNK CLASSES?</span>
-                  </span>
-                  <span className="chip !py-0.5 !px-2 text-xs font-bold border-2 border-[var(--border)]">
-                    {simSkipCount} CLASS{simSkipCount === 1 ? '' : 'ES'}
-                  </span>
-                </div>
+              <div className="pad-card rounded bg-[var(--surface)] border-2 border-[var(--border)] space-y-3 flex flex-col justify-between">
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span className="t-card-title text-[var(--text)] flex items-center gap-1.5">
+                      <TrendingDown className="icon-sm text-[var(--absent-ink)] shrink-0" />
+                      <span>TOOL 1: WHAT IF I BUNK CLASSES?</span>
+                    </span>
+                    <span className="chip !py-0.5 !px-2 text-xs font-bold border-2 border-[var(--border)]">
+                      {simSkipCount} CLASS{simSkipCount === 1 ? '' : 'ES'}
+                    </span>
+                  </div>
 
-                <p className="t-body muted">
-                  Simulate your percentage drop if you skip the next upcoming classes in this scope.
-                </p>
+                  <p className="t-body muted text-xs sm:text-sm">
+                    Simulate your percentage drop if you skip the next upcoming classes in this scope.
+                  </p>
 
-                {/* Counter Steppers */}
-                <div className="flex items-center gap-2 flex-wrap">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      triggerHaptic()
-                      setSimSkipCount((c) => Math.max(1, c - 1))
-                    }}
-                    className="btn !p-1.5 !h-9 !w-9 grid place-items-center cursor-pointer"
-                    aria-label="Decrease skip count"
-                  >
-                    <Minus className="icon-micro shrink-0" strokeWidth={2.5} />
-                  </button>
-                  <input
-                    type="number"
-                    min={1}
-                    max={50}
-                    value={simSkipCount}
-                    onChange={(e) => setSimSkipCount(Math.max(1, Number(e.target.value) || 1))}
-                    className="field !py-1 text-center font-bold text-sm sm:text-base w-16"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => {
-                      triggerHaptic()
-                      setSimSkipCount((c) => c + 1)
-                    }}
-                    className="btn !p-1.5 !h-9 !w-9 grid place-items-center cursor-pointer"
-                    aria-label="Increase skip count"
-                  >
-                    <Plus className="icon-micro shrink-0" strokeWidth={2.5} />
-                  </button>
+                  {/* Counter Steppers */}
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        triggerHaptic()
+                        setSimSkipCount((c) => Math.max(1, c - 1))
+                      }}
+                      className="btn !p-1.5 !h-9 !w-9 grid place-items-center cursor-pointer"
+                      aria-label="Decrease skip count"
+                    >
+                      <Minus className="icon-micro shrink-0" strokeWidth={2.5} />
+                    </button>
+                    <input
+                      type="number"
+                      min={1}
+                      max={50}
+                      value={simSkipCount}
+                      onChange={(e) => setSimSkipCount(Math.max(1, Number(e.target.value) || 1))}
+                      className="field !py-1 text-center font-bold text-sm sm:text-base w-16"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => {
+                        triggerHaptic()
+                        setSimSkipCount((c) => c + 1)
+                      }}
+                      className="btn !p-1.5 !h-9 !w-9 grid place-items-center cursor-pointer"
+                      aria-label="Increase skip count"
+                    >
+                      <Plus className="icon-micro shrink-0" strokeWidth={2.5} />
+                    </button>
 
-                  <div className="flex items-center gap-1.5 ml-auto">
-                    {[1, 3, 5, 10].map((n) => (
-                      <button
-                        key={n}
-                        type="button"
-                        onClick={() => {
-                          triggerHaptic()
-                          setSimSkipCount(n)
-                        }}
-                        className={`chip !py-1 !px-2.5 text-xs sm:text-sm cursor-pointer transition-all border-2 border-[var(--border)] ${
-                          simSkipCount === n ? '!bg-[var(--text)] !text-[var(--bg)] font-bold' : 'font-semibold hover:border-[var(--text)]'
-                        }`}
-                      >
-                        +{n}
-                      </button>
-                    ))}
+                    <div className="flex items-center gap-1.5 ml-auto">
+                      {[1, 3, 5, 10].map((n) => (
+                        <button
+                          key={n}
+                          type="button"
+                          onClick={() => {
+                            triggerHaptic()
+                            setSimSkipCount(n)
+                          }}
+                          className={`chip !py-1 !px-2.5 text-xs sm:text-sm cursor-pointer transition-all border-2 border-[var(--border)] ${
+                            simSkipCount === n ? '!bg-[var(--text)] !text-[var(--bg)] font-bold' : 'font-semibold hover:border-[var(--text)]'
+                          }`}
+                        >
+                          +{n}
+                        </button>
+                      ))}
+                    </div>
                   </div>
                 </div>
 
@@ -721,63 +765,155 @@ export default function Attendance() {
                 </div>
               </div>
 
-              {/* Tool 2: Goal Recovery Calculator */}
-              <div className="pad-card rounded bg-[var(--surface)] border-2 border-[var(--border)] space-y-3">
-                <div className="flex items-center justify-between">
-                  <span className="t-card-title text-[var(--text)] flex items-center gap-1.5">
-                    <TrendingUp className="icon-sm text-[var(--present-ink)] shrink-0" />
-                    <span>TOOL 2: TARGET GOAL RECOVERY</span>
-                  </span>
-                  <span className="chip !py-0.5 !px-2 text-xs font-bold border-2 border-[var(--border)]">
-                    GOAL: {simGoalTarget}%
-                  </span>
-                </div>
-
-                <p className="t-body muted">
-                  Select your desired percentage to see how many consecutive classes you must attend.
-                </p>
-
-                {/* Target Goals Selector */}
-                <div className="flex items-center gap-1.5">
-                  {[65, 75, 85, 90].map((t) => (
-                    <button
-                      key={t}
-                      type="button"
-                      onClick={() => {
-                        triggerHaptic()
-                        setSimGoalTarget(t)
-                      }}
-                      className={`btn !py-1.5 !px-3 text-xs sm:text-sm flex-1 cursor-pointer transition-all border-2 border-[var(--border)] ${
-                        simGoalTarget === t ? '!bg-[var(--text)] !text-[var(--bg)] !border-[var(--text)] font-bold shadow-hard-sm' : 'font-semibold'
-                      }`}
-                    >
-                      {t}%
-                    </button>
-                  ))}
-                </div>
-
-                {/* Target Goal Output Card */}
-                <div className="p-3 rounded bg-[var(--surface-2)] border-2 border-[var(--border)] flex items-center justify-between gap-3">
-                  <div>
-                    <span className="t-meta muted block">ACTION REQUIRED FOR {simGoalTarget}%</span>
-                    <p className="t-stat mt-0.5 text-[var(--text)]">
-                      {activeScopeData.percent !== null && activeScopeData.percent >= simGoalTarget ? (
-                        <span className="text-[var(--present-ink)] font-bold">
-                          ALREADY ON TRACK · {simGoalSkips} SKIPS
-                        </span>
-                      ) : (
-                        <span className="text-[var(--warn-ink)] font-bold">
-                          ATTEND {simGoalAttend} IN A ROW
-                        </span>
-                      )}
-                    </p>
+              {/* Tool 2: Enhanced Target Goal & Semester Roadmap Calculator */}
+              <div className="pad-card rounded bg-[var(--surface)] border-2 border-[var(--border)] space-y-3 flex flex-col justify-between">
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span className="t-card-title text-[var(--text)] flex items-center gap-1.5">
+                      <TrendingUp className="icon-sm text-[var(--present-ink)] shrink-0" />
+                      <span>TOOL 2: TARGET GOAL & ROADMAP</span>
+                    </span>
+                    <span className="chip !py-0.5 !px-2 text-xs font-bold border-2 border-[var(--border)]">
+                      GOAL: {simGoalTarget}%
+                    </span>
                   </div>
-                  {activeScopeData.percent !== null && activeScopeData.percent >= simGoalTarget ? (
-                    <ShieldCheck className="icon-lg text-[var(--present-ink)] shrink-0" />
-                  ) : (
-                    <Flame className="icon-lg text-[var(--warn-ink)] shrink-0" />
-                  )}
+
+                  {/* Target Goals Selector */}
+                  <div className="flex items-center gap-1.5">
+                    {[65, 75, 85, 90].map((t) => (
+                      <button
+                        key={t}
+                        type="button"
+                        onClick={() => {
+                          triggerHaptic()
+                          setSimGoalTarget(t)
+                        }}
+                        className={`btn !py-1.5 !px-3 text-xs sm:text-sm flex-1 cursor-pointer transition-all border-2 border-[var(--border)] ${
+                          simGoalTarget === t ? '!bg-[var(--text)] !text-[var(--bg)] !border-[var(--text)] font-bold shadow-hard-sm' : 'font-semibold'
+                        }`}
+                      >
+                        {t}%
+                      </button>
+                    ))}
+                  </div>
+
+                  {/* Academic Calendar Status Banner (Bigger & Clearer) */}
+                  <div className="p-2.5 sm:p-3 rounded bg-[var(--surface-2)] border-2 border-[var(--border)] flex items-center justify-between gap-3">
+                    <div className="flex items-center gap-2.5 min-w-0">
+                      <div className="w-8 h-8 rounded grid place-items-center bg-[var(--surface)] border border-[var(--border)] shrink-0">
+                        <CalendarClock size={16} className="text-[var(--warn-ink)]" />
+                      </div>
+                      <div className="min-w-0">
+                        <div className="flex items-center gap-1.5 flex-wrap">
+                          <span className="text-xs sm:text-sm font-black text-[var(--text)] uppercase tracking-tight">
+                            Teaching Closes: {fmtDateShort(semesterEndDate)}
+                          </span>
+                          {isCustomEndDate ? (
+                            <span className="chip !py-0 !px-1.5 text-[0.65rem] font-bold bg-[var(--color-amber)] text-[var(--on-accent)]">
+                              CUSTOM
+                            </span>
+                          ) : null}
+                        </div>
+                        <span className="text-xs text-[var(--muted)] font-semibold block">
+                          {activeRemainingClasses} class{activeRemainingClasses === 1 ? '' : 'es'} remaining
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-1.5 shrink-0">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          triggerHaptic(5)
+                          setShowEndDateEditor(!showEndDateEditor)
+                        }}
+                        className="btn !py-1 !px-2.5 text-xs font-bold border-2 border-[var(--border)] bg-[var(--surface)] hover:bg-[var(--surface-2)] flex items-center gap-1 cursor-pointer"
+                      >
+                        <Pencil size={11} />
+                        <span>{showEndDateEditor ? 'Hide' : 'Edit'}</span>
+                      </button>
+                      {isCustomEndDate ? (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            triggerHaptic(5)
+                            setCustomEndDate('')
+                            setShowEndDateEditor(false)
+                          }}
+                          className="btn !py-1 !px-2 text-xs font-bold border-2 border-[var(--border)] text-[var(--present-ink)] bg-[var(--surface)] hover:bg-[var(--surface-2)] flex items-center gap-1 cursor-pointer"
+                          title="Reset to official date"
+                        >
+                          <RotateCcw size={11} />
+                        </button>
+                      ) : null}
+                    </div>
+                  </div>
+
+                  {/* Inline Date Editor */}
+                  {showEndDateEditor ? (
+                    <div className="p-2 rounded bg-[var(--surface-2)] border-2 border-[var(--border)] flex items-center gap-2 flex-wrap text-xs">
+                      <span className="font-semibold text-[var(--text)] text-[0.75rem]">Custom Last Day:</span>
+                      <input
+                        type="date"
+                        min={iso}
+                        value={semesterEndDate}
+                        onChange={(e) => {
+                          if (e.target.value) setCustomEndDate(e.target.value)
+                        }}
+                        className="field !py-1 !px-2 text-xs font-bold text-[var(--text)] bg-[var(--surface)] border border-[var(--border)] rounded"
+                      />
+                      <span className="muted text-[0.7rem]">Official: {fmtDateShort(defaultEndDate)}</span>
+                    </div>
+                  ) : null}
                 </div>
+
+                {/* Target Goal Output Compact Card - Consistent with Tool 1 Output Card */}
+                {!activeRoadmap.isAchievable ? (
+                  /* State 1: Unachievable */
+                  <div className="p-3 rounded border-2 border-[var(--color-absent)] flex items-center justify-between gap-3 bg-[var(--surface-2)]">
+                    <div>
+                      <span className="t-meta block text-[var(--absent-ink)] font-bold">REQUIRED ATTENDANCE</span>
+                      <p className="t-stat mt-0.5 text-[var(--absent-ink)]">
+                        Attend {activeRemainingClasses} of {activeRemainingClasses}
+                      </p>
+                    </div>
+                    <span className="chip !py-1 !px-2.5 text-xs sm:text-sm font-black uppercase bg-[var(--color-absent)] text-[var(--on-accent)] border-2 border-[var(--border)] shrink-0">
+                      Short by {activeRoadmap.deficit}
+                    </span>
+                  </div>
+                ) : activeRoadmap.status === 'safe' ? (
+                  /* State 2: Already Secure */
+                  <div className="p-3 rounded border-2 border-[var(--border)] flex items-center justify-between gap-3 bg-[var(--surface-2)]">
+                    <div>
+                      <span className="t-meta block text-[var(--present-ink)] font-bold">REQUIRED ATTENDANCE</span>
+                      <p className="t-stat mt-0.5 text-[var(--present-ink)]">
+                        Attend 0 of {activeRemainingClasses}
+                      </p>
+                    </div>
+                    <span className="chip !py-1 !px-2.5 text-xs sm:text-sm font-black uppercase bg-[var(--color-present)] text-[var(--on-accent)] border-2 border-[var(--border)] shrink-0">
+                      {activeRemainingClasses} Bunks Left
+                    </span>
+                  </div>
+                ) : (
+                  /* State 3: Achievable */
+                  <div className="p-3 rounded border-2 border-[var(--border)] flex items-center justify-between gap-3 bg-[var(--surface-2)]">
+                    <div>
+                      <span className="t-meta muted block">REQUIRED ATTENDANCE</span>
+                      <p className="t-stat mt-0.5 text-[var(--text)]">
+                        Attend {activeRoadmap.neededToAttend} of {activeRemainingClasses}
+                      </p>
+                    </div>
+                    <span
+                      className="chip !py-1 !px-2.5 text-xs sm:text-sm font-black uppercase border-2 border-[var(--border)] shrink-0"
+                      style={{
+                        background: activeRoadmap.skipsAllowed > 0 ? 'var(--color-present)' : 'var(--color-amber)',
+                        color: 'var(--on-accent)',
+                      }}
+                    >
+                      {activeRoadmap.skipsAllowed > 0 ? `${activeRoadmap.skipsAllowed} Bunks Left` : '0 Bunks Left'}
+                    </span>
+                  </div>
+                )}
               </div>
             </div>
 
@@ -873,6 +1009,209 @@ export default function Attendance() {
                   </p>
                 </div>
               </div>
+            </div>
+
+            {/* All Subjects End-of-Semester Roadmap Table & Cards (Requirement A4) */}
+            <div className="pad-card rounded bg-[var(--surface)] border-2 border-[var(--border)] space-y-3">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b-2 border-[var(--border)] pb-2.5">
+                <div className="flex items-center gap-2">
+                  <ClipboardCheck className="icon-sm text-[var(--present-ink)] shrink-0" />
+                  <span className="t-card-title">
+                    ALL SUBJECTS ROADMAP · {simGoalTarget}% TARGET (UNTIL {fmtDateShort(semesterEndDate)})
+                  </span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <span className="chip !py-0.5 !px-2 text-xs font-bold border-2 border-[var(--border)]">
+                    {allSubjectsRoadmap.length} SUBJECTS
+                  </span>
+                </div>
+              </div>
+
+              <p className="t-body muted text-xs sm:text-sm">
+                Classes left and attendance needed for each subject based on your timetable and holidays. Tap any subject to inspect it in the simulator above.
+              </p>
+
+              {allSubjectsRoadmap.length === 0 ? (
+                <EmptyState
+                  title="NO SUBJECTS FOUND"
+                  body="Your timetable has no active courses. Set up your branch and group in profile or timetable."
+                />
+              ) : (
+                <>
+                  {/* Desktop Table View */}
+                  <div className="hidden md:block overflow-x-auto">
+                    <table className="w-full text-left text-xs sm:text-sm border-collapse">
+                      <thead>
+                        <tr className="border-b-2 border-[var(--border)] text-[var(--muted)] font-black uppercase tracking-wider text-[0.7rem]">
+                          <th className="py-2.5 px-3">Subject</th>
+                          <th className="py-2.5 px-3">Current</th>
+                          <th className="py-2.5 px-3 text-center">Classes Left</th>
+                          <th className="py-2.5 px-3 text-center">Must Attend</th>
+                          <th className="py-2.5 px-3 text-center">Safe Skips</th>
+                          <th className="py-2.5 px-3 text-center">Projected %</th>
+                          <th className="py-2.5 px-3 text-right">Scope</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-[var(--border)] border-b-2 border-[var(--border)]">
+                        {allSubjectsRoadmap.map((c) => {
+                          const r = c.roadmap
+                          const isCurrentScope = simScope === c.key
+                          return (
+                            <tr
+                              key={c.key}
+                              onClick={() => {
+                                triggerHaptic()
+                                setSimScope(c.key)
+                              }}
+                              className={`cursor-pointer transition-colors hover:bg-[var(--surface-2)] ${
+                                isCurrentScope ? 'bg-[var(--surface-2)] font-bold' : ''
+                              }`}
+                            >
+                              <td className="py-2.5 px-3">
+                                <div className="flex items-center gap-2">
+                                  <span
+                                    className="chip !py-0.5 !px-1.5 text-[0.65rem] font-black uppercase border border-[var(--border)] shrink-0"
+                                    style={{ background: c.category === 'LAB' ? 'var(--color-amber)' : 'var(--surface-2)' }}
+                                  >
+                                    {c.category === 'LAB' ? 'LAB' : 'TH'}
+                                  </span>
+                                  <div className="min-w-0">
+                                    <span className="font-bold text-[var(--text)] block truncate max-w-[200px] lg:max-w-[280px]">
+                                      {c.name}
+                                    </span>
+                                    {c.code ? <span className="font-mono text-[0.7rem] text-[var(--muted)]">{c.code}</span> : null}
+                                  </div>
+                                </div>
+                              </td>
+                              <td className="py-2.5 px-3 whitespace-nowrap">
+                                <span className="font-bold text-[var(--text)]">
+                                  {c.tallyData.held === 0 ? '—' : `${c.tallyData.present}/${c.tallyData.held}`}
+                                </span>
+                                <span className="text-[var(--muted)] ml-1 text-xs">
+                                  ({c.tallyData.percent !== null ? `${Math.round(c.tallyData.percent)}%` : '0%'})
+                                </span>
+                              </td>
+                              <td className="py-2.5 px-3 text-center font-bold">
+                                {c.remaining}
+                              </td>
+                              <td className="py-2.5 px-3 text-center whitespace-nowrap">
+                                {!r.isAchievable ? (
+                                  <span className="chip !py-0.5 !px-2 text-xs font-black bg-[var(--color-absent)] text-[var(--on-accent)]">
+                                    Max {r.maxAchievablePercent.toFixed(0)}%
+                                  </span>
+                                ) : r.neededToAttend === 0 ? (
+                                  <span className="chip !py-0.5 !px-2 text-xs font-black bg-[var(--color-present)] text-[var(--on-accent)]">
+                                    0 of {c.remaining}
+                                  </span>
+                                ) : (
+                                  <span className="chip !py-0.5 !px-2 text-xs font-black border-2 border-[var(--border)] bg-[var(--surface-2)] text-[var(--text)]">
+                                    {r.neededToAttend} of {c.remaining}
+                                  </span>
+                                )}
+                              </td>
+                              <td className="py-2.5 px-3 text-center whitespace-nowrap">
+                                {!r.isAchievable ? (
+                                  <span className="text-[var(--absent-ink)] font-bold text-xs">0 skips</span>
+                                ) : (
+                                  <span className="text-[var(--present-ink)] font-bold text-xs">+{r.skipsAllowed} skips</span>
+                                )}
+                              </td>
+                              <td className="py-2.5 px-3 text-center font-bold whitespace-nowrap">
+                                <span style={{ color: STATUS_INK[r.status === 'unachievable' ? 'short' : r.status === 'edge' ? 'edge' : 'safe'] }}>
+                                  {r.projectedPercent.toFixed(1)}%
+                                </span>
+                              </td>
+                              <td className="py-2.5 px-3 text-right">
+                                <button
+                                  type="button"
+                                  onClick={(e) => {
+                                    e.stopPropagation()
+                                    triggerHaptic()
+                                    setSimScope(c.key)
+                                  }}
+                                  className={`chip !py-0.5 !px-2 text-xs cursor-pointer border-2 border-[var(--border)] ${
+                                    isCurrentScope
+                                      ? '!bg-[var(--text)] !text-[var(--bg)] font-bold'
+                                      : 'hover:border-[var(--text)] font-semibold'
+                                  }`}
+                                >
+                                  {isCurrentScope ? 'ACTIVE' : 'SELECT'}
+                                </button>
+                              </td>
+                            </tr>
+                          )
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
+
+                  {/* Mobile Cards View */}
+                  <div className="grid grid-cols-1 gap-2.5 md:hidden">
+                    {allSubjectsRoadmap.map((c) => {
+                      const r = c.roadmap
+                      const isCurrentScope = simScope === c.key
+                      return (
+                        <div
+                          key={c.key}
+                          onClick={() => {
+                            triggerHaptic()
+                            setSimScope(c.key)
+                          }}
+                          className={`p-3 rounded border-2 cursor-pointer transition-all ${
+                            isCurrentScope
+                              ? 'border-[var(--text)] bg-[var(--surface-2)] shadow-hard-sm'
+                              : 'border-[var(--border)] bg-[var(--surface)] hover:border-[var(--text)]'
+                          }`}
+                        >
+                          <div className="flex items-center justify-between gap-2 mb-2">
+                            <div className="min-w-0">
+                              <span className="font-bold text-[var(--text)] text-sm block truncate">{c.name}</span>
+                              {c.code ? <span className="font-mono text-xs text-[var(--muted)]">{c.code}</span> : null}
+                            </div>
+                            <span
+                              className="chip !py-0.5 !px-2 text-xs font-black uppercase border border-[var(--border)] shrink-0"
+                              style={{
+                                background: !r.isAchievable ? 'var(--color-absent)' : r.neededToAttend === 0 ? 'var(--color-present)' : 'var(--surface-2)',
+                                color: !r.isAchievable || r.neededToAttend === 0 ? 'var(--on-accent)' : 'var(--text)',
+                              }}
+                            >
+                              {!r.isAchievable ? `SHORT ${r.deficit}` : r.neededToAttend === 0 ? 'SECURE' : `${r.neededToAttend}/${c.remaining} REQ`}
+                            </span>
+                          </div>
+
+                          <div className="grid grid-cols-3 gap-2 text-center text-xs py-1.5 border-t border-b border-[var(--border)] my-1.5">
+                            <div>
+                              <span className="t-meta muted block text-[0.65rem]">CURRENT</span>
+                              <span className="font-bold text-[var(--text)]">
+                                {c.tallyData.percent !== null ? `${Math.round(c.tallyData.percent)}%` : '—'}
+                              </span>
+                            </div>
+                            <div>
+                              <span className="t-meta muted block text-[0.65rem]">CLASSES LEFT</span>
+                              <span className="font-bold text-[var(--text)]">{c.remaining}</span>
+                            </div>
+                            <div>
+                              <span className="t-meta muted block text-[0.65rem]">SAFE SKIPS</span>
+                              <span className={`font-bold ${!r.isAchievable ? 'text-[var(--absent-ink)]' : 'text-[var(--present-ink)]'}`}>
+                                {!r.isAchievable ? '0' : `+${r.skipsAllowed}`}
+                              </span>
+                            </div>
+                          </div>
+
+                          <div className="flex items-center justify-between gap-2 text-xs pt-1">
+                            <span className="muted text-[0.7rem]">
+                              {!r.isAchievable ? `Max possible: ${r.maxAchievablePercent.toFixed(1)}%` : `Final: ${r.projectedPercent.toFixed(1)}%`}
+                            </span>
+                            <span className={`text-[0.7rem] font-bold ${isCurrentScope ? 'text-[var(--text)] underline' : 'text-[var(--muted)]'}`}>
+                              {isCurrentScope ? 'Selected Scope' : 'Tap to select'}
+                            </span>
+                          </div>
+                        </div>
+                      )
+                    })}
+                  </div>
+                </>
+              )}
             </div>
           </Panel>
         ) : null}

@@ -25,6 +25,7 @@ export const KEYS = {
   cgpaSemesters: 'kkr.cgpa.semesters',
   notificationsRead: 'kkr.notifications.read',
   swipeRollcall: 'kkr.rollcall.swipe',
+  semesterEndDate: 'kkr.attendance.semesterEndDate',
 }
 
 // Every key this app owns starts here. The backup walks the prefix rather

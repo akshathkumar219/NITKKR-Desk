@@ -68,6 +68,17 @@ export function getCalendarByTerm(termKey = CURRENT_TERM) {
   )
 }
 
+/**
+ * Resolves the official date when teaching closes for the current academic term.
+ * Looks up 'Teaching Closes' event in the official calendar.
+ */
+export function getDefaultSemesterEndDate(now = new Date()) {
+  const termKey = getCurrentTerm(now)
+  const cal = getCalendarByTerm(termKey)
+  const event = cal?.events?.find((e) => e.label?.toLowerCase().includes('teaching closes'))
+  return event?.date || (termKey === 'even' ? '2027-04-30' : '2026-12-04')
+}
+
 const term = getCalendarByTerm(CURRENT_TERM)
 
 export const CALENDAR = {

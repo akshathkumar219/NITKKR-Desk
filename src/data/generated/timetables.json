@@ -5071,12 +5071,12 @@
         "day": "THU",
         "start": 880,
         "end": 990,
-        "name": "Object-Oriented Programming using Java",
-        "code": "CSPC-205",
+        "name": "Object-Oriented Programming using Java Lab",
+        "code": "CSPC-205 (P)",
         "room": "",
         "group": "A1",
         "instructor": "Dr. Banhi Sanyal",
-        "type": "lecture",
+        "type": "lab",
         "id": "hb23u"
       },
       {

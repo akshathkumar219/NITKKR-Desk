@@ -21,8 +21,12 @@ export function useRollcall() {
   const setMark = useCallback(
     (iso, sessionId, mark) =>
       setMarks((prev) => {
-        const key = markKey(iso, sessionId)
+        const canonicalId = sessionId === 'av9iz1' ? 'hb23u' : sessionId
+        const key = markKey(iso, canonicalId)
         const next = { ...prev }
+        if (canonicalId === 'hb23u') {
+          delete next[markKey(iso, 'av9iz1')]
+        }
         // Setting null or clicking the active mark again clears it.
         if (!mark || next[key] === mark) delete next[key]
         else next[key] = mark
@@ -75,7 +79,13 @@ export function useRollcall() {
   )
 
   const getMark = useCallback(
-    (iso, sessionId) => marks[markKey(iso, sessionId)] ?? null,
+    (iso, sessionId) => {
+      const key = markKey(iso, sessionId)
+      if (marks[key] !== undefined) return marks[key]
+      if (sessionId === 'hb23u') return marks[markKey(iso, 'av9iz1')] ?? null
+      if (sessionId === 'av9iz1') return marks[markKey(iso, 'hb23u')] ?? null
+      return null
+    },
     [marks],
   )
 
@@ -143,16 +153,21 @@ export function tally(
     const sep = key.indexOf('|')
     const iso = key.slice(0, sep)
     const sid = key.slice(sep + 1)
-    if (!ids.has(sid)) continue
+    let matchingSid = sid
+    if (!ids.has(matchingSid)) {
+      if (sid === 'hb23u' && ids.has('av9iz1')) matchingSid = 'av9iz1'
+      else if (sid === 'av9iz1' && ids.has('hb23u')) matchingSid = 'hb23u'
+      else continue
+    }
     if (!inWindow(iso, since)) continue
-    let weight = weights[sid]
+    let weight = weights[matchingSid] ?? weights[sid]
     if (weight == null || isNaN(weight) || weight === 2) {
-      const sess = getSessionById(sid)
+      const sess = getSessionById(matchingSid) || getSessionById(sid)
       weight =
         sess?.attendanceCredits && sess.attendanceCredits !== 2
           ? Number(sess.attendanceCredits)
           : 1
-      weights[sid] = weight
+      weights[matchingSid] = weight
     }
     if (mark === 'present') present += weight
     else if (mark === 'absent') absent += weight

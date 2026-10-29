@@ -64,7 +64,7 @@ source: Dept. of Computer Engineering Odd Sem 2026-27 Time Table
 | 11:35 | 12:30 | Design and Analysis of Algorithms      | CSPC-201     | LHC 105 | A1+A2 | Dr. Vijay Verma       | lecture |
 | 11:35 | 12:30 | Object-Oriented Programming using Java | CSPC-205     | LHC 202 | B3+B4 | Dr. Banhi Sanyal      | lecture |
 | 12:30 | 14:40 | Break                                  |              |         | A1+B3+B4 |                    | break   |
-| 14:40 | 16:30 | Object-Oriented Programming using Java | CSPC-205     |         | A1    | Dr. Banhi Sanyal      | lecture |
+| 14:40 | 16:30 | Object-Oriented Programming using Java Lab | CSPC-205 (P) |         | A1    | Dr. Banhi Sanyal      | lab     |
 | 14:40 | 15:35 | Discrete Mathematics & Statistical Methods | MAIC-201 | LHC 202 | B3+B4 | Dr. Saraswati Yadav   | lecture |
 
 ## FRI

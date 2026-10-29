@@ -1379,6 +1379,83 @@ function migrateAttendanceRequirement() {
 migrateAttendanceRequirement()
 
 // ---------------------------------------------------------------------------
+// One-time migration — CSE 2nd Year Thursday 14:40 Java Lab (hb23u)
+//
+// In earlier versions, this Thursday 2:40-4:30 PM slot was listed as a lecture
+// with code CSPC-205. Any user who edited this session (e.g. customized the title
+// to "OOPS JAVA") had `type: 'lecture'` saved in their stored board overrides
+// (KEYS.board). This migration updates the stored override so it is recognized
+// as a lab (type: 'lab', code: 'CSPC-205 (P)'), while preserving all custom
+// names, instructors, rooms, and notes. It also ensures any attendance marks
+// logged under alias ID 'av9iz1' are consolidated to 'hb23u'.
+// ---------------------------------------------------------------------------
+
+function migrateCs01JavaLabSession() {
+  if (typeof window === 'undefined') return
+  const FLAG = 'kkr.migrations.cs01_java_lab_v1'
+  try {
+    if (localStorage.getItem(FLAG)) return
+
+    const board = read(KEYS.board, null)
+    if (board && typeof board === 'object') {
+      let changed = false
+      const nextBoard = { ...board }
+      for (const [k, override] of Object.entries(nextBoard)) {
+        if (override?.moved?.['hb23u']) {
+          const mv = override.moved['hb23u']
+          const updatedMv = { ...mv }
+          if (updatedMv.type === 'lecture' || !updatedMv.type) {
+            updatedMv.type = 'lab'
+            changed = true
+          }
+          if (updatedMv.code === 'CSPC-205' || !updatedMv.code) {
+            updatedMv.code = 'CSPC-205 (P)'
+            changed = true
+          }
+          if (updatedMv.name === 'Object-Oriented Programming using Java') {
+            updatedMv.name = 'Object-Oriented Programming using Java Lab'
+            changed = true
+          }
+          nextBoard[k] = {
+            ...override,
+            moved: {
+              ...override.moved,
+              ['hb23u']: updatedMv,
+            },
+          }
+        }
+      }
+      if (changed) write(KEYS.board, nextBoard)
+    }
+
+    // Consolidate any rollcall marks recorded under av9iz1 to hb23u
+    const rollcall = read(KEYS.rollcall, null)
+    if (rollcall && typeof rollcall === 'object') {
+      let rcChanged = false
+      const nextRollcall = { ...rollcall }
+      for (const [key, val] of Object.entries(nextRollcall)) {
+        if (key.endsWith('|av9iz1')) {
+          const iso = key.slice(0, key.indexOf('|'))
+          const targetKey = `${iso}|hb23u`
+          if (!nextRollcall[targetKey]) {
+            nextRollcall[targetKey] = val
+          }
+          delete nextRollcall[key]
+          rcChanged = true
+        }
+      }
+      if (rcChanged) write(KEYS.rollcall, nextRollcall)
+    }
+
+    localStorage.setItem(FLAG, '1')
+  } catch {
+    // Best-effort
+  }
+}
+
+migrateCs01JavaLabSession()
+
+// ---------------------------------------------------------------------------
 // Notifications
 // ---------------------------------------------------------------------------
 

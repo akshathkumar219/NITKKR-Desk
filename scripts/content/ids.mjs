@@ -38,6 +38,17 @@ function fnv1a(str) {
  */
 export function sessionId({ branch, year, day, start, code, name }) {
   const subject = (code || name || '').trim().toUpperCase()
+  // Legacy ID preservation: CSE-2 THU 14:40 Java Lab originally used code CSPC-205 (id hb23u).
+  // Keep hb23u so students' logged attendance history remains intact.
+  if (
+    branch === 'CSE' &&
+    String(year) === '2' &&
+    day === 'THU' &&
+    Number(start) === 880 &&
+    (subject === 'CSPC-205 (P)' || subject === 'CSPC-205' || subject.includes('JAVA'))
+  ) {
+    return 'hb23u'
+  }
   return fnv1a(`${branch}|${year}|${day}|${start}|${subject}`)
 }
 

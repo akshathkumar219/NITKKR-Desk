@@ -14,9 +14,9 @@
 // consume, so the pipeline stayed invisible to every component.
 // ---------------------------------------------------------------------------
 
-import links from './generated/links.json'
-import landmarksJson from './generated/landmarks.json'
-import calendarJson from './generated/calendar.json'
+import links from './generated/links.json' with { type: 'json' }
+import landmarksJson from './generated/landmarks.json' with { type: 'json' }
+import calendarJson from './generated/calendar.json' with { type: 'json' }
 
 const rows = (dataset, section = 'DEFAULT') => links[dataset]?.[section] ?? []
 

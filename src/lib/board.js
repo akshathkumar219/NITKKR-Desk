@@ -44,8 +44,19 @@ export function useBoard(branch, year) {
 
     for (const s of published) {
       if (removed.has(s.id)) continue
-      const mv = override.moved[s.id]
-      out.push(withCredits(mv ? { ...s, ...mv } : s))
+      let sess = s
+      if (override.moved[s.id]) {
+        const mv = override.moved[s.id]
+        sess = { ...s, ...mv }
+        // Ensure hb23u is always recognized as lab even if an older saved override had type: 'lecture'
+        if (s.id === 'hb23u') {
+          sess.type = 'lab'
+          if (!sess.code || sess.code === 'CSPC-205') {
+            sess.code = 'CSPC-205 (P)'
+          }
+        }
+      }
+      out.push(withCredits(sess))
     }
     for (const s of override.added) {
       if (removed.has(s.id)) continue
@@ -170,11 +181,13 @@ export function sessionsForDay(sessions, day, group, includeAutoBreaks = false) 
 /** Unique course key for a session block (distinguishing Labs from Theory). */
 export function courseKeyForSession(s) {
   if (!s) return ''
-  const isLab = s.type === 'lab' || (s.name || '').toUpperCase().includes('LAB')
+  const isLab = s.type === 'lab' || (s.name || '').toUpperCase().includes('LAB') || s.id === 'hb23u'
   const baseCode = s.code || s.name || ''
-  return isLab
-    ? (baseCode.toUpperCase().includes('LAB') || baseCode.includes('(P)') ? baseCode : `${baseCode} (Lab)`)
-    : baseCode
+  if (isLab) {
+    if (baseCode === 'CSPC-205' || baseCode === 'CSPC 205') return 'CSPC-205 (P)'
+    return (baseCode.toUpperCase().includes('LAB') || baseCode.includes('(P)') ? baseCode : `${baseCode} (Lab)`)
+  }
+  return baseCode
 }
 
 /** Distinct courses (excludes breaks) — the roll-call subject list. */

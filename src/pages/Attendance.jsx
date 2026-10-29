@@ -32,7 +32,7 @@ import SessionModal from '../components/SessionModal'
 import SubjectModal from '../components/SubjectModal'
 import { EmptyState, Field, Modal, Panel, Ring } from '../ui'
 import { useProfile, useRollcallSettings, useAllSubjectsData, useStored, KEYS } from '../lib/storage'
-import { coursesOf, filterSessionsByGroup, useBoard } from '../lib/board'
+import { courseKeyForSession, coursesOf, filterSessionsByGroup, useBoard } from '../lib/board'
 import { getDefaultSemesterEndDate } from '../data/info'
 import { branchName } from '../data/campus'
 import {
@@ -431,7 +431,7 @@ export default function Attendance() {
   function handleSaveSubject(updatedSubject) {
     if (!subjectModal.course) return
     const courseKey = subjectModal.course.key
-    const matchingSessions = sessions.filter((s) => (s.code || s.name) === courseKey)
+    const matchingSessions = sessions.filter((s) => courseKeyForSession(s) === courseKey || (s.code || s.name) === courseKey)
     for (const s of matchingSessions) {
       moveSession(s.id, {
         name: updatedSubject.name,
@@ -445,7 +445,7 @@ export default function Attendance() {
 
   // Handle deleting an entire course and all its timetable slots
   function handleDeleteSubject(courseKey) {
-    const matchingSessions = sessions.filter((s) => (s.code || s.name) === courseKey)
+    const matchingSessions = sessions.filter((s) => courseKeyForSession(s) === courseKey || (s.code || s.name) === courseKey)
     for (const s of matchingSessions) {
       removeSession(s.id)
     }

@@ -31,6 +31,7 @@ import { baseTimetable, groupsFor } from '../data/timetables'
 import { getNoClassEvent } from '../data/info'
 import { useProfile, useRollcallSettings, useSwipeRollcall } from '../lib/storage'
 import {
+  courseKeyForSession,
   coursesOf,
   filterSessionsByGroup,
   gridBounds,
@@ -1712,8 +1713,8 @@ export default function Board() {
     for (const c of courses) {
       const res = tally(marks, c.sessions, since)
       map[c.key] = res
-      if (c.code) map[c.code] = res
-      if (c.name) map[c.name] = res
+      if (c.code && !map[c.code]) map[c.code] = res
+      if (c.name && !map[c.name]) map[c.name] = res
     }
     return map
   }, [sessions, marks, since])
@@ -2251,7 +2252,7 @@ export default function Board() {
                 {dayList.map((s) => {
                   const isLive = isLiveSession(s, today, currentMins)
                   const isNext = today === day && nextSess?.id === s.id && !isLive
-                  const courseKey = s.key || s.code || s.name
+                  const courseKey = courseKeyForSession(s) || s.key || s.code || s.name
                   const tallyData = subjectStats[courseKey] || subjectStats[s.code] || subjectStats[s.name]
 
                   if (s.type === 'break') {

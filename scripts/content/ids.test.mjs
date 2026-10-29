@@ -118,6 +118,21 @@ check('duplicate rows are suffixed, not silently merged', () => {
   eq(sessions[1].id, `${sessions[0].id}-2`, 'Unexpected suffix format.')
 })
 
+check('CSE-2 THU 14:40 Java Lab preserves legacy ID hb23u', () => {
+  eq(
+    sessionId({
+      branch: 'CSE',
+      year: '2',
+      day: 'THU',
+      start: 880,
+      code: 'CSPC-205 (P)',
+      name: 'Object-Oriented Programming using Java Lab',
+    }),
+    'hb23u',
+    'The Java lab ID hb23u must be preserved for attendance continuity.',
+  )
+})
+
 // Guard against an accidental change to the hash itself. If this fails and the
 // change was deliberate, every deployed user's attendance detaches — so it
 // should fail loudly rather than be quietly updated.
